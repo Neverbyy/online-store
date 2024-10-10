@@ -1,0 +1,33 @@
+
+body{
+    font-family: 'Robto', sans-serif;
+    font-weight: 600;
+    line-height: 1.08;
+    color: var(--color-black);
+    overflow: auto;
+
+}
+
+button,
+input,
+textarea,
+svg *{
+    transition-duration: var(--transition-duration);
+}
+
+a{
+    text-decoration: none;
+}
+
+button{
+    border: none;
+    background-color: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.container{
+    width: 100%;
+    max-width: var(--container-width);
+    margin: 0 auto;
+}
