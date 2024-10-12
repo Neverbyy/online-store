@@ -16,6 +16,9 @@ export default {
     }
   },
   actions: {
+    setActiveItem({ commit }, index) {
+      commit('SET_ACTIVE_ITEM', index);
+    },
     async fetchContact({ commit }) {
       try {
         const user = JSON.parse(localStorage.getItem('user'));
