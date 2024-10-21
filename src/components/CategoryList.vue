@@ -8,7 +8,7 @@ const addToCart = (product) => {
   store.dispatch('cart/addToCart', product);
 }
 
-defineProps({
+const props = defineProps({
   products: Array
 })
 

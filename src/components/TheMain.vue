@@ -3,7 +3,7 @@ import catalog from './catalog.vue';
 import SalesList from './salesList.vue';
 import Slider from './slider.vue';
 
-defineProps({
+const props = defineProps({
   products: Array,
   sales: Array
 })

@@ -14,7 +14,7 @@ onMounted(() => {
 });
 
 
-defineProps({
+const props = defineProps({
   products: Array,
   sales: Array
 })

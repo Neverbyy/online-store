@@ -10,7 +10,7 @@ onMounted(() => {
   store.dispatch('fetchProducts');
 });
 
-defineProps({
+const props = defineProps({
   products: Array
 })
 </script>

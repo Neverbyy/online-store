@@ -7,7 +7,7 @@ const route = useRoute();
 
 const isHomePage = computed(() => route.name === 'Home');
 
-defineProps({
+const props = defineProps({
   products: Array
 })
 </script>

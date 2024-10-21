@@ -25,7 +25,7 @@ onMounted(async () => {
 });
 
 
-defineProps({
+const props = defineProps({
   products: Array
 })
 
