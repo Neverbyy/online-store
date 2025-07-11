@@ -18,11 +18,12 @@ app.get('/', (req, res) => {
   res.send('<h1>Добро пожаловать на наш сервер!</h1><p>Используйте API для регистрации и входа в систему.</p>');
 });
 
-// Регистрация пользователя
+// Возвращает список зарегистрированных пользователей
 app.get('/api/register', (req, res) => {
-  res.send('<h1>Регистер</h1>');
+  res.json(users);
 });
 
+// Регистрация пользователя
 app.post('/api/register', async (req, res) => {
   const { phone, password } = req.body;
 
@@ -35,8 +36,12 @@ app.post('/api/register', async (req, res) => {
   // Хеширование пароля перед сохранением
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Создание нового пользователя
-  const newUser = { phone, password: hashedPassword };
+  // Создание нового пользователя с уникальным ID
+  const newUser = { 
+    id: users.length + 1, // Уникальный ID (можно заменить на UUID, если нужно)
+    phone, 
+    password: hashedPassword 
+  };
   users.push(newUser);
 
   res.status(201).json({ message: 'Пользователь успешно зарегистрирован', user: newUser });
@@ -61,18 +66,25 @@ app.post('/api/login', async (req, res) => {
   res.status(200).json({ message: 'Вход выполнен успешно', user });
 });
 
+// Обновление номера телефона
 app.put('/api/profile', async (req, res) => {
-  const { phone } = req.body;
+  const { id, phone } = req.body;
 
-  // Здесь вам нужно будет определить, как вы идентифицируете текущего пользователя
-  // Например, через токен или сессию
-  const user = users.find(user => user.phone === phone);
+  // Проверка наличия пользователя с таким ID
+  const user = users.find(user => user.id === id);
   if (!user) {
     return res.status(404).json({ message: 'Пользователь не найден' });
   }
 
-  user.phone = phone; // Обновляем номер телефона
-  res.status(200).json({ message: 'Номер телефона обновлен', user });
+  // Проверка, используется ли новый номер телефона другим пользователем
+  const phoneExists = users.some(user => user.phone === phone && user.id !== id);
+  if (phoneExists) {
+    return res.status(400).json({ message: 'Этот номер телефона уже используется' });
+  }
+
+  // Обновляем номер телефона
+  user.phone = phone;
+  res.status(200).json({ message: 'Номер телефона успешно обновлен', user });
 });
 
 // Запуск сервера

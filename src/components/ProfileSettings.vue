@@ -51,4 +51,7 @@ onMounted(() => {
 .confirm {
   margin-top: 20px;
 }
+.logout-button{
+  margin-top: 10px;
+}
 </style>

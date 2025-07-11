@@ -30,7 +30,14 @@ export default {
     async updateContact({ commit }, contact) {
       commit('SET_CONTACT', contact);
       try {
-        await axios.put('http://localhost:5000/api/profile', { phone: contact });
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && user.id) {
+          await axios.put('http://localhost:5000/api/profile', { id: user.id, phone: contact });
+    
+          // Обновление локального хранилища пользователя
+          user.phone = contact;
+          localStorage.setItem('user', JSON.stringify(user));
+        }
       } catch (error) {
         console.error('Ошибка при обновлении номера телефона:', error);
       }
