@@ -23,6 +23,7 @@ const props = defineProps({
         :name="sale.name"
         :imageUrl="sale.image"
         :price="sale.price"
+        :oldPrice="sale.oldPrice"
         :addToCart="() => addToCart(sale)"
         />
     </div>

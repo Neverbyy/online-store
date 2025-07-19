@@ -72,4 +72,19 @@ const handleAddToCart = () => {
 .category__main-image{
   max-width: 200px;
 }
+
+// Стили для названий товаров
+.category__main-details-left h2 {
+  color: var(--color-black);
+}
+
+// Также добавим стили для ссылок, чтобы они не меняли цвет при наведении
+.category__main-details-left a {
+  color: var(--color-black);
+  text-decoration: none;
+  
+  &:hover {
+    color: var(--color-black);
+  }
+}
 </style>

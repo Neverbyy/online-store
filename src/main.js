@@ -11,4 +11,5 @@ createApp(App)
     .use(router)
     .mount('#app');
 
+
 store.dispatch('cart/loadCart');

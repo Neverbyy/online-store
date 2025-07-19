@@ -19,5 +19,7 @@ const props = defineProps({
 
 
 <style lang="scss" scoped>
-
+  .main__list-item-inner-name{
+    color: black;
+  }
 </style>

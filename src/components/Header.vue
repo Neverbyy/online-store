@@ -11,6 +11,7 @@ const cartLength = computed(() => cart.value.length);
 
 const isModalVisible = ref(false);
 const modalType = ref('');
+const authMessage = ref('');
 
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
 
@@ -21,6 +22,7 @@ const openModal = (type) => {
 
 const closeModal = () => {
   isModalVisible.value = false;
+  authMessage.value = '';
 };
 
 const handleAuthSubmit = async (payload) => {
@@ -43,6 +45,11 @@ const handleAuthSubmit = async (payload) => {
       alert('Произошла ошибка. Пожалуйста, попробуйте снова.');
     }
   }
+};
+
+const handleAuthWarning = (event) => {
+  authMessage.value = event.detail;
+  showLoginModal();
 };
 
 const searchText = ref('');
@@ -77,8 +84,15 @@ const switchModalType = (type) => {
 };
 
 onMounted(() => {
+  window.addEventListener('open-auth-modal', showLoginModal);
+  window.addEventListener('auth-warning', handleAuthWarning);
   store.dispatch('fetchItems');
 });
+
+
+const showLoginModal = () => {
+  openModal('login');
+};
 </script>
 
 <template>
@@ -88,11 +102,7 @@ onMounted(() => {
         <h2>GLANCE</h2>
       </router-link>
 
-      <search 
-        @update:searchText="updateSearchText"
-        @focus="onSearchFocus"
-        @blur="onSearchBlur"
-      />
+      <search @update:searchText="updateSearchText" @focus="onSearchFocus" @blur="onSearchBlur" />
 
       <div class="header__navbar">
         <ul class="header__navbar-list">
@@ -101,10 +111,10 @@ onMounted(() => {
               <img class="header__navbar-image" src="/src/assets/catalog.svg" alt=""><span>Каталог</span>
             </li>
           </router-link>
-          
+
           <router-link to="/cart">
             <li class="header__navbar-item">
-              <span :class="['cart-count', {green: cartLength >= 1}]">{{ cartLength  }}</span>
+              <span :class="['cart-count', { green: cartLength >= 1 }]">{{ cartLength }}</span>
               <img class="header__navbar-image" src="/src/assets/cart.svg" alt=""><span>Корзина</span>
             </li>
           </router-link>
@@ -122,14 +132,8 @@ onMounted(() => {
             </li>
           </template>
         </ul>
-        <AuthModal 
-          v-if="isModalVisible" 
-          :visible="isModalVisible" 
-          :type="modalType" 
-          @close="closeModal" 
-          @submit="handleAuthSubmit"
-          @switch="switchModalType"
-        />
+        <AuthModal v-if="isModalVisible" :visible="isModalVisible" :type="modalType" :message="authMessage" @close="closeModal"
+          @submit="handleAuthSubmit" @switch="switchModalType" />
       </div>
     </div>
     <div v-if="filteredItems.length > 0 && isSearchFocused" class="search-results">
@@ -180,16 +184,16 @@ onMounted(() => {
 }
 
 .cart-count {
-    position: absolute;
-    top: 10px;
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
+  position: absolute;
+  top: 10px;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
 
 }
 

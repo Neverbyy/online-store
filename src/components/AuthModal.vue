@@ -13,6 +13,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  message: {
+    type: String,
+    default: '',
+  }
 });
 
 const emit = defineEmits(['close', 'submit', 'switch']);
@@ -72,6 +76,11 @@ const switchLinkText = computed(() =>
     <div class="modal-content">
       <button class="close-button" @click="closeModal">&times;</button>
       <h2>{{ modalTitle }}</h2>
+
+      <div v-if="props.message" class="auth-warning">
+        {{ props.message }}
+      </div>
+
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <FormInput
@@ -99,6 +108,16 @@ const switchLinkText = computed(() =>
 </template>
   
   <style scoped>
+  .auth-warning {
+    background-color: #ffe5e5;
+    color: #c00;
+    padding: 10px;
+    border: 1px solid #c00;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    text-align: center;
+  }
   .modal-overlay {
     position: fixed;
     top: 0;

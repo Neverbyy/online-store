@@ -119,6 +119,39 @@ const toggleShowAll = (filterKey) => {
 
 
 <style lang="scss" scoped>
+.sidebar-input input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #0018A8;
+  border-radius: 6px;
+  margin-right: 8px;
+  cursor: pointer;
+  position: relative;
+  background-color: white;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+}
+
+/* Галочка */
+.sidebar-input input[type="checkbox"]::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 8px;
+  width: 6px;
+  height: 12px;
+  border: solid #0018A8;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-input input[type="checkbox"]:checked::after {
+  opacity: 1;
+}
     .sidebar{
         padding: 16px;
         border: 1px solid #ddd;
