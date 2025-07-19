@@ -135,7 +135,6 @@ input, textarea {
   margin: 20px 0px;
   &__inner{
     display: flex;
-  cursor: pointer;
   }
 }
 .star {

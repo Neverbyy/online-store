@@ -48,7 +48,7 @@ const handleAddToCart = () => {
       <div class="category__main-details-right">
         <div :class="['added-to-cart', { show: showAddedMessage }]" >Товар добавлен!</div>
         <div :class="['max-quantity', { show: showMaxQuantityMessage }]">Лимит достигнут!</div>
-        <h2>{{ props.product.price }} Руб.</h2>
+        <h2 class="category__main-details-right-price">{{ props.product.price }} Руб.</h2>
         <div class="category__main-details-right-btns">
           <svg class="main__list-item-inner-like" width="32" height="32" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="19" y="19" width="40" height="40" rx="8"/>
@@ -67,6 +67,10 @@ const handleAddToCart = () => {
 <style lang="scss" scoped>
 .category__main-details-right{
   position: relative;
+  display: flex;
+  gap: 15px;
+  flex-direction: column;
+  align-self: center;
 }
 
 .category__main-image{
@@ -87,4 +91,10 @@ const handleAddToCart = () => {
     color: var(--color-black);
   }
 }
+
+.category__main-details-right-price{
+  text-align: right;
+}
+
+
 </style>

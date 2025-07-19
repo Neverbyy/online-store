@@ -55,5 +55,6 @@ const closeModal = () => {
 .star{
   font-size: 1.5rem;
   color: #750DC5;
+  cursor: pointer;
 }
 </style>
