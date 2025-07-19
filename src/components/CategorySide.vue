@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, nextTick } from 'vue';
 
 const props = defineProps({
   selectedFilters: {
@@ -19,43 +19,67 @@ const props = defineProps({
 
 const emit = defineEmits(['filterChange', 'priceChange']);
 
+// Отслеживаем изменения priceRange извне
+watch(() => props.priceRange, (newRange) => {
+  nextTick(() => {
+    updateSliderTrack(newRange);
+  });
+}, { deep: true });
+
 const updatePriceRange = (type, value) => {
-  // Убираем все нечисловые символы, кроме цифр
-  const cleanValue = value.replace(/[^\d]/g, '');
-  
-  // Преобразуем в число
-  let numValue = parseInt(cleanValue) || 0;
-  
-  // Ограничиваем максимальное значение
-  if (numValue > 300000) {
-    numValue = 300000;
-  }
-  
+  const numValue = parseInt(value) || 0;
   const newRange = [...props.priceRange];
+  
   if (type === 'min') {
     // Минимальная цена не может быть больше максимальной
-    if (numValue > newRange[1]) {
-      numValue = newRange[1];
-    }
-    newRange[0] = numValue;
+    const maxValue = Math.min(numValue, newRange[1]);
+    newRange[0] = maxValue;
   } else {
     // Максимальная цена не может быть меньше минимальной
-    if (numValue < newRange[0]) {
-      numValue = newRange[0];
-    }
-    newRange[1] = numValue;
+    const minValue = Math.max(numValue, newRange[0]);
+    newRange[1] = minValue;
   }
   
+  // Обновляем трек немедленно для синхронизации
+  updateSliderTrack(newRange);
   emit('priceChange', newRange);
 };
 
-const applyFilters = () => {
-  // Вызов метода для применения фильтров
+const updateSliderTrack = (range) => {
+  const minPercent = (range[0] / 300000) * 100;
+  const maxPercent = (range[1] / 300000) * 100;
+  
+  const track = document.querySelector('.slider-track');
+  if (track) {
+    track.style.setProperty('--min-percent', `${minPercent}%`);
+    track.style.setProperty('--max-percent', `${maxPercent}%`);
+  }
+};
+
+const handleSliderStart = () => {
+  // Добавляем класс для более плавной анимации при перетаскивании
+  const track = document.querySelector('.slider-track');
+  if (track) {
+    track.classList.add('dragging');
+  }
+};
+
+const handleSliderEnd = () => {
+  // Убираем класс после окончания перетаскивания
+  const track = document.querySelector('.slider-track');
+  if (track) {
+    track.classList.remove('dragging');
+  }
 };
 
 const resetFilters = () => {
   // Сброс диапазона цен
-  emit('priceChange', [0, 300000]);
+  const newPriceRange = [0, 300000];
+  emit('priceChange', newPriceRange);
+  // Обновляем визуальное отображение ползунка
+  nextTick(() => {
+    updateSliderTrack(newPriceRange);
+  });
   // Сброс всех фильтров
   emit('filterChange', 'brand', []);
   emit('filterChange', 'memory', []);
@@ -141,6 +165,10 @@ const toggleShowAll = (filterKey) => {
   filter.showAll = !filter.showAll;
 };
 
+onMounted(() => {
+  updateSliderTrack(props.priceRange);
+});
+
 </script>
 
 <template>
@@ -150,32 +178,36 @@ const toggleShowAll = (filterKey) => {
             <div class="sidebar-inner">
                 <h3>Цена, ₽</h3>
                 <div class="price-range">
-                  <div class="price-inputs">
-                    <div class="price-input-wrapper">
-                      <input 
-                        type="text" 
-                        class="price-input"
-                        :value="priceRange[0].toLocaleString()"
-                        @input="updatePriceRange('min', $event.target.value)"
-                        @blur="updatePriceRange('min', $event.target.value)"
-                        @keyup.enter="updatePriceRange('min', $event.target.value)"
-                        placeholder="от"
-                      />
-                      <span class="price-currency">₽</span>
-                    </div>
-                    <div class="price-separator"></div>
-                    <div class="price-input-wrapper">
-                      <input 
-                        type="text" 
-                        class="price-input"
-                        :value="priceRange[1].toLocaleString()"
-                        @input="updatePriceRange('max', $event.target.value)"
-                        @blur="updatePriceRange('max', $event.target.value)"
-                        @keyup.enter="updatePriceRange('max', $event.target.value)"
-                        placeholder="до"
-                      />
-                      <span class="price-currency">₽</span>
-                    </div>
+                  <div class="price-slider">
+                    <div class="slider-track"></div>
+                    <input 
+                      type="range" 
+                      class="slider-input slider-min"
+                      :min="0"
+                      :max="300000"
+                      :value="priceRange[0]"
+                      @input="updatePriceRange('min', $event.target.value)"
+                      @mousedown="handleSliderStart"
+                      @mouseup="handleSliderEnd"
+                      @touchstart="handleSliderStart"
+                      @touchend="handleSliderEnd"
+                    />
+                    <input 
+                      type="range" 
+                      class="slider-input slider-max"
+                      :min="0"
+                      :max="300000"
+                      :value="priceRange[1]"
+                      @input="updatePriceRange('max', $event.target.value)"
+                      @mousedown="handleSliderStart"
+                      @mouseup="handleSliderEnd"
+                      @touchstart="handleSliderStart"
+                      @touchend="handleSliderEnd"
+                    />
+                  </div>
+                  <div class="price-values">
+                    <span class="price-value">{{ priceRange[0].toLocaleString() }} ₽</span>
+                    <span class="price-value">{{ priceRange[1].toLocaleString() }} ₽</span>
                   </div>
                 </div>
                 <div 
@@ -206,7 +238,6 @@ const toggleShowAll = (filterKey) => {
                 </div>
                 
                 <div class="sidebar-btns">
-                  <button class="btn-accept">Применить</button>
                   <button class="btn-reset" @click="resetFilters">Сбросить фильтры</button>
                 </div>
             </div>
@@ -297,56 +328,118 @@ const toggleShowAll = (filterKey) => {
 .price-range {
   margin-bottom: 15px;
   
-  .price-inputs {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .price-input-wrapper {
+  .price-slider {
     position: relative;
-    flex: 1;
-  }
-  
-  .price-input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #f8f9fa;
-    font-size: 14px;
-    color: #333;
-    outline: none;
-    transition: all 0.2s ease;
-    text-align: center;
+    height: 40px;
+    margin: 20px 0;
     
-    &:focus {
-      border-color: #750DC5;
-      background-color: white;
-      box-shadow: 0 0 0 2px rgba(117, 13, 197, 0.1);
+    .slider-track {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #e0e0e0;
+      border-radius: 2px;
+      transform: translateY(-50%);
+      --min-percent: 0%;
+      --max-percent: 100%;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: var(--min-percent);
+        right: calc(100% - var(--max-percent));
+        height: 100%;
+        background: #750DC5;
+        border-radius: 2px;
+        transition: all 0.1s ease;
+      }
+      
+      &.dragging::before {
+        transition: none;
+      }
     }
     
-    &::placeholder {
-      color: #999;
+    .slider-input {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      pointer-events: none;
+      appearance: none;
+      -webkit-appearance: none;
+      transform: translateY(-50%);
+      
+      &::-webkit-slider-thumb {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #750DC5;
+        border-radius: 50%;
+        cursor: pointer;
+        pointer-events: auto;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+        
+        &:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+      }
+      
+      &::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #750DC5;
+        border-radius: 50%;
+        cursor: pointer;
+        pointer-events: auto;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+        
+        &:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+      }
+      
+      &::-webkit-slider-track {
+        background: transparent;
+        border: none;
+      }
+      
+      &::-moz-range-track {
+        background: transparent;
+        border: none;
+      }
+    }
+    
+    .slider-min {
+      z-index: 2;
+    }
+    
+    .slider-max {
+      z-index: 1;
     }
   }
   
-  .price-currency {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #666;
-    font-size: 14px;
-    pointer-events: none;
-    font-weight: 500;
-  }
-  
-  .price-separator {
-    width: 1px;
-    height: 24px;
-    background-color: #e0e0e0;
-    margin: 0 6px;
+  .price-values {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    
+    .price-value {
+      font-size: 14px;
+      color: #666;
+      font-weight: 500;
+    }
   }
 }
 
