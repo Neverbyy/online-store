@@ -2,12 +2,17 @@
 import catalog from './catalog.vue';
 import SalesList from './salesList.vue';
 import Slider from './slider.vue';
+import { useStore } from 'vuex';
+import { computed } from 'vue';
+
+const store = useStore();
 
 const props = defineProps({
-  products: Array,
-  sales: Array
+  products: Array
 })
 
+// Получаем товары со скидками через getter
+const saleItems = computed(() => store.getters.getSaleItems);
 
 </script>
 
@@ -22,7 +27,7 @@ const props = defineProps({
 
     <h1>Акции</h1>
 
-    <SalesList :sales="sales"/>
+    <SalesList :sales="saleItems"/>
   </div>
 
 </template>

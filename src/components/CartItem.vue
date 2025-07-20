@@ -2,6 +2,8 @@
 import ButtonCart from './UI/buttonCart.vue';
 import { defineProps } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+import { transliterate } from '../helpers/translit';
 
 const props = defineProps({
     item: Object,
@@ -9,6 +11,7 @@ const props = defineProps({
 });
 
 const store = useStore();
+const router = useRouter();
 
 const increment = () => {
     if (props.item.quantity < 20) {
@@ -22,14 +25,25 @@ const decrement = () => {
     }
 };
 
+const handleProductClick = () => {
+    // Проверяем, есть ли у товара категория
+    if (!props.item.category) {
+        console.warn('Товар не имеет категории:', props.item);
+        return;
+    }
+    
+    // Переходим на страницу товара
+    router.push(`/catalog/${props.item.category}/${transliterate(props.item.name)}/${props.item.id}`);
+};
+
 </script>
 
 <template>
     <div class="cart__main-item">
         <div class="cart__main-details">
-            <img class="cart__main-image" :src="item.image" alt="">
+            <img class="cart__main-image" :src="item.image" alt="" @click="handleProductClick">
             <div class="cart__main-details-left">
-                <h2>{{ item.name }}</h2>
+                <h2 class="cart__main-details-left-title" @click="handleProductClick">{{ item.name }}</h2>
                 <h2>{{ item.price }} Руб.</h2>
                 <div>
                 <ul class="cart__main-details-left-features" v-for="(value, key) in item.features" :key="key"> 
@@ -67,6 +81,12 @@ const decrement = () => {
         max-width: 200px;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        cursor: pointer;
+        
+        &:hover {
+            transform: scale(1.02);
+        }
     }
     
     &-item{
@@ -106,6 +126,16 @@ const decrement = () => {
                     font-weight: 700;
                     font-size: 1.5rem;
                     margin-bottom: 16px;
+                }
+            }
+            
+            &-title {
+                cursor: pointer;
+                transition: color 0.3s ease;
+                display: inline-block;
+                
+                &:hover {
+                    color: #750DC5;
                 }
             }
 

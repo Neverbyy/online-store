@@ -20,10 +20,7 @@ const props = defineProps({
         <SaleItem 
         v-for="sale in sales"
         :key="sale.id"
-        :name="sale.name"
-        :imageUrl="sale.image"
-        :price="sale.price"
-        :oldPrice="sale.oldPrice"
+        :product="sale"
         :addToCart="() => addToCart(sale)"
         />
     </div>

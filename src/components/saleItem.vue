@@ -1,15 +1,11 @@
 <script setup>
 import ButtonCart from './UI/buttonCart.vue';
 import { useStore } from 'vuex';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { transliterate } from '../helpers/translit';
 
 const props = defineProps({
-  name: String,
-  imageUrl: String,
-  price: String,
-  oldPrice: String,
-  isExist: Boolean,
-  isFavorite: Boolean,
+  product: Object,
   addToCart: Function
 })
 
@@ -17,19 +13,31 @@ const store = useStore();
 const showAddedMessage = ref(false);
 const showMaxQuantityMessage = ref(false);
 
+// Вычисляем процент скидки
+const discountPercentage = computed(() => {
+  if (!props.product.oldPrice || !props.product.price) return 0;
+  
+  const oldPrice = parseInt(props.product.oldPrice.replace(/\s/g, ''));
+  const currentPrice = parseInt(props.product.price.replace(/\s/g, ''));
+  
+  if (oldPrice <= currentPrice) return 0;
+  
+  return Math.round(((oldPrice - currentPrice) / oldPrice) * 100);
+});
+
 const handleAddToCart = () => {
-  const cartItem = store.getters['cart/getCart'].find(item => item.name === props.name);
+  const cartItem = store.getters['cart/getCart'].find(item => item.name === props.product.name);
   if (cartItem && cartItem.quantity >= 20) {
     showMaxQuantityMessage.value = true;
     setTimeout(() => {
       showMaxQuantityMessage.value = false;
-    }, 1500); // Показываем сообщение на 1.5 секунды
+    }, 1500);
   } else {
     props.addToCart();
     showAddedMessage.value = true;
     setTimeout(() => {
       showAddedMessage.value = false;
-    }, 1500); // Показываем сообщение на 1.5 секунды
+    }, 1500);
   }
 };
 
@@ -40,16 +48,24 @@ const handleAddToCart = () => {
     <div class="main__list-item sale-item">
       <div :class="['added-to-cart', { show: showAddedMessage }]">Товар добавлен!</div>
       <div :class="['max-quantity', { show: showMaxQuantityMessage }]">Лимит достигнут!</div>
-        <router-link to="#">
+      
+      <!-- Виджет скидки -->
+      <div v-if="discountPercentage > 0" class="discount-widget">
+        -{{ discountPercentage }}%
+      </div>
+      
+        <router-link :to="`/catalog/${product.category}/${transliterate(product.name)}/${product.id}`">
           <div class="main__list-item-inner sale-item">
-            <img class="main__list-item-inner-image" :src="imageUrl" alt="1">
+            <img class="main__list-item-inner-image" :src="product.image" alt="1">
           </div>
         </router-link>
         <div class="main__list-item-inner-details">
-            <span class="main__list-item-inner-name">{{name}}</span>
+            <router-link :to="`/catalog/${product.category}/${transliterate(product.name)}/${product.id}`">
+              <span class="main__list-item-inner-name">{{product.name}}</span>
+            </router-link>
             <div class="main__list-item-inner-price-wrapper">
-              <span class="main__list-item-inner-price"> {{ price }} ₽</span>
-              <span class="main__list-item-inner-oldprice">{{ oldPrice }} ₽</span>
+              <span class="main__list-item-inner-price"> {{ product.price }} ₽</span>
+              <span v-if="product.oldPrice" class="main__list-item-inner-oldprice">{{ product.oldPrice }} ₽</span>
             </div>
         </div>
         <div class="main__list-item-inner-btns">
@@ -93,7 +109,7 @@ const handleAddToCart = () => {
 }
 
 .max-quantity {
-  background-color: #df3939; /* Красный цвет для сообщения о максимальном количестве */
+  background-color: #df3939;
 }
 
 .added-to-cart.show, .max-quantity.show {
@@ -103,6 +119,22 @@ const handleAddToCart = () => {
 .sale-item{
   position: relative;
 }
+
+// Виджет скидки
+.discount-widget {
+  position: absolute;
+  top: 45px;
+  right: 25px;
+  background-color: #FFD700;
+  color: #000;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 .main__list-item-inner-price-wrapper {
   display: flex;
   align-items: center;
@@ -113,5 +145,14 @@ const handleAddToCart = () => {
   color: #888;
   font-weight: 400;
   text-decoration: line-through;
+}
+
+.main__list-item-inner-name {
+  color: var(--color-black);
+  text-decoration: none;
+  
+  &:hover {
+    color: var(--color-black);
+  }
 }
 </style>

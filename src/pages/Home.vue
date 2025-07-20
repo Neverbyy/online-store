@@ -6,22 +6,20 @@
 
 const store = useStore();
 const products = computed(() => store.getters.getLimitedProducts)
-const sales = computed(() => store.getters.getSales)
 
 onMounted(() => {
   store.dispatch('fetchProducts');
-  store.dispatch('fetchSales');
+  store.dispatch('fetchItems');
 });
 
 
 const props = defineProps({
-  products: Array,
-  sales: Array
+  products: Array
 })
 </script>
 
 <template>
-    <TheMain :products="products" :sales="sales"/>
+    <TheMain :products="products"/>
 </template>
 
 <style lang="scss" scoped>

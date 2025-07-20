@@ -17,7 +17,6 @@ export default createStore({
     
     state: {
         products: [],
-        sales: [],
         items: [],
         categoryNames: {
             Computers: 'Компьютеры',
@@ -29,7 +28,6 @@ export default createStore({
 
     getters: {
         getProducts: (state) => state.products,
-        getSales: (state) => state.sales,
         getItems: (state) => state.items,
         getCategoryNameById: (state) => (id) => state.categoryNames[id] || id,
         getLimitedProducts: (state) => state.products.slice(0, 6),
@@ -39,6 +37,10 @@ export default createStore({
         },
         getItemById: (state) => (id) => {
             return state.items.find(item => item.id === id) || null;
+        },
+        // Новый getter для получения товаров со скидками
+        getSaleItems: (state) => {
+            return state.items.filter(item => item.isSale === true);
         }
     },
 
@@ -48,9 +50,6 @@ export default createStore({
         },
         setProducts(state, products) {
             state.products = products;
-        },
-        setSales(state, sales) {
-            state.sales = sales;
         },
         setItems(state, items) {
             state.items = items;
@@ -81,19 +80,11 @@ export default createStore({
                 console.log('Ошибка:', error);
             }
         },
-        async fetchSales({ commit }) {
-            try {
-                const response = await axios.get('https://48e8b1c201ae4e29.mokky.dev/sales');
-                commit('setSales', response.data);
-                console.log(response.data)
-            } catch (error) {
-                console.error('Error fetching sales:', error);
-            }
-        },
+        
         async loadProductData({ commit }, id) {
             try {
                 const response = await axios.get(`https://48e8b1c201ae4e29.mokky.dev/items/${id}`);
-                commit('addItem', response.data);  // Используем новую мутацию `addItem`
+                commit('addItem', response.data);
             } catch (error) {
                 console.error('Error loading product data:', error);
             }

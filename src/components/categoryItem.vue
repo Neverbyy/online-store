@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import ButtonCart from './UI/buttonCart.vue';
 import { useStore } from 'vuex';
 import { transliterate } from '../helpers/translit';
@@ -12,6 +12,18 @@ const props = defineProps({
 const store = useStore();
 const showAddedMessage = ref(false);
 const showMaxQuantityMessage = ref(false);
+
+// Вычисляем процент скидки
+const discountPercentage = computed(() => {
+  if (!props.product.oldPrice || !props.product.price || !props.product.isSale) return 0;
+  
+  const oldPrice = parseInt(props.product.oldPrice.replace(/\s/g, ''));
+  const currentPrice = parseInt(props.product.price.replace(/\s/g, ''));
+  
+  if (oldPrice <= currentPrice) return 0;
+  
+  return Math.round(((oldPrice - currentPrice) / oldPrice) * 100);
+});
 
 const handleAddToCart = () => {
   const cartItem = store.getters['cart/getCart'].find(item => item.name === props.product.name);
@@ -33,6 +45,11 @@ const handleAddToCart = () => {
 <template>
   <div class="category__main-item">
     <div class="category__main-details">
+      <!-- Виджет скидки -->
+      <div v-if="discountPercentage > 0" class="discount-widget">
+        -{{ discountPercentage }}%
+      </div>
+      
       <router-link :to="`/catalog/${props.product.category}/${transliterate(props.product.name)}/${props.product.id}`">
         <img class="category__main-image" :src="props.product.image" alt="">
       </router-link>
@@ -50,7 +67,10 @@ const handleAddToCart = () => {
       <div class="category__main-details-right">
         <div :class="['added-to-cart', { show: showAddedMessage }]" >Товар добавлен!</div>
         <div :class="['max-quantity', { show: showMaxQuantityMessage }]">Лимит достигнут!</div>
-        <h2 class="category__main-details-right-price">{{ props.product.price }} Руб.</h2>
+        <div class="category__main-details-right-price-wrapper">
+          <h2 class="category__main-details-right-price">{{ props.product.price }} Руб.</h2>
+          <span v-if="props.product.oldPrice && props.product.isSale" class="category__main-details-right-oldprice">{{ props.product.oldPrice }} Руб.</span>
+        </div>
         <div class="category__main-details-right-btns">
           <svg class="main__list-item-inner-like" width="32" height="32" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="19" y="19" width="40" height="40" rx="8"/>
@@ -70,6 +90,25 @@ const handleAddToCart = () => {
 
 .category__main-image{
   max-width: 200px;
+}
+
+// Виджет скидки
+.discount-widget {
+  position: absolute;
+  top: 45px;
+  right: 25px;
+  background-color: #FFD700;
+  color: #000;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.category__main-item {
+  position: relative;
 }
 
 // Стили для названий товаров
@@ -92,9 +131,25 @@ const handleAddToCart = () => {
   gap: 5px;
 }
 
+.category__main-details-right-price-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
 .category__main-details-right-price{
   text-align: right;
+  margin: 0;
 }
+
+.category__main-details-right-oldprice {
+  font-size: 14px;
+  color: #888;
+  font-weight: 400;
+  text-decoration: line-through;
+}
+
 .category__main-details-right{
   position: relative;
   display: flex;
