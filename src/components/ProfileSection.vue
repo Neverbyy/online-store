@@ -4,7 +4,6 @@ import { useStore } from 'vuex';
 
 import ProfileSettings from '../components/ProfileSettings.vue';
 import Orders from '../components/Orders.vue';
-import Favorites from '../components/Favorites.vue';
 import Addresses from '../components/Addresses.vue';
 import Feedback from '../components/Feedback.vue';
 
@@ -14,7 +13,6 @@ const store = useStore();
 const components = [
     ProfileSettings,
     Orders,
-    Favorites,
     Addresses,
     Feedback
 ];

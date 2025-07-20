@@ -4,7 +4,10 @@ export default {
   namespaced: true,
   state: {
     user: JSON.parse(localStorage.getItem('user')) || null, // Восстанавливаем пользователя из localStorage
-    isLoggedIn: !!localStorage.getItem('user'), // Проверяем авторизован ли пользователь на основе данных в localStorage
+    isLoggedIn: (() => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      return !!(user && user.id);
+    })(), // Проверяем авторизован ли пользователь по наличию id
   },
   mutations: {
     SET_USER(state, user) {
@@ -15,15 +18,24 @@ export default {
       state.isLoggedIn = true;
     },
     LOGOUT(state) {
-      state.user = null;
+      // Получаем текущего пользователя из localStorage
+      let user = JSON.parse(localStorage.getItem('user')) || { name: '', email: '', phone: '' };
+      // Удаляем id, если он есть (чтобы не было признака авторизации)
+      if (user && user.id) {
+        delete user.id;
+      }
+      state.user = user;
       state.isLoggedIn = false;
-      localStorage.removeItem('user'); // Удаляем пользователя из localStorage при выходе
+      localStorage.setItem('user', JSON.stringify(user));
     },
   },
   actions: {
     async register({ commit }, payload) {
       try {
         const response = await axios.post('http://localhost:5000/api/register', payload);
+        // Сохраняем пользователя сразу после регистрации
+        commit('SET_USER', response.data.user);
+        commit('LOGIN');
         alert('Регистрация успешна!');
         return true;
       } catch (error) {
@@ -35,6 +47,7 @@ export default {
     async login({ commit }, payload) {
       try {
         const response = await axios.post('http://localhost:5000/api/login', payload);
+        // Сохраняем пользователя, пришедшего с сервера
         commit('SET_USER', response.data.user);
         commit('LOGIN');
         alert('Вход выполнен успешно!');

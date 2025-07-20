@@ -25,7 +25,13 @@ const routes = [
     path: '/cart/order/success',
     name: 'OrderSuccess',
     component: OrderSuccessPage,
-    meta: { requiresCart: true },
+    beforeEnter: (to, from, next) => {
+      if (sessionStorage.getItem('orderSuccess') === 'true') {
+        next();
+      } else {
+        next({ name: 'Home' });
+      }
+    }
   },
   {
     path: '/profile',

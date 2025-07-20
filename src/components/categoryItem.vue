@@ -40,9 +40,11 @@ const handleAddToCart = () => {
         <router-link :to="`/catalog/${props.product.category}/${transliterate(props.product.name)}/${props.product.id}`">
           <h2>{{ props.product.name }}</h2>
         </router-link>
-        <span v-for="(value, key) in product.features" :key="key">
-          {{ key + ' ' + value + ' '}}
-        </span>
+        <div class="category__main-details-left-features">
+          <span v-for="(value, key) in Object.entries(product.features).slice(0, 3)" :key="key">
+            {{ value[0] + ': ' + value[1] + ' '}}
+          </span>
+        </div>
         <h3>В наличии</h3>
       </div>
       <div class="category__main-details-right">
@@ -65,13 +67,6 @@ const handleAddToCart = () => {
 
 
 <style lang="scss" scoped>
-.category__main-details-right{
-  position: relative;
-  display: flex;
-  gap: 15px;
-  flex-direction: column;
-  align-self: center;
-}
 
 .category__main-image{
   max-width: 200px;
@@ -91,10 +86,21 @@ const handleAddToCart = () => {
     color: var(--color-black);
   }
 }
+.category__main-details-left-features{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 
 .category__main-details-right-price{
   text-align: right;
 }
-
+.category__main-details-right{
+  position: relative;
+  display: flex;
+  gap: 15px;
+  flex-direction: column;
+  align-self: center;
+}
 
 </style>

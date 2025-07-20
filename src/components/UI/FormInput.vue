@@ -53,9 +53,9 @@ const isInvalid = computed(() => {
         return 'Номер телефона должен состоять из 10 цифр';
       }
     } else if (props.type === 'email') {
-      if (!value) {
+      if (!value && props.required) {
         return 'Укажите Email адрес';
-      } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
+      } else if (value && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
         return 'Неверный Email';
       }
     } else if (props.required && !value) {

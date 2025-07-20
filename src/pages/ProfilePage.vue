@@ -12,7 +12,6 @@ const activeItem = computed(() => store.state.profile.activeItem);
 const menuItems = [
     'Настройка профиля',
     'Заказы',
-    'Избранное',
     'Мои адреса',
     'Обратная связь'
 ];

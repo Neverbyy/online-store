@@ -112,6 +112,12 @@ const showLoginModal = () => {
             </li>
           </router-link>
 
+          <router-link to="/favorites">
+            <li class="header__navbar-item">
+              <img class="header__navbar-image" src="/src/assets/heart.png" alt=""><span>Избранное</span>
+            </li>
+          </router-link>
+          
           <router-link to="/cart">
             <li class="header__navbar-item">
               <span :class="['cart-count', { green: cartLength >= 1 }]">{{ cartLength }}</span>
@@ -155,6 +161,7 @@ const showLoginModal = () => {
 .search-results {
   position: absolute;
   top: 80%;
+  z-index: 500;
   left: -65px;
   right: 130px;
   background-color: white;

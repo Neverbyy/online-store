@@ -25,7 +25,7 @@ app.get('/api/register', (req, res) => {
 
 // Регистрация пользователя
 app.post('/api/register', async (req, res) => {
-  const { phone, password } = req.body;
+  const { phone, password, name = '', email = '' } = req.body;
 
   // Проверка, существует ли пользователь с таким же номером
   const userExists = users.some(user => user.phone === phone);
@@ -37,10 +37,12 @@ app.post('/api/register', async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   // Создание нового пользователя с уникальным ID
-  const newUser = { 
+  const newUser = {
     id: users.length + 1, // Уникальный ID (можно заменить на UUID, если нужно)
-    phone, 
-    password: hashedPassword 
+    phone,
+    password: hashedPassword,
+    name,
+    email
   };
   users.push(newUser);
 
@@ -66,9 +68,21 @@ app.post('/api/login', async (req, res) => {
   res.status(200).json({ message: 'Вход выполнен успешно', user });
 });
 
-// Обновление номера телефона
+// Получение профиля пользователя по id
+app.get('/api/profile/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const user = users.find(user => user.id === id);
+  if (!user) {
+    return res.status(404).json({ message: 'Пользователь не найден' });
+  }
+  // Не возвращаем пароль
+  const { password, ...userData } = user;
+  res.status(200).json({ user: userData });
+});
+
+// Обновление профиля пользователя
 app.put('/api/profile', async (req, res) => {
-  const { id, phone } = req.body;
+  const { id, phone, name = '', email = '' } = req.body;
 
   // Проверка наличия пользователя с таким ID
   const user = users.find(user => user.id === id);
@@ -82,9 +96,11 @@ app.put('/api/profile', async (req, res) => {
     return res.status(400).json({ message: 'Этот номер телефона уже используется' });
   }
 
-  // Обновляем номер телефона
+  // Обновляем данные
   user.phone = phone;
-  res.status(200).json({ message: 'Номер телефона успешно обновлен', user });
+  user.name = name;
+  user.email = email;
+  res.status(200).json({ message: 'Профиль успешно обновлен', user });
 });
 
 // Запуск сервера

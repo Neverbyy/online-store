@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import FormInput from '../components/UI/FormInput.vue';
@@ -8,15 +8,39 @@ import buttonCart from '../components/UI/buttonCart.vue';
 const store = useStore();
 const router = useRouter();
 
-const contact = computed({
-  get: () => store.getters['profile/getContact'],
-  set: (value) => store.dispatch('profile/updateContact', value),
+const name = ref('');
+const email = ref('');
+const contact = ref('');
+const errorMessage = ref('');
+
+const storeUser = computed(() => store.getters['profile/getUser']);
+const storeName = computed(() => store.getters['profile/getName']);
+const storeEmail = computed(() => store.getters['profile/getEmail']);
+const storeContact = computed(() => store.getters['profile/getContact']);
+
+onMounted(() => {
+  store.dispatch('profile/fetchContact').then(() => {
+    name.value = storeUser.value.name || '';
+    email.value = storeUser.value.email || '';
+    contact.value = storeUser.value.phone || '';
+  });
 });
 
-const submitForm = () => {
-  // Логика для сохранения изменений профиля
-  store.dispatch('profile/updateContact', contact.value);
-  alert('Изменения сохранены!');
+const submitForm = async () => {
+  errorMessage.value = '';
+  try {
+    await store.dispatch('profile/updateContact', {
+      phone: contact.value,
+      name: name.value,
+      email: email.value
+    });
+    alert('Изменения сохранены!');
+  } catch (e) {
+    errorMessage.value = e.message;
+    alert(errorMessage.value);
+    errorMessage.value = '';
+    contact.value = storeUser.value.phone || '';
+  }
 };
 
 const logout = async () => {
@@ -24,14 +48,21 @@ const logout = async () => {
   router.push('/'); // Перенаправление на главную страницу после выхода
 };
 
-onMounted(() => {
-  store.dispatch('profile/fetchContact');
-});
 </script>
 
 <template>
   <form @submit.prevent="submitForm" class="contactform">
     <div class="order-details">
+      <FormInput
+        v-model="name"
+        type="text"
+        placeholder="Имя"
+      />
+      <FormInput
+        v-model="email"
+        type="email"
+        placeholder="Email"
+      />
       <FormInput
         v-model="contact"
         type="tel"

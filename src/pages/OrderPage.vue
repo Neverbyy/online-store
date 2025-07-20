@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import {useStore} from 'vuex';
 import { useRouter } from 'vue-router';
 import buttonCart from '/src/components/UI/buttonCart.vue'
@@ -42,6 +42,18 @@ const submitForm = () => {
   router.push({ name: 'OrderSuccess' });
 };
 
+onMounted(() => {
+  const profileUser = store.getters['profile/getUser'];
+  const contactData = store.getters.getContact;
+  if (profileUser && profileUser.phone && !contactData.phone) {
+    store.dispatch('setContact', {
+      name: profileUser.name || '',
+      phone: profileUser.phone || '',
+      email: profileUser.email || ''
+    });
+  }
+});
+
 </script>
 
 <template>
@@ -67,11 +79,11 @@ const submitForm = () => {
             <form @submit.prevent="submitForm" class="contactform">
                 <div class="order-details">
                     <h3>Контактные данные</h3>
-                    <FormInput v-model="contact.name" placeholder="Имя*" required />
+                    <FormInput v-model="contact.name" placeholder="Имя" required />
                     <FormInput
                         v-model="contact.phone"
                         type="tel"
-                        placeholder="Телефон*"
+                        placeholder="Телефон"
                         required
                         mask="+7 (###) ###-##-##"
                     />
@@ -90,7 +102,6 @@ const submitForm = () => {
 
                 <div class="payment">
                     <h3>Оплата</h3>
-                    <!-- Логика оплаты -->
                 </div>
 
                 <div class="confirm">
