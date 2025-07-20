@@ -1,10 +1,8 @@
 <script setup>
 import { onBeforeUnmount, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import buttonCart from '/src/components/UI/buttonCart.vue'
 
-const store = useStore();
 const router = useRouter();
 
 onMounted(() => {

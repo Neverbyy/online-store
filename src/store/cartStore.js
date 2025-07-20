@@ -32,24 +32,31 @@ export default {
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
         recalculateTotalPrice(state);
       },
-    removeFromCart(state, index) {
-      state.cart.splice(index, 1);
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
-      recalculateTotalPrice(state);
+    removeFromCart(state, id) {
+      const index = state.cart.findIndex(item => item.id === id);
+      if (index !== -1) {
+        state.cart.splice(index, 1);
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
+        recalculateTotalPrice(state);
+      }
     },
     setCart(state, cart) {
       state.cart = cart;
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
       recalculateTotalPrice(state);
     },
-    incrementQuantity(state, index) {
-      state.cart[index].quantity += 1;
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
-      recalculateTotalPrice(state);
+    incrementQuantity(state, id) {
+      const item = state.cart.find(item => item.id === id);
+      if (item && item.quantity < 20) {
+        item.quantity += 1;
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
+        recalculateTotalPrice(state);
+      }
     },
-    decrementQuantity(state, index) {
-      if (state.cart[index].quantity > 1) {
-        state.cart[index].quantity -= 1;
+    decrementQuantity(state, id) {
+      const item = state.cart.find(item => item.id === id);
+      if (item && item.quantity > 1) {
+        item.quantity -= 1;
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
         recalculateTotalPrice(state);
       }
@@ -64,14 +71,14 @@ export default {
     addToCart({ commit }, item) {
       commit('addToCart', item);
     },
-    removeFromCart({ commit }, index) {
-      commit('removeFromCart', index);
+    removeFromCart({ commit }, id) {
+      commit('removeFromCart', id);
     },
-    incrementQuantity({ commit }, index) {
-      commit('incrementQuantity', index);
+    incrementQuantity({ commit }, id) {
+      commit('incrementQuantity', id);
     },
-    decrementQuantity({ commit }, index) {
-      commit('decrementQuantity', index);
+    decrementQuantity({ commit }, id) {
+      commit('decrementQuantity', id);
     },
     loadCart({ commit }) {
       const cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY));

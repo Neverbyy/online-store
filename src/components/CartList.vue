@@ -5,8 +5,8 @@ import { useStore } from 'vuex';
 const store = useStore();
 const cart = store.getters['cart/getCart'];
 
-const removeFromCart = (index) => {
-    store.dispatch('cart/removeFromCart', index);
+const removeFromCart = (id) => {
+    store.dispatch('cart/removeFromCart', id);
 };
 </script>
 
@@ -14,9 +14,8 @@ const removeFromCart = (index) => {
 <template>
     <CartItem
     v-for="(item,index) in cart"
-    :key="index"
+    :key="item.id"
     :item="item"
-    :index="index"
     :removeFromCart="removeFromCart"
     />
 </template>

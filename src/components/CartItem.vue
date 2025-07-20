@@ -5,7 +5,6 @@ import { useStore } from 'vuex';
 
 const props = defineProps({
     item: Object,
-    index: Number,
     removeFromCart: Function
 });
 
@@ -13,13 +12,13 @@ const store = useStore();
 
 const increment = () => {
     if (props.item.quantity < 20) {
-        store.dispatch('cart/incrementQuantity', props.index);
+        store.dispatch('cart/incrementQuantity', props.item.id);
     }
 };
 
 const decrement = () => {
     if (props.item.quantity > 1) {
-        store.dispatch('cart/decrementQuantity', props.index);
+        store.dispatch('cart/decrementQuantity', props.item.id);
     }
 };
 
@@ -40,7 +39,7 @@ const decrement = () => {
             </div>
             <div class="cart__main-details-right">
                 <div class="cart__main-details-right-btns">
-                    <ButtonCart @click="removeFromCart"><slot>Удалить</slot></ButtonCart>
+                    <ButtonCart @click="removeFromCart(item.id)"><slot>Удалить</slot></ButtonCart>
                     <div class="cart__main-item-counter">
                         <button 
                             class="counter-btn decrement"
@@ -66,42 +65,88 @@ const decrement = () => {
 
     &-image{
         max-width: 200px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
+    
     &-item{
-        border-top: 1px solid gray;
-        border-bottom: 1px solid gray;
-        padding: 15px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+        border-radius: 16px;
+        padding: 24px;
+        margin: 16px 0;
+        box-shadow: 0 2px 20px rgba(117, 13, 197, 0.08);
+        border: 1px solid rgba(117, 13, 197, 0.1);
+        transition: all 0.3s ease;
+        
+        &:hover {
+            box-shadow: 0 8px 32px rgba(117, 13, 197, 0.12);
+            transform: translateY(-1px);
+        }
     }
 
     &-details{
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        gap: 24px;
 
         &-left{
-        flex: auto;
-        margin-left: 15px;
+            flex: auto;
+            margin-left: 0;
+
+            h2 {
+                margin: 0 0 8px 0;
+                font-weight: 600;
+                color: #2d3748;
+                font-size: 1.25rem;
+                line-height: 1.4;
+                
+                &:last-of-type {
+                    color: #750DC5;
+                    font-weight: 700;
+                    font-size: 1.5rem;
+                    margin-bottom: 16px;
+                }
+            }
 
             &-features{
-                font-weight: 300;
-                row-gap: 10px;
+                font-weight: 400;
+                color: #718096;
+                font-size: 0.95rem;
+                line-height: 1.6;
+                margin: 0;
+                padding: 0;
+                list-style: none;
 
                 li{
-                    padding-top: 5px;
+                    padding: 4px 0;
+                    position: relative;
+                    padding-left: 16px;
+                    
+                    &::before {
+                        content: '•';
+                        color: #750DC5;
+                        font-weight: bold;
+                        position: absolute;
+                        left: 0;
+                    }
                 }
             }
         }
+        
         &-right{
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: flex-end;
 
             &-btns{
                 display: flex;
                 column-gap: 30px;
+                align-items: center;
             }
         }
     }
-
 }
 
 .cart__main-item-counter {

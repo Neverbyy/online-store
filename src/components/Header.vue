@@ -114,7 +114,7 @@ const showLoginModal = () => {
 
           <router-link to="/favorites">
             <li class="header__navbar-item">
-              <img class="header__navbar-image" src="/src/assets/heart.png" alt=""><span>Избранное</span>
+              <img class="header__navbar-image" src="/src/assets/heart.svg" alt=""><span>Избранное</span>
             </li>
           </router-link>
           
