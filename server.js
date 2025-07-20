@@ -8,6 +8,8 @@ const PORT = 5000;
 
 // Массив пользователей (вместо базы данных)
 const users = [];
+// Массив заказов (вместо базы данных)
+const orders = [];
 
 // Настройка middlewares
 app.use(bodyParser.json());
@@ -102,6 +104,32 @@ app.put('/api/profile', async (req, res) => {
   user.email = email;
   res.status(200).json({ message: 'Профиль успешно обновлен', user });
 });
+
+// ===================== ЗАКАЗЫ =====================
+// Создать заказ
+app.post('/api/orders', (req, res) => {
+  const order = req.body;
+  if (!order.userId && !order.userPhone) {
+    return res.status(400).json({ message: 'userId или userPhone обязателен' });
+  }
+  order.id = orders.length + 1;
+  order.createdAt = new Date().toISOString();
+  orders.push(order);
+  res.status(201).json({ message: 'Заказ успешно создан', order });
+});
+
+// Получить заказы пользователя
+app.get('/api/orders', (req, res) => {
+  const { userId, userPhone } = req.query;
+  let userOrders = [];
+  if (userId) {
+    userOrders = orders.filter(order => String(order.userId) === String(userId));
+  } else if (userPhone) {
+    userOrders = orders.filter(order => order.userPhone === userPhone);
+  }
+  res.status(200).json({ orders: userOrders });
+});
+// ==================================================
 
 // Запуск сервера
 app.listen(PORT, () => {

@@ -4,6 +4,7 @@ import {useStore} from 'vuex';
 import { useRouter } from 'vue-router';
 import buttonCart from '/src/components/UI/buttonCart.vue'
 import FormInput from '../components/UI/FormInput.vue';
+import axios from 'axios';
 
 const store = useStore();
 const router = useRouter();
@@ -25,11 +26,34 @@ const address = computed({
 
 const formattedTotalPrice = computed(() => store.getters['cart/formattedTotalPrice']);
 
-const submitForm = () => {
+const submitForm = async () => {
   // Логика отправки формы
   console.log('Delivery Method:', deliveryMethod.value);
   console.log('Contact:', contact.value);
   console.log('Address:', address.value);
+
+  // --- Отправка заказа на сервер ---
+  const cartItems = store.getters['cart/getCart'];
+  const totalPrice = store.getters['cart/getTotalPrice'];
+  const user = store.getters['profile/getUser'] || {};
+  const order = {
+    date: new Date().toLocaleString('ru-RU'),
+    deliveryMethod: deliveryMethod.value,
+    contact: { ...contact.value },
+    address: deliveryMethod.value === 'courier' ? { ...address.value } : null,
+    items: cartItems,
+    totalPrice: totalPrice,
+    status: 'Оформлен',
+    userId: user.id || null,
+    userPhone: user.phone || null
+  };
+  try {
+    await axios.post('http://localhost:5000/api/orders', order);
+  } catch (e) {
+    alert('Ошибка при оформлении заказа!');
+    return;
+  }
+  // --- конец блока отправки заказа ---
 
   // Логика обработки успешного заказа
   store.dispatch('markOrderAsSuccess'); // Устанавливаем флаг успешного заказа в store
