@@ -30,12 +30,11 @@ export default {
     },
   },
   actions: {
-    async register({ commit }, payload) {
+    async register({ commit, dispatch }, payload) {
       try {
         const response = await axios.post('http://localhost:5000/api/register', payload);
-        // Сохраняем пользователя сразу после регистрации
         commit('SET_USER', response.data.user);
-        commit('LOGIN');
+        await dispatch('favorite/fetchFavorites', null, { root: true });
         alert('Регистрация успешна!');
         return true;
       } catch (error) {
@@ -44,12 +43,12 @@ export default {
         return false;
       }
     },
-    async login({ commit }, payload) {
+    async login({ commit, dispatch }, payload) {
       try {
         const response = await axios.post('http://localhost:5000/api/login', payload);
-        // Сохраняем пользователя, пришедшего с сервера
         commit('SET_USER', response.data.user);
         commit('LOGIN');
+        await dispatch('favorite/fetchFavorites', null, { root: true });
         alert('Вход выполнен успешно!');
         return true;
       } catch (error) {
@@ -58,8 +57,9 @@ export default {
         return false;
       }
     },
-    logout({ commit }) {
+    logout({ commit, dispatch }) {
       commit('LOGOUT');
+      dispatch('favorite/clearFavorites', null, { root: true });
     },
   },
   getters: {

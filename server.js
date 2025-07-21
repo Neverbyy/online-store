@@ -44,7 +44,8 @@ app.post('/api/register', async (req, res) => {
     phone,
     password: hashedPassword,
     name,
-    email
+    email,
+    favorites: [] // Добавляем поле избранного
   };
   users.push(newUser);
 
@@ -130,6 +131,50 @@ app.get('/api/orders', (req, res) => {
   res.status(200).json({ orders: userOrders });
 });
 // ==================================================
+
+// Получение избранных товаров пользователя
+app.get('/api/favorites', (req, res) => {
+  const { userId } = req.query;
+  if (!userId) {
+    return res.status(400).json({ message: 'userId обязателен' });
+  }
+  const user = users.find(u => String(u.id) === String(userId));
+  if (!user) {
+    return res.status(404).json({ message: 'Пользователь не найден' });
+  }
+  res.status(200).json({ favorites: user.favorites || [] });
+});
+
+// Добавление товара в избранное
+app.post('/api/favorites', (req, res) => {
+  const { userId, product } = req.body;
+  if (!userId || !product || !product.id) {
+    return res.status(400).json({ message: 'userId и product.id обязательны' });
+  }
+  const user = users.find(u => String(u.id) === String(userId));
+  if (!user) {
+    return res.status(404).json({ message: 'Пользователь не найден' });
+  }
+  if (!user.favorites) user.favorites = [];
+  if (!user.favorites.find(item => item.id === product.id)) {
+    user.favorites.push(product);
+  }
+  res.status(200).json({ favorites: user.favorites });
+});
+
+// Удаление товара из избранного
+app.delete('/api/favorites', (req, res) => {
+  const { userId, productId } = req.body;
+  if (!userId || !productId) {
+    return res.status(400).json({ message: 'userId и productId обязательны' });
+  }
+  const user = users.find(u => String(u.id) === String(userId));
+  if (!user) {
+    return res.status(404).json({ message: 'Пользователь не найден' });
+  }
+  user.favorites = (user.favorites || []).filter(item => item.id !== productId);
+  res.status(200).json({ favorites: user.favorites });
+});
 
 // Запуск сервера
 app.listen(PORT, () => {

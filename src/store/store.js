@@ -5,14 +5,16 @@ import reviewStore from "./reviewStore"
 import orderStore from "./orderStore"
 import profileStore from "./profileStore";
 import authStore from "./authStore"
+import favoriteStore from './favoriteStore';
 
 export default createStore({
     modules: {
+        auth: authStore,
         cart: cartStore,
-        review: reviewStore,
         order: orderStore,
         profile: profileStore,
-        auth: authStore
+        review: reviewStore,
+        favorite: favoriteStore
     },
     
     state: {

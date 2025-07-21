@@ -10,6 +10,7 @@ import OrderSuccessPage from '../pages/OrderSuccessPage.vue';
 import CategoryPage from '../pages/CategoryPage.vue';
 import ProductPage from '../pages/ProductPage.vue';
 import NotFoundPage from '../pages/NotFoundPage.vue';
+import FavoritePage from '../pages/FavoritePage.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -58,6 +59,7 @@ const routes = [
       productId: route.params.productId
     })
   },
+  { path: '/favorites', name: 'Favorites', component: FavoritePage },
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage }
 ];
 

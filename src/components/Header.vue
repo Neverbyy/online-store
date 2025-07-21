@@ -8,6 +8,7 @@ import { transliterate } from '../helpers/translit';
 const store = useStore();
 const cart = computed(() => store.getters['cart/getCart']);
 const cartLength = computed(() => cart.value.length);
+const favoriteLength = computed(() => store.getters['favorite/getFavorites'].length);
 
 const isModalVisible = ref(false);
 const modalType = ref('');
@@ -87,6 +88,9 @@ onMounted(() => {
   window.addEventListener('open-auth-modal', showLoginModal);
   window.addEventListener('auth-warning', handleAuthWarning);
   store.dispatch('fetchItems');
+  if (store.getters['auth/isAuthenticated']) {
+    store.dispatch('favorite/fetchFavorites');
+  }
 });
 
 
@@ -114,6 +118,7 @@ const showLoginModal = () => {
 
           <router-link to="/favorites">
             <li class="header__navbar-item">
+              <span :class="['favorite-count', { green: favoriteLength >= 1 }]">{{ favoriteLength }}</span>
               <img class="header__navbar-image" src="/src/assets/heart.svg" alt=""><span>Избранное</span>
             </li>
           </router-link>
@@ -205,6 +210,22 @@ const showLoginModal = () => {
 }
 
 .cart-count.green {
+  background-color: green;
+}
+
+.favorite-count {
+  position: absolute;
+  top: 10px;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+.favorite-count.green {
   background-color: green;
 }
 </style>

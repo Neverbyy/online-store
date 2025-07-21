@@ -5,7 +5,7 @@ import { useStore } from 'vuex';
 import ProfileSettings from '../components/ProfileSettings.vue';
 import Orders from '../components/Orders.vue';
 import Addresses from '../components/Addresses.vue';
-import Feedback from '../components/Feedback.vue';
+import Reviews from '../components/Reviews.vue';
 
 const store = useStore();
 
@@ -14,7 +14,7 @@ const components = [
     ProfileSettings,
     Orders,
     Addresses,
-    Feedback
+    Reviews
 ];
 
 // Вычисляемое свойство для получения текущего компонента из Vuex Store
