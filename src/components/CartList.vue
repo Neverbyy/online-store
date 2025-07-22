@@ -1,12 +1,13 @@
 <script setup>
 import CartItem from './CartItem.vue';
 import { useStore } from 'vuex';
+import { computed } from 'vue';
 
 const store = useStore();
-const cart = store.getters['cart/getCart'];
+const cart = computed(() => store.state.cart.cart);
 
-const removeFromCart = (id) => {
-    store.dispatch('cart/removeFromCart', id);
+const removeFromCart = async (id) => {
+    await store.dispatch('cart/removeFromCart', id);
 };
 </script>
 

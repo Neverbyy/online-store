@@ -18,15 +18,9 @@ export default {
       state.isLoggedIn = true;
     },
     LOGOUT(state) {
-      // Получаем текущего пользователя из localStorage
-      let user = JSON.parse(localStorage.getItem('user')) || { name: '', email: '', phone: '' };
-      // Удаляем id, если он есть (чтобы не было признака авторизации)
-      if (user && user.id) {
-        delete user.id;
-      }
-      state.user = user;
+      state.user = {};
       state.isLoggedIn = false;
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify({}));
     },
   },
   actions: {
@@ -35,6 +29,7 @@ export default {
         const response = await axios.post('http://localhost:5000/api/register', payload);
         commit('SET_USER', response.data.user);
         await dispatch('favorite/fetchFavorites', null, { root: true });
+        await dispatch('cart/fetchCart', null, { root: true });
         alert('Регистрация успешна!');
         return true;
       } catch (error) {
@@ -49,6 +44,7 @@ export default {
         commit('SET_USER', response.data.user);
         commit('LOGIN');
         await dispatch('favorite/fetchFavorites', null, { root: true });
+        await dispatch('cart/fetchCart', null, { root: true });
         alert('Вход выполнен успешно!');
         return true;
       } catch (error) {
@@ -60,6 +56,18 @@ export default {
     logout({ commit, dispatch }) {
       commit('LOGOUT');
       dispatch('favorite/clearFavorites', null, { root: true });
+      dispatch('cart/clearCart', null, { root: true });
+    },
+    async checkUserExists({ commit, state }) {
+      if (!state.user || !state.user.id) return;
+      try {
+        await axios.get(`http://localhost:5000/api/profile/${state.user.id}`);
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          commit('LOGOUT');
+          alert('Ваша сессия устарела. Пожалуйста, войдите снова.');
+        }
+      }
     },
   },
   getters: {

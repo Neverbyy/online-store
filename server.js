@@ -176,6 +176,69 @@ app.delete('/api/favorites', (req, res) => {
   res.status(200).json({ favorites: user.favorites });
 });
 
+// ===================== КОРЗИНА =====================
+// Получить корзину пользователя
+app.get('/api/cart', (req, res) => {
+  const { userId } = req.query;
+  if (!userId) {
+    return res.status(400).json({ message: 'userId обязателен' });
+  }
+  const user = users.find(u => String(u.id) === String(userId));
+  if (!user) {
+    return res.status(404).json({ message: 'Пользователь не найден' });
+  }
+  res.status(200).json({ cart: user.cart || [] });
+});
+
+// Добавить/обновить товар в корзине
+app.post('/api/cart', (req, res) => {
+  const { userId, product, quantity = 1 } = req.body;
+  if (!userId || !product || !product.id) {
+    return res.status(400).json({ message: 'userId и product.id обязательны' });
+  }
+  const user = users.find(u => String(u.id) === String(userId));
+  if (!user) {
+    return res.status(404).json({ message: 'Пользователь не найден' });
+  }
+  if (!user.cart) user.cart = [];
+  const existing = user.cart.find(item => item.id === product.id);
+  if (existing) {
+    existing.quantity = Math.min(quantity, 20);
+  } else {
+    user.cart.push({ ...product, quantity: Math.min(quantity, 20) });
+  }
+  res.status(200).json({ cart: user.cart });
+});
+
+// Удалить товар из корзины
+app.delete('/api/cart', (req, res) => {
+  const { userId, productId } = req.body;
+  if (!userId || !productId) {
+    return res.status(400).json({ message: 'userId и productId обязательны' });
+  }
+  const user = users.find(u => String(u.id) === String(userId));
+  if (!user) {
+    return res.status(404).json({ message: 'Пользователь не найден' });
+  }
+  user.cart = (user.cart || []).filter(item => item.id !== productId);
+  res.status(200).json({ cart: user.cart });
+});
+
+// Очистить корзину
+app.post('/api/cart/clear', (req, res) => {
+  const { userId } = req.body;
+  if (!userId) {
+    return res.status(400).json({ message: 'userId обязателен' });
+  }
+  const user = users.find(u => String(u.id) === String(userId));
+  if (!user) {
+    return res.status(404).json({ message: 'Пользователь не найден' });
+  }
+  user.cart = [];
+  res.status(200).json({ cart: user.cart });
+});
+// ===================================================
+
 // Запуск сервера
 app.listen(PORT, () => {
   console.log(`Сервер запущен на http://localhost:${PORT}`);

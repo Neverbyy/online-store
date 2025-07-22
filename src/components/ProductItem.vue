@@ -1,33 +1,18 @@
 <script setup>
 import { defineProps, ref, computed } from 'vue';
-import buttonCart from './UI/buttonCart.vue';
+import CartActionButton from './UI/CartActionButton.vue';
 import { useStore } from 'vuex';
 import FavoriteIcon from './UI/FavoriteIcon.vue';
 
 const props = defineProps({
-  product: Object,
-  addToCart: Function
+  product: Object
 });
 
 const store = useStore();
 const showAddedMessage = ref(false);
 const showMaxQuantityMessage = ref(false);
 
-const handleAddToCart = () => {
-  const cartItem = store.getters['cart/getCart'].find(item => item.name === props.product.name);
-  if (cartItem && cartItem.quantity >= 20) {
-    showMaxQuantityMessage.value = true;
-    setTimeout(() => {
-      showMaxQuantityMessage.value = false;
-    }, 1500);
-  } else {
-    props.addToCart(props.product); // Передаем выбранный продукт в функцию addToCart
-    showAddedMessage.value = true;
-    setTimeout(() => {
-      showAddedMessage.value = false;
-    }, 1500);
-  }
-};
+// Удаляю addToCart из props и handleAddToCart
 
 const isFavorite = computed(() => store.getters['favorite/isFavorite'](props.product.id));
 const handleToggleFavorite = async () => {
@@ -36,6 +21,13 @@ const handleToggleFavorite = async () => {
   } else {
     await store.dispatch('favorite/addToFavorites', props.product);
   }
+};
+
+const handleShowAddedMessage = () => {
+  showAddedMessage.value = true;
+  setTimeout(() => {
+    showAddedMessage.value = false;
+  }, 1500);
 };
 </script>
 <template>
@@ -57,7 +49,7 @@ const handleToggleFavorite = async () => {
             <div class="product-card-price"><h2> {{ product.price }} ₽</h2></div>
             <div class="product-card-buy-row">
               <FavoriteIcon :active="isFavorite" @click="handleToggleFavorite" width="40" height="40" style="cursor:pointer;"/>
-              <div class="product-card-btn"><buttonCart @click="handleAddToCart">В корзину</buttonCart></div>
+              <div class="product-card-btn"><CartActionButton :product="product" :onAdded="handleShowAddedMessage" /></div>
             </div>
           </div>
         </div>

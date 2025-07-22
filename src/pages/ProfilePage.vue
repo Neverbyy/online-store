@@ -1,7 +1,8 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
 import ProfileSection from '../components/ProfileSection.vue';
+import { useRouter } from 'vue-router';
 
 const store = useStore();
 
@@ -20,6 +21,19 @@ const menuItems = [
 const setActiveItem = (index) => {
     store.dispatch('profile/setActiveItem', index);
 };
+
+const router = useRouter();
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
+
+watch(isAuthenticated, (newVal) => {
+  if (!newVal) {
+    router.push({ name: 'Home' });
+  }
+});
+
+onMounted(() => {
+    store.dispatch('auth/checkUserExists');
+});
 
 </script>
 

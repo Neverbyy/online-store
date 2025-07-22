@@ -5,7 +5,7 @@ import ButtonCart from './UI/buttonCart.vue';
 import {useStore} from 'vuex';
 
 const store = useStore();
-const cart = computed(() => store.getters['cart/getCart']);
+const cart = computed(() => store.state.cart.cart);
 const formattedTotalPrice = computed(() => store.getters['cart/formattedTotalPrice']);
 
 const clearCart = () => {
@@ -27,7 +27,7 @@ const clearCart = () => {
             <div v-if="cart.length >= 2" class="cart-clearbtn">
                 <ButtonCart @click="clearCart">Очистить всё</ButtonCart>
             </div>
-            <div v-if="cart.length === 0">
+            <div class="cart-info" v-if="cart.length === 0">
                 <h2>Добавьте товары из каталога</h2>
                 <router-link to="/catalog">
                 <div class="cart-btn">
@@ -71,8 +71,8 @@ const clearCart = () => {
 
 
     &-btn{
-        display: flex;
-        justify-content: center;
+        display: inline-block;
+        margin: 0 auto;
     }
 
     &-clearbtn{
@@ -81,5 +81,11 @@ const clearCart = () => {
         margin-top: 45px;
     }
 
+    &-payment {
+        text-align: center;
+    }
+    &-info{
+        text-align: center;
+    }
 }
 </style>

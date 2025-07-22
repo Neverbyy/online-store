@@ -13,16 +13,20 @@ const props = defineProps({
 const store = useStore();
 const router = useRouter();
 
-const increment = () => {
+const increment = async () => {
     if (props.item.quantity < 20) {
-        store.dispatch('cart/incrementQuantity', props.item.id);
+        await store.dispatch('cart/incrementQuantity', props.item.id);
     }
 };
 
-const decrement = () => {
+const decrement = async () => {
     if (props.item.quantity > 1) {
-        store.dispatch('cart/decrementQuantity', props.item.id);
+        await store.dispatch('cart/decrementQuantity', props.item.id);
     }
+};
+
+const handleRemoveFromCart = async () => {
+    await props.removeFromCart(props.item.id);
 };
 
 const handleProductClick = () => {
@@ -53,7 +57,7 @@ const handleProductClick = () => {
             </div>
             <div class="cart__main-details-right">
                 <div class="cart__main-details-right-btns">
-                    <ButtonCart @click="removeFromCart(item.id)"><slot>Удалить</slot></ButtonCart>
+                    <ButtonCart @click="handleRemoveFromCart"><slot>Удалить</slot></ButtonCart>
                     <div class="cart__main-item-counter">
                         <button 
                             class="counter-btn decrement"

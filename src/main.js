@@ -11,5 +11,8 @@ createApp(App)
     .use(router)
     .mount('#app');
 
+if (store.getters['auth/isAuthenticated']) {
+    store.dispatch('auth/checkUserExists');
+}
 
-store.dispatch('cart/loadCart');
+store.dispatch('cart/fetchCart');

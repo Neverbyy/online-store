@@ -4,10 +4,10 @@ import { useStore } from 'vuex';
 import { ref, computed } from 'vue';
 import { transliterate } from '../helpers/translit';
 import FavoriteIcon from './UI/FavoriteIcon.vue';
+import CartActionButton from './UI/CartActionButton.vue';
 
 const props = defineProps({
-  product: Object,
-  addToCart: Function
+  product: Object
 })
 
 const store = useStore();
@@ -26,22 +26,6 @@ const discountPercentage = computed(() => {
   return Math.round(((oldPrice - currentPrice) / oldPrice) * 100);
 });
 
-const handleAddToCart = () => {
-  const cartItem = store.getters['cart/getCart'].find(item => item.name === props.product.name);
-  if (cartItem && cartItem.quantity >= 20) {
-    showMaxQuantityMessage.value = true;
-    setTimeout(() => {
-      showMaxQuantityMessage.value = false;
-    }, 1500);
-  } else {
-    props.addToCart();
-    showAddedMessage.value = true;
-    setTimeout(() => {
-      showAddedMessage.value = false;
-    }, 1500);
-  }
-};
-
 const isFavorite = computed(() => store.getters['favorite/isFavorite'](props.product.id));
 const handleToggleFavorite = async () => {
   if (isFavorite.value) {
@@ -49,6 +33,13 @@ const handleToggleFavorite = async () => {
   } else {
     await store.dispatch('favorite/addToFavorites', props.product);
   }
+};
+
+const handleShowAddedMessage = () => {
+  showAddedMessage.value = true;
+  setTimeout(() => {
+    showAddedMessage.value = false;
+  }, 1500);
 };
 
 </script>
@@ -86,7 +77,7 @@ const handleToggleFavorite = async () => {
               @click.stop="handleToggleFavorite"
             />
         </div>
-        <ButtonCart @click="handleAddToCart">В корзину</ButtonCart>
+        <CartActionButton :product="product" :onAdded="handleShowAddedMessage" />
     </div>
 
 </template>

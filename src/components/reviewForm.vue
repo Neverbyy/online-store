@@ -140,6 +140,7 @@ input, textarea {
 .star {
   font-size: 2rem;
   color: #cfcece;
+  cursor: pointer;
 
   &.active {
     color: #750DC5;
