@@ -1,6 +1,6 @@
 <script setup>
 import buttonCart from './UI/buttonCart.vue';
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, computed } from 'vue';
 import { useStore } from 'vuex';
 
 const props = defineProps({
@@ -13,12 +13,21 @@ const props = defineProps({
 const emit = defineEmits(['reviewAdded']);
 
 const store = useStore();
+const userId = computed(() => store.getters['auth/getUser']?.id);
+const userName = computed(() => store.getters['profile/getName']);
 const advantages = ref('');
 const disadvantages = ref('');
 const text = ref('');
 const rating = ref(0);
 const hoverRating = ref(0);
 const ratingError = ref(false);
+
+const getCurrentDate = () => {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  return `${day}.${month}`;
+};
 
 const handleSubmit = async () => {
   if (rating.value === 0) {
@@ -31,7 +40,10 @@ const handleSubmit = async () => {
     advantages: advantages.value,
     disadvantages: disadvantages.value,
     text: text.value,
-    rating: rating.value
+    rating: rating.value,
+    userId: userId.value,
+    userName: userName.value,
+    date: getCurrentDate()
   };
 
   try {

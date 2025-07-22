@@ -1,4 +1,5 @@
 import axios from 'axios';
+import router from '../router/router';
 
 export default {
   namespaced: true,
@@ -65,7 +66,7 @@ export default {
       } catch (error) {
         if (error.response && error.response.status === 404) {
           commit('LOGOUT');
-          alert('Ваша сессия устарела. Пожалуйста, войдите снова.');
+          router.push('/');
         }
       }
     },

@@ -1,11 +1,117 @@
 <template>
-    asd
+  <div class="user-reviews">
+    <h2>Мои отзывы</h2>
+    <div v-if="userReviews.length === 0" class="user-reviews__empty">
+      У вас пока нет отзывов.
+    </div>
+    <div v-else class="user-reviews__list">
+      <div v-for="review in userReviews" :key="review.id" class="user-reviews__item">
+        <div class="user-reviews__product">
+          <router-link :to="getProductLink(review.productId)" class="user-reviews__product-link">
+            {{ getProductName(review.productId) }}
+          </router-link>
+        </div>
+        <div class="user-reviews__card">
+          <reviewItem :review="review" />
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
+import { computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import reviewItem from './reviewItem.vue';
+import { transliterate } from '../helpers/translit.js';
 
+const store = useStore();
+
+const userId = computed(() => store.getters['profile/getUser']?.id);
+
+const userReviews = computed(() => {
+  return store.state.review.reviews.filter(r => r.userId === userId.value);
+});
+
+const getProductName = (productId) => {
+  const product = store.getters.getItemById?.(productId);
+  return product ? product.name : 'Товар не найден';
+};
+
+const getProductLink = (productId) => {
+  const product = store.getters.getItemById?.(productId);
+  if (!product) return '#';
+  return `/catalog/${product.category}/${transliterate(product.name)}/${product.id}`;
+};
+
+onMounted(() => {
+  store.dispatch('fetchReviews');
+});
 </script>
 
 <style lang="scss" scoped>
-
+.user-reviews {
+  padding: 10px 0 0 0;
+  &__empty {
+    color: #888;
+    margin-top: 18px;
+    text-align: center;
+  }
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px 22px;
+    margin-top: 18px;
+  }
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 340px;
+    max-width: 400px;
+  }
+  &__product {
+    font-size: 1.04rem;
+    font-weight: 500;
+    color: #750DC5;
+    margin-bottom: 2px;
+    margin-left: 2px;
+  }
+  &__product-link {
+    color: #750DC5;
+    text-decoration: underline;
+    transition: color 0.18s;
+    &:hover {
+      color: #091D9E;
+    }
+  }
+  &__card {
+    background: #f8f6fd;
+    border-radius: 18px;
+    box-shadow: 0 4px 18px rgba(117, 13, 197, 0.09), 0 1.5px 8px rgba(0,0,0,0.04);
+    padding: 22px 20px 18px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: box-shadow 0.18s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  h2 {
+    color: #750DC5;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+}
+@media (max-width: 600px) {
+  .user-reviews__item {
+    min-width: 98vw;
+    max-width: 98vw;
+  }
+  .user-reviews__card {
+    padding: 14px 2vw 14px 2vw;
+  }
+}
 </style>

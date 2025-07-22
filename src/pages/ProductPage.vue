@@ -17,6 +17,7 @@ const productId = computed(() => Number(route.params.productId));
 const product = computed(() => store.getters.getItemById(productId.value));
 const reviews = computed(() => store.getters.getReviewsByProductId(productId.value));
 const isReviewModalActive = ref(false);
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
 
 const addToCart = (product) => {
   store.dispatch('cart/addToCart', product);
@@ -71,10 +72,15 @@ onMounted(() => {
     <div v-else>
       <reviewsList :reviews="reviews" />
     </div>
-    <buttonCart class="product-btn" @click="openReviewModal">Добавить отзыв </buttonCart>
-    <reviewModal :isActive="isReviewModalActive" @close="closeReviewModal">
+    <template v-if="isAuthenticated">
+      <buttonCart class="product-btn" @click="openReviewModal">Добавить отзыв </buttonCart>
+      <reviewModal :isActive="isReviewModalActive" @close="closeReviewModal">
         <reviewForm :productId="productId" @reviewAdded="closeReviewModal" />
-    </reviewModal>
+      </reviewModal>
+    </template>
+    <template v-else>
+      <div class="review-auth-hint">Войдите, чтобы оставить отзыв</div>
+    </template>
   </div>
 </template>
 
@@ -91,5 +97,11 @@ onMounted(() => {
 }
 .modal.is-active {
   display: flex;
+}
+.review-auth-hint {
+  margin-top: 40px;
+  color: #888;
+  font-size: 1.1rem;
+  text-align: center;
 }
 </style>
