@@ -2,9 +2,10 @@
 import { ref, onMounted, onUnmounted} from 'vue';
 
 const slides = ([
-      '/src/assets/slide.webp',
-      '/src/assets/slide2.webp',
-      '/src/assets/slide3.webp'
+      '/src/assets/slide1.png',
+      '/src/assets/slide2.png',
+      '/src/assets/slide3.png',
+      '/src/assets/slide4.png'
     ]);
 
 const currentIndex = ref(0);

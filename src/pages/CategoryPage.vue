@@ -63,6 +63,15 @@ const filteredProducts = computed(() => {
 
 const categoryName = computed(() => store.getters.getCategoryNameById(category.value));
 
+const categoryBrands = computed(() => {
+  const filtered = items.value.filter(item => item.category === category.value);
+  const brandsSet = new Set(filtered.map(item => item.brand));
+  return Array.from(brandsSet).map(b => ({
+    label: b.charAt(0).toUpperCase() + b.slice(1),
+    value: b.toLowerCase()
+  }));
+});
+
 const handleFilterChange = (filterType, values) => {
   selectedFilters.value[filterType] = values;
 };
@@ -177,6 +186,7 @@ const props = defineProps({
         <CategorySide 
           :selectedFilters="selectedFilters"
           :priceRange="priceRange"
+          :brands="categoryBrands"
           @filterChange="handleFilterChange"
           @priceChange="handlePriceChange"
         />

@@ -14,6 +14,10 @@ const props = defineProps({
   priceRange: {
     type: Array,
     default: () => [0, 300000]
+  },
+  brands: {
+    type: Array,
+    default: () => []
   }
 });
 
@@ -131,7 +135,7 @@ const filters = ref([
   {
     name: 'Производитель',
     key: 'brand',
-    options: [
+    options: props.brands.length > 0 ? props.brands : [
       { label: 'Apple', value: 'apple' },
       { label: 'Samsung', value: 'samsung' },
       { label: 'Xiaomi', value: 'xiaomi' },
