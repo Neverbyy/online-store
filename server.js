@@ -10,6 +10,8 @@ const PORT = 5000;
 const users = [];
 // Массив заказов (вместо базы данных)
 const orders = [];
+// Массив отзывов (вместо базы данных)
+const reviews = [];
 
 // Настройка middlewares
 app.use(bodyParser.json());
@@ -45,7 +47,8 @@ app.post('/api/register', async (req, res) => {
     password: hashedPassword,
     name,
     email,
-    favorites: [] // Добавляем поле избранного
+    favorites: [], // Добавляем поле избранного
+    addresses: [] // Добавляем поле адресов
   };
   users.push(newUser);
 
@@ -85,7 +88,7 @@ app.get('/api/profile/:id', (req, res) => {
 
 // Обновление профиля пользователя
 app.put('/api/profile', async (req, res) => {
-  const { id, phone, name = '', email = '' } = req.body;
+  const { id, phone, name = '', email = '', addresses } = req.body;
 
   // Проверка наличия пользователя с таким ID
   const user = users.find(user => user.id === id);
@@ -103,6 +106,7 @@ app.put('/api/profile', async (req, res) => {
   user.phone = phone;
   user.name = name;
   user.email = email;
+  if (addresses) user.addresses = addresses;
   res.status(200).json({ message: 'Профиль успешно обновлен', user });
 });
 
@@ -238,6 +242,32 @@ app.post('/api/cart/clear', (req, res) => {
   res.status(200).json({ cart: user.cart });
 });
 // ===================================================
+
+// ===================== ОТЗЫВЫ =====================
+// Получить отзывы (все, по productId или userId)
+app.get('/api/reviews', (req, res) => {
+  const { productId, userId } = req.query;
+  let filtered = reviews;
+  if (productId) {
+    filtered = filtered.filter(r => String(r.productId) === String(productId));
+  }
+  if (userId) {
+    filtered = filtered.filter(r => String(r.userId) === String(userId));
+  }
+  res.status(200).json(filtered);
+});
+
+// Добавить отзыв
+app.post('/api/reviews', (req, res) => {
+  const review = req.body;
+  if (!review.productId || !review.userId || !review.userName || !review.rating) {
+    return res.status(400).json({ message: 'productId, userId, userName, rating обязательны' });
+  }
+  review.id = reviews.length + 1;
+  reviews.push(review);
+  res.status(201).json(review);
+});
+// ==================================================
 
 // Запуск сервера
 app.listen(PORT, () => {

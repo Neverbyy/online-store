@@ -1,6 +1,8 @@
 // reviewStore.js
 import axios from 'axios';
 
+const API_URL = 'http://localhost:5000/api/reviews';
+
 export default {
   state: {
     reviews: []
@@ -21,7 +23,7 @@ export default {
   actions: {
     async fetchReviews({ commit }) {
       try {
-        const response = await axios.get('https://48e8b1c201ae4e29.mokky.dev/reviews');
+        const response = await axios.get(API_URL);
         commit('setReviews', response.data);
       } catch (error) {
         console.error('Ошибка при загрузке отзывов:', error);
@@ -29,7 +31,7 @@ export default {
     },
     async addReview({ commit }, newReview) {
       try {
-        const response = await axios.post('https://48e8b1c201ae4e29.mokky.dev/reviews', newReview);
+        const response = await axios.post(API_URL, newReview);
         commit('addReview', response.data); // Добавляем новый отзыв в хранилище
       } catch (error) {
         console.error('Ошибка при добавлении отзыва:', error);

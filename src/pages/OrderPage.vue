@@ -55,6 +55,11 @@ const submitForm = async () => {
   }
   // --- конец блока отправки заказа ---
 
+  // Добавление адреса в профиль пользователя, если выбран курьер
+  if (deliveryMethod.value === 'courier' && user.id) {
+    await store.dispatch('profile/addAddress', address.value);
+  }
+
   // Логика обработки успешного заказа
   store.dispatch('markOrderAsSuccess'); // Устанавливаем флаг успешного заказа в store
   sessionStorage.setItem('orderSuccess', 'true'); // Устанавливаем флаг успешного заказа в sessionStorage

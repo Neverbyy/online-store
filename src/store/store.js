@@ -24,7 +24,13 @@ export default createStore({
             Computers: 'Компьютеры',
             Smartphones: 'Смартфоны',
             Laptops: 'Ноутбуки',
-            Macbooks: 'Макбуки'
+            Macbooks: 'Макбуки',
+            Tablets: 'Планшеты',
+            TVs: 'Телевизоры',
+            Audio: 'Аудиотехника',
+            Cameras: 'Фотоаппараты',
+            Consoles: 'Игровые приставки',
+            Smartwatches: 'Смарт-часы'
         }
     },
 
