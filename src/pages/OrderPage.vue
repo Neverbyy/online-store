@@ -27,11 +27,6 @@ const address = computed({
 const formattedTotalPrice = computed(() => store.getters['cart/formattedTotalPrice']);
 
 const submitForm = async () => {
-  // Логика отправки формы
-  console.log('Delivery Method:', deliveryMethod.value);
-  console.log('Contact:', contact.value);
-  console.log('Address:', address.value);
-
   // --- Отправка заказа на сервер ---
   const cartItems = store.getters['cart/getCart'];
   const totalPrice = store.getters['cart/getTotalPrice'];

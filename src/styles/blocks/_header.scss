@@ -8,8 +8,12 @@
         justify-content: space-between;
         align-items: center;
 
-        h2{
-            color: var(--color-gradient);
+        h1{
+            background: linear-gradient(135deg, #750DC5 0%, #9B2CFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
         }
     }
 
@@ -27,6 +31,19 @@
             flex-direction: column;
             cursor: pointer;
             color: #454545;
+
+            &:hover{
+                color: var(--color-primary);
+                
+                .header__navbar-image {
+                    rect {
+                        fill: var(--color-primary);
+                    }
+                    path {
+                        stroke: var(--color-primary);
+                    }
+                }
+            }
         }
 
         &-image{
@@ -34,6 +51,7 @@
             padding-bottom: 8px;
             width: 30px;
             height: 30px;
+
         }
     }
 }

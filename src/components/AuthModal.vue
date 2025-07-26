@@ -47,7 +47,6 @@ const handleSubmit = async () => {
     }
   } else {
     const success = await store.dispatch('auth/login', payload);
-    console.log('Login success:', success); // Отладочная информация
     if (success) {
       emit('close'); // Закрываем модальное окно только при успешном входе
     }

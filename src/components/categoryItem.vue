@@ -95,7 +95,7 @@ const handleShowAddedMessage = () => {
 // Виджет скидки
 .discount-widget {
   position: absolute;
-  top: 45px;
+  top: 40px;
   right: 25px;
   background-color: #FFD700;
   color: #000;
