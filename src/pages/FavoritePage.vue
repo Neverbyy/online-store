@@ -131,4 +131,89 @@ onMounted(() => {
     transform: translateY(-4px) scale(1.02);
   }
 }
+
+@media (max-width: 900px) {
+  .favorites-page {
+    padding: 24px 12px 100px 12px;
+  }
+  
+  .favorites-header {
+    margin-bottom: 24px;
+    h1 {
+      font-size: 1.8rem;
+    }
+  }
+  
+  .favorites-list {
+    gap: 20px;
+  }
+  
+  .favorite-card {
+    width: 280px;
+    min-height: 380px;
+    flex: 0 1 280px;
+  }
+  
+  .favorites-empty {
+    padding: 32px 16px 24px 16px;
+    margin-top: 24px;
+  }
+  
+  .favorites-empty-title {
+    font-size: 1.3rem;
+  }
+  
+  .favorites-empty-desc {
+    font-size: 1rem;
+  }
+  
+  .main {
+    padding-bottom: 80px;
+  }
+}
+
+@media (max-width: 600px) {
+  .favorites-page {
+    padding: 16px 8px 100px 8px;
+  }
+  
+  .favorites-header {
+    margin-bottom: 20px;
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .favorites-list {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+  
+  .favorite-card {
+    width: 100%;
+    max-width: 320px;
+    min-height: auto;
+    flex: none;
+  }
+  
+  .favorites-empty {
+    padding: 24px 12px 20px 12px;
+    margin-top: 20px;
+  }
+  
+  .favorites-empty-title {
+    font-size: 1.2rem;
+  }
+  
+  .favorites-empty-desc {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  
+  .favorites-empty-btn {
+    padding: 10px 24px;
+    font-size: 1rem;
+  }
+}
 </style>

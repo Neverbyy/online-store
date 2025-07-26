@@ -17,12 +17,89 @@ const props = defineProps({
 
 <template>
     <div class="main container">
-        <h1>Каталог товаров</h1>
-        <catalog :products="products"/>
+        <h1 class="main-title">Каталог товаров</h1>
+        <div class="mobile-scroll-container">
+          <catalog :products="products"/>
+        </div>
     </div>
 </template>
 
 
 <style lang="scss" scoped>
+.mobile-scroll-container {
+  // Стили для десктопа (больше 900px)
+  @media (min-width: 901px) {
+    overflow: visible;
+    
+    .main__list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 0;
+      min-width: auto;
+      
+      &-item {
+        width: auto;
+        min-width: auto;
+        
+        .cart-action-btn {
+          width: auto;
+          margin-top: 10px;
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 900px) {
+    overflow: visible;
+    
+    .main__list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 0 16px;
+      
+      &-item {
+        width: 100%;
+        min-width: auto;
+        
+        .cart-action-btn {
+          width: 100%;
+          margin-top: 10px;
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 600px) {
+    overflow: visible;
+    
+    .main__list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 0 12px;
+      
+      &-item {
+        width: 100%;
+        min-width: auto;
+        
+        .cart-action-btn {
+          width: 100%;
+          margin-top: 10px;
+        }
+      }
+    }
+  }
+}
 
+@media (max-width: 900px) {
+  .main-title {
+    padding-left: 16px;
+  }
+  
+  .main {
+    padding-bottom: 80px;
+  }
+}
 </style>

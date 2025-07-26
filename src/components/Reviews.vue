@@ -105,13 +105,36 @@ onMounted(() => {
     margin-bottom: 8px;
   }
 }
-@media (max-width: 600px) {
-  .user-reviews__item {
-    min-width: 98vw;
-    max-width: 98vw;
+
+@media (max-width: 900px) {
+  .user-reviews__list {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .review-item{
+    width: 100%;
   }
   .user-reviews__card {
-    padding: 14px 2vw 14px 2vw;
+    padding: 16px 14px 12px 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .user-reviews__list {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .review-item{
+    width: 100%;
+  }
+  .user-reviews__item {
+    min-width: 100%;
+    max-width: 100%;
+    width: 100%;
+  }
+  .user-reviews__card {
+    padding: 14px 12px 10px 12px;
   }
 }
 </style>

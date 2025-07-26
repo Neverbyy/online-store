@@ -10,6 +10,7 @@ const route = useRoute();
 const router = useRouter();
 
 const categoryExists = ref(false);
+const showFiltersModal = ref(false);
 const selectedFilters = ref({
   brand: [],
   memory: [],
@@ -158,6 +159,14 @@ const getActiveFilters = computed(() => {
   return active;
 });
 
+const handleOpenFilters = () => {
+  showFiltersModal.value = true;
+};
+
+const handleCloseFilters = () => {
+  showFiltersModal.value = false;
+};
+
 onMounted(async () => {
   await store.dispatch('fetchItems');
   categoryExists.value = items.value.some(item => item.category === category.value);
@@ -181,9 +190,22 @@ const props = defineProps({
       </ol>
     </nav>
         <h1>{{ categoryName }}</h1>
+        
+        <!-- Мобильная панель с кнопками -->
+        <div class="mobile-controls">
+          <button class="btn-filters" @click="handleOpenFilters">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 4H21V6H3V4ZM6 11H18V13H6V11ZM9 18H15V20H9V18Z" fill="currentColor"/>
+            </svg>
+            Фильтры
+          </button>
+        </div>
+        
         <div class="category-page">
 
+        <!-- Десктопная боковая панель -->
         <CategorySide 
+          class="desktop-filters"
           :selectedFilters="selectedFilters"
           :priceRange="priceRange"
           :brands="categoryBrands"
@@ -218,6 +240,29 @@ const props = defineProps({
           :products="filteredProducts"
           />
         </div>
+        </div>
+        
+        <!-- Модальное окно фильтров -->
+        <div v-if="showFiltersModal" class="filters-modal-overlay" @click="handleCloseFilters">
+          <div class="filters-modal" @click.stop>
+            <div class="filters-modal-header">
+              <h3>Фильтры</h3>
+              <button class="btn-close" @click="handleCloseFilters">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"/>
+                </svg>
+              </button>
+            </div>
+            <div class="filters-modal-content">
+              <CategorySide 
+                :selectedFilters="selectedFilters"
+                :priceRange="priceRange"
+                :brands="categoryBrands"
+                @filterChange="handleFilterChange"
+                @priceChange="handlePriceChange"
+              />
+            </div>
+          </div>
         </div>
     </div>
 </template>
@@ -297,6 +342,199 @@ const props = defineProps({
       &:focus {
         outline: none;
         background-color: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+}
+
+// Мобильная панель управления
+.mobile-controls {
+  display: none;
+  margin: 20px 0;
+  
+  .btn-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background-color: #750DC5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: #5a0a9a;
+    }
+    
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// Модальное окно фильтров
+.filters-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.filters-modal {
+  background-color: white;
+  border-radius: 16px 16px 0 0;
+  width: 100%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  
+  .filters-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .btn-close {
+      background: none;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: #f5f5f5;
+      }
+      
+      svg {
+        width: 20px;
+        height: 20px;
+        color: #666;
+      }
+    }
+  }
+  
+  .filters-modal-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    
+    :deep(.sidebar) {
+      width: 100%;
+      border: none;
+      border-radius: 0;
+      background-color: white;
+      position: static;
+      padding: 20px;
+      
+      .sidebar-inner {
+        padding: 0;
+      }
+      
+      // Стили для ползунка в модальном окне
+      .slider-track {
+        background: #e0e0e0 !important;
+        
+        &::before {
+          background: #750DC5 !important;
+        }
+      }
+    }
+  }
+}
+
+// Адаптивные стили - только для мобильных устройств
+@media (max-width: 900px) {
+  .category-page {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .desktop-filters {
+    display: none;
+  }
+  
+  .mobile-controls {
+    display: block;
+  }
+  
+  .category-content {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .main.container {
+    padding: 0 16px;
+    padding-bottom: 80px; // Отступ от мобильной навигации
+  }
+  
+  .breadcrumb {
+    font-size: 14px;
+  }
+  
+  h1 {
+    font-size: 24px;
+    margin: 16px 0;
+  }
+  
+  .results-info {
+    margin-bottom: 16px;
+    padding: 12px;
+    
+    p {
+      font-size: 13px;
+    }
+  }
+  
+  .active-filters {
+    .filter-tags {
+      gap: 6px;
+    }
+    
+    .filter-tag {
+      font-size: 11px;
+      padding: 3px 6px;
+    }
+  }
+  
+  .filters-modal {
+    max-height: 90vh;
+    
+    .filters-modal-header {
+      padding: 16px;
+      
+      h3 {
+        font-size: 16px;
+      }
+    }
+    
+    .filters-modal-content {
+      :deep(.sidebar) {
+        padding: 16px;
       }
     }
   }

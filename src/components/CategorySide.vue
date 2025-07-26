@@ -49,30 +49,29 @@ const updatePriceRange = (type, value) => {
   emit('priceChange', newRange);
 };
 
+const sliderTrackRef = ref(null);
+
 const updateSliderTrack = (range) => {
   const minPercent = (range[0] / 300000) * 100;
   const maxPercent = (range[1] / 300000) * 100;
   
-  const track = document.querySelector('.slider-track');
-  if (track) {
-    track.style.setProperty('--min-percent', `${minPercent}%`);
-    track.style.setProperty('--max-percent', `${maxPercent}%`);
+  if (sliderTrackRef.value) {
+    sliderTrackRef.value.style.setProperty('--min-percent', `${minPercent}%`);
+    sliderTrackRef.value.style.setProperty('--max-percent', `${maxPercent}%`);
   }
 };
 
 const handleSliderStart = () => {
   // Добавляем класс для более плавной анимации при перетаскивании
-  const track = document.querySelector('.slider-track');
-  if (track) {
-    track.classList.add('dragging');
+  if (sliderTrackRef.value) {
+    sliderTrackRef.value.classList.add('dragging');
   }
 };
 
 const handleSliderEnd = () => {
   // Убираем класс после окончания перетаскивания
-  const track = document.querySelector('.slider-track');
-  if (track) {
-    track.classList.remove('dragging');
+  if (sliderTrackRef.value) {
+    sliderTrackRef.value.classList.remove('dragging');
   }
 };
 
@@ -183,7 +182,7 @@ onMounted(() => {
                 <h3>Цена, ₽</h3>
                 <div class="price-range">
                   <div class="price-slider">
-                    <div class="slider-track"></div>
+                    <div class="slider-track" ref="sliderTrackRef"></div>
                     <input 
                       type="range" 
                       class="slider-input slider-min"

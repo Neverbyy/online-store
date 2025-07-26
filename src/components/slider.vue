@@ -52,6 +52,26 @@ onMounted(() => {
   margin: 0 20px;
 }
 
+@media (max-width: 900px) {
+  .slide img {
+    width: 100vw !important;
+    max-width: 700px !important;
+    height: 220px !important;
+    object-fit: cover !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .slide img {
+    width: 100vw !important;
+    height: 140px !important;
+    object-fit: cover !important;
+  }
+  .slider {
+    margin-top: 10px;
+  }
+}
+
 .slide-fade-enter-active,
 .slide-fade-leave-active {
   transition: opacity 0.5s ease;
