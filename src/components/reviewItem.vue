@@ -63,6 +63,13 @@ const closeModal = () => {
   word-break: break-word;
   font-size: 1.08rem;
   line-height: 1.5;
+  
+  @media (max-width: 600px) {
+    width: 280px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    padding: 16px 16px 12px 16px;
+  }
 
   &__header {
     display: flex;

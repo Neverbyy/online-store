@@ -62,12 +62,22 @@ const handleShowAddedMessage = () => {
   display: flex;
   justify-content: space-between;
   position: relative;
+  
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 .product-card-buy {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
+  
+  @media (max-width: 600px) {
+    padding: 0 16px;
+    margin-top: 20px;
+  }
 }
 .product-card-buy-row {
   display: flex;
@@ -75,12 +85,32 @@ const handleShowAddedMessage = () => {
   align-items: center;
   gap: 16px;
   margin-top: 12px;
+  
+  @media (max-width: 600px) {
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 0 16px;
+  }
 }
 .product-card{
   border-radius: 8px;
+  
+  @media (max-width: 600px) {
+    border-radius: 8px;
+  }
 
   &-image{
     width: 350px;
+    
+    @media (max-width: 600px) {
+      width: 80%;
+      max-width: 300px;
+      height: auto;
+      border-radius: 8px;
+      margin: 0 auto;
+      display: block;
+    }
   }
 
   &-buy{
@@ -94,11 +124,24 @@ const handleShowAddedMessage = () => {
     display: flex;
     flex-direction: column;
     row-gap: 20px;
+    
+    @media (max-width: 600px) {
+      row-gap: 16px;
+      padding: 0 16px;
+    }
+    
     &-inner{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 16px;
-  }
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 16px;
+      
+      @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+        grid-gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+      }
+    }
   }
 }
 

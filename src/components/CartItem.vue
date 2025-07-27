@@ -220,4 +220,193 @@ const handleProductClick = () => {
   background-image: url('/src/assets/remove.png');
   align-self: flex-end;
 }
+
+// Адаптивные стили для планшетов
+@media (max-width: 900px) {
+  .cart__main {
+    &-image {
+      max-width: 160px;
+      border-radius: 10px;
+    }
+    
+    &-item {
+      padding: 20px;
+      margin: 12px 0;
+      border-radius: 14px;
+    }
+    
+    &-details {
+      gap: 20px;
+      
+      &-left {
+        h2 {
+          font-size: 1.1rem;
+          
+          &:last-of-type {
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+          }
+        }
+        
+        &-features {
+          font-size: 0.9rem;
+          
+          li {
+            padding: 3px 0;
+            padding-left: 14px;
+          }
+        }
+      }
+      
+      &-right {
+        &-btns {
+            flex-direction: column;
+            gap: 20px;
+        }
+      }
+    }
+  }
+  
+  .cart__main-item-counter {
+    width: 90px;
+  }
+  
+  .counter-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+}
+
+// Адаптивные стили для мобильных устройств
+@media (max-width: 600px) {
+  .cart__main {
+    &-image {
+      max-width: 120px;
+      border-radius: 8px;
+    }
+    
+    &-item {
+      padding: 16px;
+      margin: 8px 0;
+      border-radius: 12px;
+    }
+    
+    &-details {
+      flex-direction: column;
+      gap: 16px;
+      
+      &-left {
+        
+        h2 {
+          font-size: 1rem;
+          margin: 0 0 6px 0;
+          
+          &:last-of-type {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+          }
+        }
+        
+        &-features {
+          font-size: 0.85rem;
+          
+          li {
+            padding: 2px 0;
+            padding-left: 12px;
+          }
+        }
+      }
+      
+      &-right {
+        width: 100%;
+        align-items: stretch;
+        
+        &-btns {
+          flex-direction: column;
+          gap: 16px;
+          width: 100%;
+          
+          :deep(.btn-cart) {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 14px;
+            border-radius: 10px;
+          }
+        }
+      }
+    }
+  }
+  
+  .cart__main-item-counter {
+    width: 120px;
+    height: 40px;
+    align-self: center;
+  }
+  
+  .counter-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+}
+
+// Адаптивные стили для очень маленьких экранов
+@media (max-width: 480px) {
+  .cart__main {
+    &-image {
+      border-radius: 6px;
+    }
+    
+    &-item {
+      padding: 12px;
+      margin: 6px 0;
+    }
+    
+    &-details {
+      gap: 12px;
+      
+      &-left {
+        h2 {
+          font-size: 0.95rem;
+          
+          &:last-of-type {
+            font-size: 1.1rem;
+          }
+        }
+        
+        &-features {
+          font-size: 0.8rem;
+          
+          li {
+            padding: 1px 0;
+            padding-left: 10px;
+          }
+        }
+      }
+      
+      &-right {
+        &-btns {
+          gap: 12px;
+          
+          :deep(.btn-cart) {
+            padding: 10px 16px;
+            font-size: 13px;
+          }
+        }
+      }
+    }
+  }
+  
+  .cart__main-item-counter {
+    width: 100px;
+    height: 36px;
+  }
+  
+  .counter-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+}
 </style>

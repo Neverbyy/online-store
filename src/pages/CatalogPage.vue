@@ -27,28 +27,7 @@ const props = defineProps({
 
 <style lang="scss" scoped>
 .mobile-scroll-container {
-  // Стили для десктопа (больше 900px)
-  @media (min-width: 901px) {
-    overflow: visible;
-    
-    .main__list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      padding: 0;
-      min-width: auto;
-      
-      &-item {
-        width: auto;
-        min-width: auto;
-        
-        .cart-action-btn {
-          width: auto;
-          margin-top: 10px;
-        }
-      }
-    }
-  }
+
   
   @media (max-width: 900px) {
     overflow: visible;
@@ -58,6 +37,7 @@ const props = defineProps({
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       padding: 0 16px;
+      place-items: center;
       
       &-item {
         width: 100%;

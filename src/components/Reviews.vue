@@ -103,6 +103,7 @@ onMounted(() => {
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 8px;
+    text-align: center;
   }
 }
 

@@ -43,16 +43,17 @@ const handleShowAddedMessage = () => {
 </script>
 
 <template>
-  <div class="category__main-item">
-    <div class="category__main-details">
-      <!-- Виджет скидки -->
-      <div v-if="discountPercentage > 0" class="discount-widget">
-        -{{ discountPercentage }}%
+      <div class="category__main-item">
+      <div class="category__main-details">
+        
+        <div class="image-container">
+        <router-link :to="`/catalog/${props.product.category}/${transliterate(props.product.name)}/${props.product.id}`">
+          <img class="category__main-image" :src="props.product.image" alt="">
+        </router-link>
+        <div v-if="discountPercentage > 0" class="discount-widget">
+          -{{ discountPercentage }}%
+        </div>
       </div>
-      
-      <router-link :to="`/catalog/${props.product.category}/${transliterate(props.product.name)}/${props.product.id}`">
-        <img class="category__main-image" :src="props.product.image" alt="">
-      </router-link>
       <div class="category__main-details-left">
         <router-link :to="`/catalog/${props.product.category}/${transliterate(props.product.name)}/${props.product.id}`">
           <h2>{{ props.product.name }}</h2>
@@ -89,15 +90,89 @@ const handleShowAddedMessage = () => {
 
 <style lang="scss" scoped>
 
+.image-container {
+  position: relative;
+  display: inline-block;
+}
+
 .category__main-image{
   max-width: 200px;
+}
+
+// Адаптивные стили для средних экранов (1200px-1400px)
+@media (max-width: 1400px) and (min-width: 901px) {
+  .category__main-image {
+    max-width: 180px;
+  }
+  
+  .category__main-details-left h2 {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+  
+  .category__main-details-left-features {
+    font-size: 15px;
+  }
+  
+  .category__main-details-right-price {
+    font-size: 20px;
+  }
+  
+  .category__main-details-right-oldprice {
+    font-size: 14px;
+  }
+}
+
+// Адаптивные стили для малых экранов (900px-1200px)
+@media (max-width: 1200px) and (min-width: 901px) {
+  .category__main-image {
+    max-width: 160px;
+  }
+  
+  .category__main-details-left h2 {
+    font-size: 18px;
+    line-height: 1.3;
+  }
+  
+  .category__main-details-left-features {
+    font-size: 14px;
+  }
+  
+  .category__main-details-right-price {
+    font-size: 18px;
+  }
+  
+  .category__main-details-right-oldprice {
+    font-size: 13px;
+  }
+  
+  .category__main-details-right-btns {
+    gap: 12px;
+  }
+  
+  :deep(.main__list-item-inner-like) {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  
+  :deep(.cart-action-button) {
+    padding: 12px 20px;
+    font-size: 15px;
+    min-height: 44px;
+  }
 }
 
 // Виджет скидки
 .discount-widget {
   position: absolute;
-  top: 40px;
-  right: 25px;
+  top: 8px;
+  right: 8px;
   background-color: #FFD700;
   color: #000;
   font-weight: bold;
@@ -169,25 +244,300 @@ const handleShowAddedMessage = () => {
 
 // Адаптивные стили для планшетов
 @media (max-width: 900px) {
-  .category__main-image {
-    max-width: 180px;
+  .category__main-item {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+      transform: translateY(-3px);
+    }
   }
   
-  .category__main-details-left h2 {
-    font-size: 18px;
-    line-height: 1.3;
+  .category__main-details {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+  }
+  
+  .category__main-image {
+    max-width: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+  }
+  
+  .category__main-details-left {
+    flex: 1;
+    min-width: 0;
+    
+    h2 {
+      font-size: 24px;
+      line-height: 1.3;
+      margin: 0 0 20px 0;
+      font-weight: 700;
+      color: #333;
+      letter-spacing: -0.01em;
+    }
+    
+    h3 {
+      display: none; // Скрываем "В наличии" в верхней секции
+    }
   }
   
   .category__main-details-left-features {
-    font-size: 14px;
+    font-size: 16px;
+    color: #666;
+    gap: 10px;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    
+    span {
+      line-height: 1.5;
+      display: block;
+      margin-bottom: 6px;
+    }
+  }
+  
+  .category__main-details-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 20px;
+    align-self: flex-start;
+    min-width: 200px;
+  }
+  
+  .category__main-details-right-price-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  
+  .in-stock-label {
+    font-size: 18px;
+    color: #4CAF50;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block; // Показываем на планшетах
   }
   
   .category__main-details-right-price {
-    font-size: 18px;
+    font-size: 28px;
+    color: #333;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1;
+    letter-spacing: -0.01em;
   }
   
   .category__main-details-right-oldprice {
-    font-size: 13px;
+    font-size: 16px;
+    color: #999;
+    font-weight: 500;
+    text-decoration: line-through;
+  }
+  
+  .category__main-details-right-btns {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  // Увеличиваем размеры кнопок для планшетов
+  :deep(.main__list-item-inner-like) {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: 14px;
+    border: 2px solid #e8e8e8;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    
+    &:hover {
+      background-color: #f8f8f8;
+      border-color: #750DC5;
+      transform: scale(1.05);
+    }
+    
+    &:active {
+      transform: scale(0.95);
+    }
+    
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+  
+  :deep(.cart-action-button) {
+    padding: 16px 28px;
+    font-size: 17px;
+    font-weight: 700;
+    border-radius: 14px;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    max-width: 200px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(117, 13, 197, 0.2);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(117, 13, 197, 0.3);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+  
+  // Виджет скидки для планшетов
+  .discount-widget {
+    top: -10px;
+    right: -10px;
+    font-size: 18px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+    border: 2px solid #fff;
+  }
+  
+  // Сообщения о добавлении в корзину
+  .added-to-cart,
+  .max-quantity {
+    position: absolute;
+    top: -70px;
+    right: 0;
+    background-color: #750DC5;
+    color: white;
+    padding: 16px 20px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 10;
+    white-space: nowrap;
+    box-shadow: 0 5px 20px rgba(117, 13, 197, 0.3);
+    
+    &.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .max-quantity {
+    background-color: #f44336;
+    box-shadow: 0 5px 20px rgba(244, 67, 54, 0.3);
+  }
+}
+
+// Дополнительные стили для средних планшетов
+@media (max-width: 768px) and (min-width: 601px) {
+  .category__main-item {
+    padding: 28px;
+    margin-bottom: 20px;
+    border-radius: 18px;
+  }
+  
+  .category__main-details {
+    gap: 24px;
+  }
+  
+  .category__main-image {
+    max-width: 200px;
+    border-radius: 14px;
+  }
+  
+  .category__main-details-left h2 {
+    font-size: 22px;
+    margin: 0 0 18px 0;
+  }
+  
+  .category__main-details-left-features {
+    font-size: 15px;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  
+  .category__main-details-right {
+    gap: 18px;
+    min-width: 180px;
+  }
+  
+  .category__main-details-right-price {
+    font-size: 26px;
+  }
+  
+  .category__main-details-right-oldprice {
+    font-size: 15px;
+  }
+  
+  .in-stock-label {
+    font-size: 17px;
+    margin-bottom: 5px;
+  }
+  
+  .category__main-details-right-btns {
+    gap: 14px;
+  }
+  
+  :deep(.main__list-item-inner-like) {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 12px;
+    
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+  
+  :deep(.cart-action-button) {
+    padding: 14px 24px;
+    min-height: 48px;
+    max-width: 180px;
+    font-size: 16px;
+  }
+  
+  .discount-widget {
+    top: 0px;
+    right: -10px;
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+  
+  .added-to-cart,
+  .max-quantity {
+    top: -60px;
+    padding: 14px 18px;
+    font-size: 15px;
+    border-radius: 12px;
   }
 }
 
@@ -210,22 +560,16 @@ const handleShowAddedMessage = () => {
     }
   }
   
-  .category__main-details {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-  
   // Верхняя секция: изображение + детали
   .category__main-details {
     display: flex;
     gap: 20px;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
   }
   
   .category__main-image {
     max-width: 160px;
-    height: 160px;
     object-fit: cover;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -371,8 +715,8 @@ const handleShowAddedMessage = () => {
   
   // Виджет скидки для мобильных
   .discount-widget {
-    top: 20px;
-    right: 20px;
+    top: 0;
+    right: -10px;
     font-size: 16px;
     padding: 8px 12px;
     border-radius: 8px;
@@ -428,7 +772,6 @@ const handleShowAddedMessage = () => {
   
   .category__main-image {
     max-width: 140px;
-    height: 140px;
     border-radius: 10px;
   }
   
@@ -485,8 +828,8 @@ const handleShowAddedMessage = () => {
   }
   
   .discount-widget {
-    top: 16px;
-    right: 16px;
+    top: 6px;
+    right: 6px;
     font-size: 14px;
     padding: 6px 10px;
     border-radius: 6px;
@@ -498,6 +841,12 @@ const handleShowAddedMessage = () => {
     padding: 12px 16px;
     font-size: 14px;
     border-radius: 10px;
+  }
+}
+
+@media (max-width: 430px) {
+  .category__main-details-right-price{
+    font-size: 18px
   }
 }
 </style>

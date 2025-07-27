@@ -35,10 +35,21 @@ const props = defineProps({
   gap: 20px;
 }
 
+// Адаптивные стили для средних экранов (1200px-1400px)
+@media (max-width: 1200px) and (min-width: 901px) {
+  .category__main {
+    width: 100%;
+    gap: 18px;
+  }
+}
+
+
+
 // Адаптивные стили для планшетов
 @media (max-width: 900px) {
   .category__main {
     gap: 16px;
+    width: 100%;
   }
 }
 

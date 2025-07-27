@@ -302,6 +302,56 @@ onMounted(() => {
             color: #750DC5;
         }
     }
+    
+    // Адаптивные стили для средних экранов (1200px-1400px)
+    @media (max-width: 1400px) and (min-width: 901px) {
+        .sidebar {
+            width: 280px;
+            padding: 14px;
+        }
+    }
+    
+    // Адаптивные стили для малых экранов (900px-1200px)
+    @media (max-width: 1200px) and (min-width: 901px) {
+        .sidebar {
+            width: 260px;
+            padding: 12px;
+            
+            h3 {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+            
+            .sidebar-input {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            
+            .btn-more {
+                font-size: 13px;
+                margin-top: 10px;
+            }
+            
+            .btn-reset {
+                font-size: 14px;
+            }
+        }
+        
+        .price-range {
+            .price-slider {
+                height: 36px;
+                margin: 16px 0;
+            }
+            
+            .price-values {
+                margin-top: 8px;
+                
+                .price-value {
+                    font-size: 13px;
+                }
+            }
+        }
+    }
     .sidebar-btns{
       margin-top: 30px;
     }

@@ -466,8 +466,57 @@ const props = defineProps({
   }
 }
 
+// Адаптивные стили для средних экранов (1200px-1400px)
+@media (max-width: 1400px) and (min-width: 901px) {
+  .main.container {
+    padding: 0 20px;
+  }
+  
+  .category-page {
+    gap: 16px;
+  }
+  
+  .category-content {
+    min-width: 0; // Позволяет контенту сжиматься
+  }
+}
+
+// Адаптивные стили для малых экранов (900px-1200px)
+@media (max-width: 1200px) and (min-width: 901px) {
+  .main.container {
+    padding: 0 16px;
+  }
+  
+  .category-page {
+    gap: 12px;
+  }
+  
+  .results-info {
+    padding: 8px;
+    
+    p {
+      font-size: 13px;
+    }
+  }
+  
+  .active-filters {
+    .filter-tags {
+      gap: 6px;
+    }
+    
+    .filter-tag {
+      font-size: 11px;
+      padding: 3px 6px;
+    }
+  }
+}
+
 // Адаптивные стили - только для мобильных устройств
 @media (max-width: 900px) {
+  .main.container {
+    padding: 0 16px;
+    padding-bottom: 80px; // Отступ от мобильной навигации
+  }
   .category-page {
     flex-direction: column;
     gap: 0;
@@ -487,10 +536,6 @@ const props = defineProps({
 }
 
 @media (max-width: 600px) {
-  .main.container {
-    padding: 0 16px;
-    padding-bottom: 80px; // Отступ от мобильной навигации
-  }
   
   .breadcrumb {
     font-size: 14px;

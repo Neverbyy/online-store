@@ -65,12 +65,14 @@ onMounted(() => {
         :addToCart="addToCart"
       />
     </div>
-    <h1>Отзывы</h1>
-    <div v-if="reviews.length === 0">
-      <p>Пока нет отзывов.</p>
-    </div>
-    <div v-else>
-      <reviewsList :reviews="reviews" />
+    <div class="reviews-section">
+      <h1>Отзывы</h1>
+      <div v-if="reviews.length === 0">
+        <p>Пока нет отзывов.</p>
+      </div>
+      <div v-else>
+        <reviewsList :reviews="reviews" />
+      </div>
     </div>
     <template v-if="isAuthenticated">
       <buttonCart class="product-btn" @click="openReviewModal">Добавить отзыв </buttonCart>
@@ -88,12 +90,21 @@ onMounted(() => {
 <style lang="scss" scoped>
 .product-page{
   padding: 20px;
+  
+  @media (max-width: 600px) {
+    padding: 0 0 90px 0;
+  }
 }
 .modal {
   display: none;
 }
 .product-btn{
   margin-top: 50px;
+  
+  @media (max-width: 600px) {
+    margin: 30px 16px;
+    width: calc(100% - 32px);
+  }
 }
 .modal.is-active {
   display: flex;
@@ -103,5 +114,56 @@ onMounted(() => {
   color: #888;
   font-size: 1.1rem;
   text-align: center;
+  
+  @media (max-width: 600px) {
+    margin-top: 30px;
+    padding: 0 16px;
+    font-size: 1rem;
+  }
+}
+
+/* Стили для хлебных крошек на мобильных */
+@media (max-width: 600px) {
+  .breadcrumb {
+    padding: 16px;
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  .breadcrumb-item {
+    margin-right: 8px;
+    font-size: 14px;
+  }
+  
+  .breadcrumb-item:not(:last-child)::after {
+    content: ">";
+    margin-left: 8px;
+    color: #666;
+  }
+  
+  h1 {
+    padding: 0 16px;
+    margin: 20px 0;
+    font-size: 24px;
+    line-height: 1.3;
+  }
+  
+  /* Стили для секции отзывов на мобильных */
+  .reviews-section {
+    padding: 0;
+    margin-top: 30px;
+  }
+  
+  .reviews-section h1 {
+    padding: 0 16px;
+    margin-bottom: 20px;
+  }
+  
+  .reviews-section p {
+    padding: 0;
+    margin: 20px 0;
+    text-align: center;
+    color: #666;
+  }
 }
 </style>

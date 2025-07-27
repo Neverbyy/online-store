@@ -23,5 +23,23 @@ const props = defineProps({
     column-gap: 15px;
     background-color: #BCC5FF;
     padding: 20px;
+    
+    @media (max-width: 600px) {
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding: 16px;
+        gap: 12px;
+        
+        /* Скрываем скроллбар для WebKit браузеров */
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Скрываем скроллбар для Firefox */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
 }
 </style>

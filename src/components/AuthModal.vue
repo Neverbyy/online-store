@@ -127,7 +127,7 @@ const switchLinkText = computed(() =>
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 2000;
   }
   
   .modal-content {
@@ -175,8 +175,39 @@ const switchLinkText = computed(() =>
   text-decoration: none;
 }
 
-.switch-text a:hover {
-  text-decoration: underline;
-}
+  .switch-text a:hover {
+    text-decoration: underline;
+  }
+
+  /* Мобильные стили */
+  @media (max-width: 768px) {
+    .modal-content {
+      margin: 20px;
+      max-width: calc(100% - 40px);
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+    }
+    
+    .modal-overlay {
+      padding: 10px;
+    }
+    
+    .close-button {
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      padding: 5px;
+    }
+    
+    h2 {
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+  }
   </style>
   

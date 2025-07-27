@@ -167,8 +167,6 @@ const showLoginModal = () => {
             </li>
           </template>
         </ul>
-        <AuthModal v-if="isModalVisible" :visible="isModalVisible" :type="modalType" :message="authMessage" @close="closeModal"
-          @submit="handleAuthSubmit" @switch="switchModalType" />
       </div>
     </div>
     <div v-if="filteredItems.length > 0 && isSearchFocused" class="search-results">
@@ -215,14 +213,25 @@ const showLoginModal = () => {
       </svg>
       <span>Профиль</span>
     </router-link>
-    <span v-else class="mobile-navbar__item" @click="openModal('login')">
+    <button v-else class="mobile-navbar__item" @click="openModal('login')" type="button">
       <svg class="mobile-navbar__icon" width="22" height="24" viewBox="0 0 22 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M21 23V20.6667C21 19.429 20.4732 18.242 19.5355 17.3668C18.5979 16.4917 17.3261 16 16 16H6C4.67392 16 3.40215 16.4917 2.46447 17.3668C1.52678 18.242 1 19.429 1 20.6667V23" stroke="#454545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M10.5 11C13.2614 11 15.5 8.76142 15.5 6C15.5 3.23858 13.2614 1 10.5 1C7.73858 1 5.5 3.23858 5.5 6C5.5 8.76142 7.73858 11 10.5 11Z" stroke="#454545" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <span>Войти</span>
-    </span>
+    </button>
   </nav>
+  
+  <!-- Модальное окно авторизации -->
+  <AuthModal 
+    v-if="isModalVisible" 
+    :visible="isModalVisible" 
+    :type="modalType" 
+    :message="authMessage" 
+    @close="closeModal"
+    @submit="handleAuthSubmit" 
+    @switch="switchModalType" 
+  />
 </template>
 
 <style lang="scss" scoped>
@@ -302,12 +311,14 @@ const showLoginModal = () => {
 
 @media (max-width: 900px) {
   .header {
-    padding: 16px 8px 16px;
-
+    padding: 20px 16px 20px;
+    border: none;
   }
+  
   .header__navbar {
     display: none !important;
   }
+  
   .search-results {
     position: fixed;
     top: 80px;
@@ -323,14 +334,17 @@ const showLoginModal = () => {
     overflow-y: auto;
     padding: 0 0 8px 0;
   }
+  
   .search-result-item {
-    padding: 8px 12px;
+    padding: 12px 16px;
   }
+  
   .search-result-item img {
-    width: 36px;
-    height: 36px;
-    margin-right: 8px;
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
   }
+  
   .mobile-navbar {
     display: flex;
     position: fixed;
@@ -338,14 +352,15 @@ const showLoginModal = () => {
     right: 0;
     bottom: 0;
     width: 100vw;
-    height: 64px;
+    height: 70px;
     background: #fff;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.07);
+    box-shadow: 0 -3px 12px rgba(0,0,0,0.08);
     z-index: 1000;
     justify-content: space-around;
     align-items: center;
     border-top: 1px solid #e0e0e0;
   }
+  
   .mobile-navbar__item {
     position: relative;
     display: flex;
@@ -353,39 +368,82 @@ const showLoginModal = () => {
     align-items: center;
     justify-content: center;
     color: #454545;
-    font-size: 14px;
+    font-size: 15px;
     text-decoration: none;
     cursor: pointer;
     height: 100%;
     width: 25%;
     transition: color 0.2s;
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
   }
+  
   .mobile-navbar__icon {
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     display: block;
   }
+  
   .mobile-navbar__item.active,
   .mobile-navbar__item.router-link-exact-active {
     color: #750DC5;
   }
+  
   .mobile-favorite-count, .mobile-cart-count {
     position: absolute;
-    top: 5px;
+    top: 6px;
     left: 62%;
     transform: translateX(-50%);
     color: white;
     border-radius: 50%;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 12px;
     background-color: #bdbdbd;
     z-index: 2;
   }
+  
   .mobile-cart-count.green, .mobile-favorite-count.green {
     background-color: green;
+  }
+}
+
+// Дополнительные стили для средних планшетов
+@media (max-width: 768px) and (min-width: 601px) {
+  .header {
+    padding: 18px 12px 18px;
+  }
+  
+  .search-result-item {
+    padding: 10px 14px;
+  }
+  
+  .search-result-item img {
+    width: 38px;
+    height: 38px;
+    margin-right: 10px;
+  }
+  
+  .mobile-navbar {
+    height: 68px;
+  }
+  
+  .mobile-navbar__item {
+    font-size: 14px;
+  }
+  
+  .mobile-navbar__icon {
+    margin-bottom: 3px;
+  }
+  
+  .mobile-favorite-count, .mobile-cart-count {
+    width: 19px;
+    height: 19px;
+    font-size: 11px;
   }
 }
 </style>
