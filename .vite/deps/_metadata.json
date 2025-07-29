@@ -1,0 +1,49 @@
+{
+  "hash": "7256f106",
+  "configHash": "3f8a04a4",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "f9965b3d",
+  "optimized": {
+    "axios": {
+      "src": "../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "b84321f9",
+      "needsInterop": false
+    },
+    "vue": {
+      "src": "../../node_modules/vue/dist/vue.runtime.esm-bundler.js",
+      "file": "vue.js",
+      "fileHash": "7a5ca203",
+      "needsInterop": false
+    },
+    "vue-router": {
+      "src": "../../node_modules/vue-router/dist/vue-router.mjs",
+      "file": "vue-router.js",
+      "fileHash": "92f5a978",
+      "needsInterop": false
+    },
+    "vue-the-mask": {
+      "src": "../../node_modules/vue-the-mask/dist/vue-the-mask.js",
+      "file": "vue-the-mask.js",
+      "fileHash": "6815f9c5",
+      "needsInterop": true
+    },
+    "vuex": {
+      "src": "../../node_modules/vuex/dist/vuex.esm-bundler.js",
+      "file": "vuex.js",
+      "fileHash": "27c18bbc",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-AYVSL3LM": {
+      "file": "chunk-AYVSL3LM.js"
+    },
+    "chunk-Q4GJSH4P": {
+      "file": "chunk-Q4GJSH4P.js"
+    },
+    "chunk-HKJ2B2AA": {
+      "file": "chunk-HKJ2B2AA.js"
+    }
+  }
+}
