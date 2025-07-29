@@ -8,7 +8,11 @@ const props = defineProps({
       brand: [],
       memory: [],
       ram: [],
-      cores: []
+      cores: [],
+      sale: [],
+      os: [],
+      resolution: [],
+      refreshRate: []
     })
   },
   priceRange: {
@@ -16,6 +20,46 @@ const props = defineProps({
     default: () => [0, 300000]
   },
   brands: {
+    type: Array,
+    default: () => []
+  },
+  showOSFilter: {
+    type: Boolean,
+    default: false
+  },
+  categoryOS: {
+    type: Array,
+    default: () => []
+  },
+  showResolutionFilter: {
+    type: Boolean,
+    default: false
+  },
+  categoryResolution: {
+    type: Array,
+    default: () => []
+  },
+  showRefreshRateFilter: {
+    type: Boolean,
+    default: false
+  },
+  categoryRefreshRate: {
+    type: Array,
+    default: () => []
+  },
+  showMemoryFilter: {
+    type: Boolean,
+    default: false
+  },
+  showRamFilter: {
+    type: Boolean,
+    default: false
+  },
+  showProcessorFilter: {
+    type: Boolean,
+    default: false
+  },
+  categoryProcessors: {
     type: Array,
     default: () => []
   }
@@ -87,7 +131,11 @@ const resetFilters = () => {
   emit('filterChange', 'brand', []);
   emit('filterChange', 'memory', []);
   emit('filterChange', 'ram', []);
-  emit('filterChange', 'cores', []);
+  emit('filterChange', 'sale', []);
+  emit('filterChange', 'os', []);
+  emit('filterChange', 'resolution', []);
+  emit('filterChange', 'refreshRate', []);
+  emit('filterChange', 'processor', []);
 };
 
 const handleFilterChange = (filterKey, value, checked) => {
@@ -109,6 +157,35 @@ const handleFilterChange = (filterKey, value, checked) => {
 
 const filters = ref([
   {
+    name: 'Акции',
+    key: 'sale',
+    options: [
+      { label: 'Скидки и предложения', value: 'sale' }
+    ],
+    showAll: false
+  },
+  {
+    name: 'Операционная система',
+    key: 'os',
+    options: props.categoryOS.length > 0 ? props.categoryOS : [],
+    showAll: false,
+    show: props.showOSFilter
+  },
+  {
+    name: 'Разрешение',
+    key: 'resolution',
+    options: props.categoryResolution.length > 0 ? props.categoryResolution : [],
+    showAll: false,
+    show: props.showResolutionFilter
+  },
+  {
+    name: 'Частота обновления',
+    key: 'refreshRate',
+    options: props.categoryRefreshRate.length > 0 ? props.categoryRefreshRate : [],
+    showAll: false,
+    show: props.showRefreshRateFilter
+  },
+  {
     name: 'Встроенная память',
     key: 'memory',
     options: [
@@ -118,7 +195,8 @@ const filters = ref([
       { label: '64 ГБ', value: '64GB' },
       { label: '32 ГБ', value: '32GB' }
     ],
-    showAll: false
+    showAll: false,
+    show: props.showMemoryFilter
   },
   {
     name: 'Оперативная память',
@@ -129,7 +207,15 @@ const filters = ref([
       { label: '4 ГБ', value: '4GB' },
       { label: '2 ГБ', value: '2GB' }
     ],
-    showAll: false
+    showAll: false,
+    show: props.showRamFilter
+  },
+  {
+    name: 'Процессор',
+    key: 'processor',
+    options: props.categoryProcessors.length > 0 ? props.categoryProcessors : [],
+    showAll: false,
+    show: props.showProcessorFilter
   },
   {
     name: 'Производитель',
@@ -147,17 +233,6 @@ const filters = ref([
       { label: 'HP', value: 'hp' },
       { label: 'Dell', value: 'dell' },
       { label: 'MSI', value: 'msi' }
-    ],
-    showAll: false
-  },
-  {
-    name: 'Кол-во ядер',
-    key: 'cores',
-    options: [
-      { label: '8 ядер', value: '8' },
-      { label: '6 ядер', value: '6' },
-      { label: '4 ядра', value: '4' },
-      { label: '2 ядра', value: '2' }
     ],
     showAll: false
   }
@@ -215,7 +290,8 @@ onMounted(() => {
                 </div>
                 <div 
                 v-for="filter in filters" 
-                :key="filter.key">
+                :key="filter.key"
+                v-show="!filter.hasOwnProperty('show') || filter.show">
                 <h3>{{ filter.name }}</h3>
                 <transition-group name="expand" tag="div">
                     <div 
@@ -235,7 +311,7 @@ onMounted(() => {
                     </label>
                     </div>
                 </transition-group>
-                    <button class="btn-more" @click="toggleShowAll(filter.key)">
+                    <button v-if="filter.options.length > 2" class="btn-more" @click="toggleShowAll(filter.key)">
                     {{ filter.showAll ? 'Скрыть' : 'Ещё' }}
                     </button>
                 </div>
@@ -290,8 +366,6 @@ onMounted(() => {
         background-color: #f9f9f9;
         width: 300px;
         height: fit-content;
-        position: sticky;
-        top: 20px;
 
         input{
             margin-right: 8px;
