@@ -33,6 +33,11 @@ watch(isAuthenticated, (newVal) => {
 
 onMounted(() => {
     store.dispatch('auth/checkUserExists');
+    
+    // Если активна вкладка "Заказы", обновляем их статус
+    if (store.state.profile.activeItem === 1) {
+        window.dispatchEvent(new CustomEvent('refresh-orders'));
+    }
 });
 
 </script>

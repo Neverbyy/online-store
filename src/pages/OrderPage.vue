@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import {useStore} from 'vuex';
 import { useRouter } from 'vue-router';
 import buttonCart from '/src/components/UI/buttonCart.vue'
@@ -8,6 +8,7 @@ import axios from 'axios';
 
 const store = useStore();
 const router = useRouter();
+const isLoading = ref(false);
 
 const deliveryMethod = computed({
   get: () => store.getters.getDeliveryMethod,
@@ -26,57 +27,108 @@ const address = computed({
 
 const formattedTotalPrice = computed(() => store.getters['cart/formattedTotalPrice']);
 
+// Автоматическое заполнение адреса из профиля пользователя
+const fillAddressFromProfile = () => {
+  const profileUser = store.getters['profile/getUser'];
+  if (profileUser && profileUser.addresses && profileUser.addresses.length > 0) {
+    const lastAddress = profileUser.addresses[profileUser.addresses.length - 1];
+    store.dispatch('setAddress', {
+      city: lastAddress.city || '',
+      street: lastAddress.street || '',
+      home: lastAddress.home || '',
+      flat: lastAddress.flat || ''
+    });
+  }
+};
+
 const submitForm = async () => {
-  // --- Отправка заказа на сервер ---
-  const cartItems = store.getters['cart/getCart'];
-  const totalPrice = store.getters['cart/getTotalPrice'];
-  const user = store.getters['profile/getUser'] || {};
-  const order = {
-    date: new Date().toLocaleString('ru-RU'),
-    deliveryMethod: deliveryMethod.value,
-    contact: { ...contact.value },
-    address: deliveryMethod.value === 'courier' ? { ...address.value } : null,
-    items: cartItems,
-    totalPrice: totalPrice,
-    status: 'Оформлен',
-    userId: user.id || null,
-    userPhone: user.phone || null
-  };
+  if (isLoading.value) return;
+  
+  isLoading.value = true;
   try {
-    await axios.post('http://localhost:5000/api/orders', order);
-  } catch (e) {
-    alert('Ошибка при оформлении заказа!');
-    return;
+    // --- Создание заказа на сервере ---
+    const cartItems = store.getters['cart/getCart'];
+    const totalPrice = store.getters['cart/getTotalPrice'];
+    const user = store.getters['profile/getUser'] || {};
+    const order = {
+      date: new Date().toLocaleString('ru-RU'),
+      deliveryMethod: deliveryMethod.value,
+      contact: { ...contact.value },
+      address: deliveryMethod.value === 'courier' ? { ...address.value } : null,
+      items: cartItems,
+      totalPrice: totalPrice,
+      status: 'Ожидает оплаты',
+      userId: user.id || null,
+      userPhone: user.phone || null
+    };
+
+    // Создаем заказ
+    const orderResponse = await axios.post('http://localhost:5000/api/orders', order);
+    const createdOrder = orderResponse.data.order;
+
+    // Добавление адреса в профиль пользователя, если выбран курьер
+    if (deliveryMethod.value === 'courier' && user.id) {
+      await store.dispatch('profile/addAddress', address.value);
+    }
+
+    // НЕ очищаем корзину до подтверждения оплаты
+    // store.dispatch('cart/clearCart');
+
+    // --- Создание платежа через YooKassa ---
+    const paymentData = {
+      value: totalPrice.toString(),
+      orderId: createdOrder.id,
+      userId: user.id || null
+    };
+
+    const paymentResponse = await axios.post('http://localhost:5000/api/payment', paymentData);
+    const payment = paymentResponse.data.payment;
+
+    // Обновляем заказ с paymentId
+    if (payment.id) {
+      await axios.put(`http://localhost:5000/api/orders/${createdOrder.id}`, {
+        paymentId: payment.id
+      });
+    }
+
+    // Очищаем корзину после создания заказа и перенаправления на оплату
+    store.dispatch('cart/clearCart');
+
+    // Перенаправляем на страницу оплаты YooKassa
+    if (payment.confirmation && payment.confirmation.confirmation_url) {
+      window.location.href = payment.confirmation.confirmation_url;
+    } else {
+      throw new Error('Не удалось получить ссылку для оплаты');
+    }
+
+  } catch (error) {
+    console.error('Ошибка при создании заказа:', error);
+    alert('Ошибка при оформлении заказа! Попробуйте еще раз.');
+  } finally {
+    isLoading.value = false;
   }
-  // --- конец блока отправки заказа ---
-
-  // Добавление адреса в профиль пользователя, если выбран курьер
-  if (deliveryMethod.value === 'courier' && user.id) {
-    await store.dispatch('profile/addAddress', address.value);
-  }
-
-  // Логика обработки успешного заказа
-  store.dispatch('markOrderAsSuccess'); // Устанавливаем флаг успешного заказа в store
-  sessionStorage.setItem('orderSuccess', 'true'); // Устанавливаем флаг успешного заказа в sessionStorage
-
-  // Очищаем корзину
-  store.dispatch('cart/clearCart');
-
-  // Перенаправляем на страницу успешного заказа
-  router.push({ name: 'OrderSuccess' });
 };
 
 onMounted(() => {
   const profileUser = store.getters['profile/getUser'];
   const contactData = store.getters.getContact;
-  if (profileUser && profileUser.phone && !contactData.phone) {
+  
+  // Если пользователь авторизован, заполняем данные из профиля
+  if (profileUser && profileUser.phone) {
     store.dispatch('setContact', {
-      name: profileUser.name || '',
-      phone: profileUser.phone || '',
-      email: profileUser.email || ''
+      name: profileUser.name || contactData.name || '',
+      phone: profileUser.phone || contactData.phone || '',
+      email: profileUser.email || contactData.email || ''
     });
   }
 });
+
+// Следим за изменением метода доставки
+const handleDeliveryMethodChange = () => {
+  if (deliveryMethod.value === 'courier') {
+    fillAddressFromProfile();
+  }
+};
 
 </script>
 
@@ -93,7 +145,7 @@ onMounted(() => {
             <h1>Оформление заказа</h1>
             
             <div class="custom-select">
-                <select class="delivery" v-model="deliveryMethod">
+                <select class="delivery" v-model="deliveryMethod" @change="handleDeliveryMethodChange">
                     <option value="pickup">Самовывоз</option>
                     <option value="courier">Курьер</option>
                 </select>
@@ -130,7 +182,10 @@ onMounted(() => {
 
                 <div class="confirm">
                     <h3>Итого: {{ formattedTotalPrice }} ₽</h3>
-                    <buttonCart>Оплатить</buttonCart>
+                    <p class="payment-note">После нажатия кнопки вы будете перенаправлены на страницу оплаты ЮKassa</p>
+                    <buttonCart :disabled="isLoading">
+                        {{ isLoading ? 'Обработка...' : 'Перейти к оплате' }}
+                    </buttonCart>
                 </div>
             </form>
         </div>
@@ -198,5 +253,12 @@ h3{
     display: flex;
     column-gap: 110px;
     max-width: 400px;
+}
+
+.payment-note {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 8px 0 16px 0;
+    font-style: italic;
 }
 </style>

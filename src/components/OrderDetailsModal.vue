@@ -11,8 +11,8 @@
         <div class="modal-row">
           <span class="modal-label">Статус:</span>
           <span class="modal-value">
-            <span :class="order.status === 'Оформлен' ? 'status-success' : 'status-other'">
-              <span class="status-dot" :class="order.status === 'Оформлен' ? 'dot-success' : 'dot-other'"></span>
+            <span :class="order.status === 'Оплачен' ? 'status-success' : 'status-other'">
+              <span class="status-dot" :class="order.status === 'Оплачен' ? 'dot-success' : 'dot-other'"></span>
               {{ order.status }}
             </span>
           </span>
@@ -186,8 +186,8 @@ const formatPrice = price => Number(price).toLocaleString('ru-RU');
   font-size: 1.01rem;
 }
 .status-other {
-  color: #b97a1a;
-  background: #fbeee6;
+  color: #1a9b1a;
+  background: #e6fbe6;
   border-radius: 8px;
   padding: 2px 12px 2px 8px;
   display: inline-flex;
@@ -206,7 +206,7 @@ const formatPrice = price => Number(price).toLocaleString('ru-RU');
   background: #1a9b1a;
 }
 .dot-other {
-  background: #b97a1a;
+  background: #1a9b1a;
 }
 .modal-items {
   list-style: none;

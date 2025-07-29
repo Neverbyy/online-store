@@ -2,8 +2,18 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
+import { YooCheckout } from '@a2seven/yoo-checkout';
 
 const app = express();
+
+// Настройка middlewares
+app.use(bodyParser.json());
+app.use(cors());
+
+const yooKassa = new YooCheckout({ 
+  shopId: '1134837', 
+  secretKey: 'test_gbE3oL_nExWQwTAImHj6n-M7ejCPaVjbXC16B6Z-MZQ'
+});
 const PORT = 5000;
 
 // Массив пользователей (вместо базы данных)
@@ -12,15 +22,100 @@ const users = [];
 const orders = [];
 // Массив отзывов (вместо базы данных)
 const reviews = [];
-
-// Настройка middlewares
-app.use(bodyParser.json());
-app.use(cors());
-
 // Главная страница
 app.get('/', (req, res) => {
   res.send('<h1>Добро пожаловать на наш сервер!</h1><p>Используйте API для регистрации и входа в систему.</p>');
 });
+
+app.post('/api/payment', async (req, res) => {
+  const { value, orderId, userId } = req.body;
+  
+  if (!value || !orderId) {
+    return res.status(400).json({ error: 'Необходимы value и orderId' });
+  }
+
+  const createPayload = {
+    amount: {
+        value: value,
+        currency: 'RUB'
+    },
+    payment_method_data: {
+        type: 'bank_card'
+    },
+    capture: true,
+    confirmation: {
+        type: 'redirect',
+        return_url: 'http://localhost:5173/?payment=success'
+    },
+    metadata: {
+      orderId: orderId,
+      userId: userId
+    },
+    description: `Оплата заказа №${orderId}`
+  };
+
+  try {
+      const payment = await yooKassa.createPayment(createPayload, Date.now().toString());
+      console.log('Создан платеж:', payment);
+      res.status(200).json({ payment });
+  } catch (error) {
+      console.error('Ошибка при создании платежа:', error);
+      res.status(500).json({ error: 'Ошибка при создании платежа' });
+  }
+});
+
+// Проверка статуса платежа
+app.get('/api/payment/:paymentId', async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+    const payment = await yooKassa.getPayment(paymentId);
+    res.status(200).json({ payment });
+  } catch (error) {
+    console.error('Ошибка при получении платежа:', error);
+    res.status(500).json({ error: 'Ошибка при получении платежа' });
+  }
+});
+
+// Webhook для обработки уведомлений от Юкасса
+app.post('/api/payment/webhook', async (req, res) => {
+  try {
+    const { event, object } = req.body;
+    
+    // Проверяем, что это уведомление об успешной оплате
+    if (event === 'payment.succeeded') {
+      const payment = object;
+      const orderId = payment.metadata?.orderId;
+      const userId = payment.metadata?.userId;
+      
+      if (orderId) {
+        // Находим заказ и обновляем его статус
+        const order = orders.find(o => String(o.id) === String(orderId));
+        if (order) {
+          order.status = 'Оплачен';
+          order.paymentId = payment.id;
+          order.paidAt = new Date().toISOString();
+          console.log(`Заказ ${orderId} успешно оплачен`);
+          
+          // Очищаем корзину пользователя после успешной оплаты
+          if (userId) {
+            const user = users.find(u => String(u.id) === String(userId));
+            if (user) {
+              user.cart = [];
+              console.log(`Корзина пользователя ${userId} очищена через webhook`);
+            }
+          }
+        }
+      }
+    }
+    
+    res.status(200).json({ received: true });
+  } catch (error) {
+    console.error('Ошибка при обработке webhook:', error);
+    res.status(500).json({ error: 'Ошибка при обработке webhook' });
+  }
+});
+
+
 
 // Возвращает список зарегистрированных пользователей
 app.get('/api/register', (req, res) => {
@@ -133,6 +228,68 @@ app.get('/api/orders', (req, res) => {
     userOrders = orders.filter(order => order.userPhone === userPhone);
   }
   res.status(200).json({ orders: userOrders });
+});
+
+// Обновить заказ
+app.put('/api/orders/:id', (req, res) => {
+  const orderId = parseInt(req.params.id, 10);
+  const updates = req.body;
+  
+  const order = orders.find(o => o.id === orderId);
+  if (!order) {
+    return res.status(404).json({ error: 'Заказ не найден' });
+  }
+  
+  // Обновляем поля заказа
+  Object.assign(order, updates);
+  
+  res.status(200).json({ order });
+});
+
+// Проверить и обновить статус заказа
+app.post('/api/orders/check-status', async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    if (!orderId) {
+      return res.status(400).json({ error: 'orderId обязателен' });
+    }
+
+    const order = orders.find(o => String(o.id) === String(orderId));
+    if (!order) {
+      return res.status(404).json({ error: 'Заказ не найден' });
+    }
+
+    // Если у заказа есть paymentId, проверяем статус платежа
+    if (order.paymentId) {
+      try {
+        const payment = await yooKassa.getPayment(order.paymentId);
+        
+        if (payment.status === 'succeeded') {
+          order.status = 'Оплачен';
+          order.paidAt = new Date().toISOString();
+          console.log(`Заказ ${orderId} успешно оплачен (проверка статуса)`);
+          
+          // Очищаем корзину пользователя после успешной оплаты
+          if (order.userId) {
+            const user = users.find(u => String(u.id) === String(order.userId));
+            if (user) {
+              user.cart = [];
+              console.log(`Корзина пользователя ${order.userId} очищена после оплаты`);
+            }
+          }
+        } else if (payment.status === 'canceled') {
+          order.status = 'Отменен';
+        }
+      } catch (error) {
+        console.error('Ошибка при проверке статуса платежа:', error);
+      }
+    }
+
+    res.status(200).json({ order });
+  } catch (error) {
+    console.error('Ошибка при проверке статуса заказа:', error);
+    res.status(500).json({ error: 'Ошибка при проверке статуса заказа' });
+  }
 });
 // ==================================================
 

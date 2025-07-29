@@ -6,7 +6,6 @@ import CatalogPage from '../pages/CatalogPage.vue';
 import ProfilePage from '../pages/ProfilePage.vue';
 import CartPage from '../pages/CartPage.vue';
 import OrderPage from '../pages/OrderPage.vue';
-import OrderSuccessPage from '../pages/OrderSuccessPage.vue';
 import CategoryPage from '../pages/CategoryPage.vue';
 import ProductPage from '../pages/ProductPage.vue';
 import NotFoundPage from '../pages/NotFoundPage.vue';
@@ -21,18 +20,6 @@ const routes = [
     name: 'Order',
     component: OrderPage,
     meta: { requiresAuth: true, requiresCart: true, showHeader: false },
-  },
-  {
-    path: '/cart/order/success',
-    name: 'OrderSuccess',
-    component: OrderSuccessPage,
-    beforeEnter: (to, from, next) => {
-      if (sessionStorage.getItem('orderSuccess') === 'true') {
-        next();
-      } else {
-        next({ name: 'Home' });
-      }
-    }
   },
   {
     path: '/profile',

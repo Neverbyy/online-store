@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, watch, nextTick } from 'vue';
 import { useStore } from 'vuex';
 
 import ProfileSettings from '../components/ProfileSettings.vue';
@@ -20,6 +20,15 @@ const components = [
 // Вычисляемое свойство для получения текущего компонента из Vuex Store
 const currentComponent = computed(() => {
     return components[store.state.profile.activeItem];
+});
+
+// Следим за изменением активного элемента и обновляем заказы при переходе на вкладку "Заказы"
+watch(() => store.state.profile.activeItem, async (newIndex) => {
+    if (newIndex === 1) { // Индекс 1 соответствует вкладке "Заказы"
+        await nextTick();
+        // Эмитим событие для обновления заказов
+        window.dispatchEvent(new CustomEvent('refresh-orders'));
+    }
 });
 </script>
 

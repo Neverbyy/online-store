@@ -1,7 +1,10 @@
 <template>
   <div class="orders-history">
     <h2 class="orders-title">История заказов</h2>
-    <div v-if="orders.length === 0" class="orders-empty">У вас пока нет заказов.</div>
+    <div class="orders-actions">
+    </div>
+    <div v-if="isLoading" class="orders-loading">Загрузка заказов...</div>
+    <div v-else-if="orders.length === 0" class="orders-empty">У вас пока нет оплаченных заказов.</div>
     <div v-else class="orders-list">
       <div
         v-for="order in orders"
@@ -12,7 +15,7 @@
       >
         <div class="order-header">
           <span class="order-date">{{ order.date }}</span>
-          <span class="order-status" :class="order.status === 'Оформлен' ? 'status-success' : 'status-other'">{{ order.status }}</span>
+          <span class="order-status" :class="order.status === 'Оплачен' ? 'status-success' : 'status-other'">{{ order.status }}</span>
         </div>
         <div class="order-info">
           <div class="order-row">
@@ -49,13 +52,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import axios from 'axios';
 import OrderDetailsModal from './OrderDetailsModal.vue';
 
 const store = useStore();
 const orders = ref([]);
+const isLoading = ref(false);
 
 const formatPrice = price => Number(price).toLocaleString('ru-RU');
 
@@ -71,7 +75,33 @@ const closeOrderModal = () => {
   selectedOrder.value = null;
 };
 
+const checkOrderStatus = async (order) => {
+  if (order.status === 'Ожидает оплаты' && order.paymentId) {
+    try {
+      const response = await axios.post('http://localhost:5000/api/orders/check-status', {
+        orderId: order.id
+      });
+      const updatedOrder = response.data.order;
+      
+      // Если заказ стал оплаченным, очищаем корзину в Vuex store
+      if (updatedOrder.status === 'Оплачен') {
+        store.dispatch('cart/clearCart');
+        console.log('Корзина очищена после успешной оплаты заказа');
+      }
+      
+      return updatedOrder;
+    } catch (error) {
+      console.error('Ошибка при проверке статуса заказа:', error);
+      return order;
+    }
+  }
+  return order;
+};
+
 const loadOrders = async () => {
+  if (isLoading.value) return;
+  
+  isLoading.value = true;
   const user = store.getters['profile/getUser'] || {};
   let url = 'http://localhost:5000/api/orders';
   if (user.id) {
@@ -80,19 +110,44 @@ const loadOrders = async () => {
     url += `?userPhone=${encodeURIComponent(user.phone)}`;
   } else {
     orders.value = [];
+    isLoading.value = false;
     return;
   }
   try {
     const res = await axios.get(url);
-    orders.value = res.data.orders || [];
+    const allOrders = res.data.orders || [];
+    
+    // Проверяем статус заказов, которые ожидают оплаты
+    const checkedOrders = await Promise.all(
+      allOrders.map(async (order) => {
+        if (order.status === 'Ожидает оплаты' && order.paymentId) {
+          try {
+            return await checkOrderStatus(order);
+          } catch (error) {
+            console.error(`Ошибка при проверке статуса заказа ${order.id}:`, error);
+            return order;
+          }
+        }
+        return order;
+      })
+    );
+    
+    // Фильтруем только оплаченные заказы
+    orders.value = checkedOrders.filter(order => order.status === 'Оплачен');
   } catch (e) {
+    console.error('Ошибка при загрузке заказов:', e);
     orders.value = [];
+  } finally {
+    isLoading.value = false;
   }
 };
 
+
 onMounted(() => {
   loadOrders();
+  
 });
+
 </script>
 
 <style lang="scss" scoped>
@@ -105,9 +160,15 @@ onMounted(() => {
 .orders-title {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
   text-align: center;
   letter-spacing: 0.5px;
+}
+
+.orders-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
 .orders-empty {
@@ -185,7 +246,7 @@ onMounted(() => {
   }
   &.status-other {
     background: #fbeee6;
-    color: #b97a1a;
+    color: #1a9b1a;
     border: 1px solid #f5d6b6;
   }
 }
