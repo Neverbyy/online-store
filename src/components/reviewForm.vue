@@ -2,6 +2,7 @@
 import buttonCart from './UI/buttonCart.vue';
 import { ref, defineProps, defineEmits, computed } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 const props = defineProps({
   productId: {
@@ -13,6 +14,7 @@ const props = defineProps({
 const emit = defineEmits(['reviewAdded']);
 
 const store = useStore();
+const router = useRouter();
 const userId = computed(() => store.getters['auth/getUser']?.id);
 const userName = computed(() => store.getters['profile/getName']);
 const advantages = ref('');
@@ -21,6 +23,7 @@ const text = ref('');
 const rating = ref(0);
 const hoverRating = ref(0);
 const ratingError = ref(false);
+const profileError = ref(false);
 
 const getCurrentDate = () => {
   const now = new Date();
@@ -30,8 +33,19 @@ const getCurrentDate = () => {
 };
 
 const handleSubmit = async () => {
+  // Сброс ошибок
+  ratingError.value = false;
+  profileError.value = false;
+
+  // Проверка рейтинга
   if (rating.value === 0) {
     ratingError.value = true;
+    return;
+  }
+
+  // Проверка имени пользователя
+  if (!userName.value || userName.value.trim() === '') {
+    profileError.value = true;
     return;
   }
 
@@ -48,7 +62,7 @@ const handleSubmit = async () => {
 
   try {
     await store.dispatch('addReview', newReview);
-    resetForm(); // Используем пропс resetForm для вызова метода извне
+    resetForm();
     emit('reviewAdded');
   } catch (error) {
     console.error('Ошибка при добавлении отзыва:', error);
@@ -70,6 +84,11 @@ const resetForm = () => {
   text.value = '';
   rating.value = 0;
   ratingError.value = false;
+  profileError.value = false;
+};
+
+const goToProfile = () => {
+  router.push({ name: 'Profile' });
 };
 </script>
 
@@ -101,7 +120,11 @@ const resetForm = () => {
         </span>
       </div>
     </div>
-      <div v-if="ratingError" class="error">Пожалуйста, выберите оценку.</div>
+    <div v-if="ratingError" class="error">Пожалуйста, выберите оценку.</div>
+    <div v-if="profileError" class="error profile-error">
+      <p>Для оставления отзыва необходимо заполнить имя в профиле.</p>
+      <button type="button" class="profile-link" @click="goToProfile">Перейти в профиль</button>
+    </div>
     <buttonCart type="submit">Добавить отзыв</buttonCart>
   </form>
 </template>
@@ -165,5 +188,34 @@ input, textarea {
 .error {
   color: red;
   font-size: 0.9em;
+  margin: 10px 0;
+}
+
+.profile-error {
+  background-color: #fff5f5;
+  border: 1px solid #fed7d7;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 15px 0;
+  
+  p {
+    margin: 0 0 10px 0;
+    color: #c53030;
+  }
+}
+
+.profile-link {
+  background-color: #750DC5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #5a0a9a;
+  }
 }
 </style>

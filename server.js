@@ -3,6 +3,12 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import { YooCheckout } from '@a2seven/yoo-checkout';
+import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+
+
+// Инициализация переменных окружения
+dotenv.config();
 
 const app = express();
 
@@ -11,10 +17,10 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const yooKassa = new YooCheckout({ 
-  shopId: '1134837', 
-  secretKey: 'test_gbE3oL_nExWQwTAImHj6n-M7ejCPaVjbXC16B6Z-MZQ'
+  shopId: process.env.YOO_KASSA_SHOP_ID,
+  secretKey: process.env.YOO_KASSA_SECRET_KEY
 });
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Массив пользователей (вместо базы данных)
 const users = [];
@@ -33,6 +39,9 @@ app.post('/api/payment', async (req, res) => {
   if (!value || !orderId) {
     return res.status(400).json({ error: 'Необходимы value и orderId' });
   }
+
+  // Генерируем уникальный ключ идемпотентности
+  const idempotenceKey = uuidv4();
 
   const createPayload = {
     amount: {
@@ -55,7 +64,7 @@ app.post('/api/payment', async (req, res) => {
   };
 
   try {
-      const payment = await yooKassa.createPayment(createPayload, Date.now().toString());
+      const payment = await yooKassa.createPayment(createPayload, idempotenceKey);
       console.log('Создан платеж:', payment);
       res.status(200).json({ payment });
   } catch (error) {

@@ -16,7 +16,6 @@ onMounted(() => {
   if (route.query.payment === 'success') {
     // Очищаем корзину при успешном возврате с оплаты
     store.dispatch('cart/clearCart');
-    console.log('Корзина очищена при возврате с успешной оплаты');
   }
 });
 

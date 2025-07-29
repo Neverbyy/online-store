@@ -32,9 +32,9 @@
       </div>
       <div class="modal-section section-contact">
         <div class="modal-section-title">Контакт</div>
-        <div class="modal-row"><span class="modal-label">Имя:</span> <span class="modal-value">{{ order.contact.name }}</span></div>
+        <div v-if="userName" class="modal-row"><span class="modal-label">Имя:</span> <span class="modal-value">{{ userName }}</span></div>
         <div class="modal-row"><span class="modal-label">Телефон:</span> <span class="modal-value">{{ order.contact.phone }}</span></div>
-        <div class="modal-row"><span class="modal-label">Email:</span> <span class="modal-value">{{ order.contact.email }}</span></div>
+        <div v-if="order.contact.email" class="modal-row"><span class="modal-label">Email:</span> <span class="modal-value">{{ order.contact.email }}</span></div>
       </div>
       <div class="modal-section section-products">
         <div class="modal-section-title">Товары</div>
@@ -51,6 +51,11 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+
+const store = useStore();
+
 const props = defineProps({
   order: { type: Object, required: true },
   onClose: { type: Function, required: true }
@@ -61,6 +66,9 @@ const handleClose = () => {
 };
 
 const formatPrice = price => Number(price).toLocaleString('ru-RU');
+
+// Получаем имя из профиля пользователя
+const userName = computed(() => store.getters['profile/getName']);
 </script>
 
 <style lang="scss" scoped>

@@ -86,7 +86,6 @@ const checkOrderStatus = async (order) => {
       // Если заказ стал оплаченным, очищаем корзину в Vuex store
       if (updatedOrder.status === 'Оплачен') {
         store.dispatch('cart/clearCart');
-        console.log('Корзина очищена после успешной оплаты заказа');
       }
       
       return updatedOrder;

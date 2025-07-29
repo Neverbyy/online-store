@@ -116,7 +116,6 @@ onMounted(() => {
   // Если пользователь авторизован, заполняем данные из профиля
   if (profileUser && profileUser.phone) {
     store.dispatch('setContact', {
-      name: profileUser.name || contactData.name || '',
       phone: profileUser.phone || contactData.phone || '',
       email: profileUser.email || contactData.email || ''
     });
@@ -155,7 +154,6 @@ const handleDeliveryMethodChange = () => {
             <form @submit.prevent="submitForm" class="contactform">
                 <div class="order-details">
                     <h3>Контактные данные</h3>
-                    <FormInput v-model="contact.name" placeholder="Имя" required />
                     <FormInput
                         v-model="contact.phone"
                         type="tel"
@@ -163,7 +161,7 @@ const handleDeliveryMethodChange = () => {
                         required
                         mask="+7 (###) ###-##-##"
                     />
-                    <FormInput v-model="contact.email" type="email" placeholder="Email" required/>
+                    <FormInput v-model="contact.email" type="email" placeholder="Email (необязательно)"/>
                 </div>
 
                 <div class="order-details" v-if="deliveryMethod === 'courier'">
@@ -182,7 +180,6 @@ const handleDeliveryMethodChange = () => {
 
                 <div class="confirm">
                     <h3>Итого: {{ formattedTotalPrice }} ₽</h3>
-                    <p class="payment-note">После нажатия кнопки вы будете перенаправлены на страницу оплаты ЮKassa</p>
                     <buttonCart :disabled="isLoading">
                         {{ isLoading ? 'Обработка...' : 'Перейти к оплате' }}
                     </buttonCart>

@@ -2,7 +2,7 @@
   <div>
     <div v-if="addresses.length === 0">Нет сохранённых адресов</div>
     <div v-for="(addr, idx) in addresses" :key="idx" class="address-item">
-      {{ addr.city }}, {{ addr.street }}, {{ addr.home }}, {{ addr.flat }}
+      {{ addr.city }}, {{ addr.street }}, {{ addr.home }}, кв. {{ addr.flat }}
     </div>
   </div>
 </template>
