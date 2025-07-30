@@ -3,6 +3,7 @@ import { defineProps, ref, computed } from 'vue';
 import CartActionButton from './UI/CartActionButton.vue';
 import { useStore } from 'vuex';
 import FavoriteIcon from './UI/FavoriteIcon.vue';
+import { getImageUrl } from '../utils/imageUtils.js';
 
 const props = defineProps({
   product: Object
@@ -11,6 +12,9 @@ const props = defineProps({
 const store = useStore();
 const showAddedMessage = ref(false);
 const showMaxQuantityMessage = ref(false);
+
+// Получаем правильный URL изображения
+const correctImageUrl = getImageUrl(props.product?.image);
 
 // Удаляю addToCart из props и handleAddToCart
 
@@ -34,7 +38,7 @@ const handleShowAddedMessage = () => {
     <div class="main container">
       <div class="product-card">
         <div class="product-card__inner">
-          <img class="product-card-image" :src="product.image" :alt="product.name">
+          <img class="product-card-image" :src="correctImageUrl" :alt="product.name">
           <div class="product-card-details">
             <h1>Характеристики:</h1>
             <div class="product-card-details-inner"

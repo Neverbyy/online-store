@@ -3,10 +3,14 @@ import CartList from './CartList.vue';
 import {computed} from 'vue';
 import ButtonCart from './UI/buttonCart.vue';
 import {useStore} from 'vuex';
+import { getImageUrl } from '../utils/imageUtils.js';
 
 const store = useStore();
 const cart = computed(() => store.state.cart.cart);
 const formattedTotalPrice = computed(() => store.getters['cart/formattedTotalPrice']);
+
+// Получаем правильный URL изображения корзины
+const cartImageUrl = getImageUrl('/src/assets/cart.png');
 
 const clearCart = () => {
     store.dispatch('cart/clearCart');
@@ -19,7 +23,7 @@ const clearCart = () => {
         <div class="cart">
             <div v-if="cart.length === 0" class="cart__inner">
                 <h1>Ваша корзина пуста</h1>
-                <img src="/src/assets/cart.png" alt=""> 
+                <img :src="cartImageUrl" alt=""> 
             </div>
             <div v-else>
                 <CartList />

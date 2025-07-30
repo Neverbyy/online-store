@@ -4,6 +4,7 @@ import { defineProps } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { transliterate } from '../helpers/translit';
+import { getImageUrl } from '../utils/imageUtils.js';
 
 const props = defineProps({
     item: Object,
@@ -12,6 +13,9 @@ const props = defineProps({
 
 const store = useStore();
 const router = useRouter();
+
+// Получаем правильный URL изображения
+const correctImageUrl = getImageUrl(props.item?.image);
 
 const increment = async () => {
     if (props.item.quantity < 20) {
@@ -45,7 +49,7 @@ const handleProductClick = () => {
 <template>
     <div class="cart__main-item">
         <div class="cart__main-details">
-            <img class="cart__main-image" :src="item.image" alt="" @click="handleProductClick">
+            <img class="cart__main-image" :src="correctImageUrl" alt="" @click="handleProductClick">
             <div class="cart__main-details-left">
                 <h2 class="cart__main-details-left-title" @click="handleProductClick">{{ item.name }}</h2>
                 <h2>{{ item.price }} Руб.</h2>
@@ -214,10 +218,10 @@ const handleProductClick = () => {
 }
 
 .counter-btn.increment::before {
-  background-image: url('/src/assets/add.png');
+  background-image: url('@/assets/add.png');
 }
 .counter-btn.decrement::before {
-  background-image: url('/src/assets/remove.png');
+  background-image: url('@/assets/remove.png');
   align-self: flex-end;
 }
 

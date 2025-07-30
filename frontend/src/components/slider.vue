@@ -1,12 +1,16 @@
 <script setup>
 import { ref, onMounted, onUnmounted} from 'vue';
+import { getImageUrl } from '../utils/imageUtils.js';
 
-const slides = ([
+const slidePaths = [
       '/src/assets/slide1.png',
       '/src/assets/slide2.png',
       '/src/assets/slide3.png',
       '/src/assets/slide4.png'
-    ]);
+    ];
+
+// Получаем правильные URL изображений
+const slides = slidePaths.map(path => getImageUrl(path));
 
 const currentIndex = ref(0);
 

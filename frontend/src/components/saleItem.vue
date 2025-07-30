@@ -5,6 +5,7 @@ import { ref, computed } from 'vue';
 import { transliterate } from '../helpers/translit';
 import FavoriteIcon from './UI/FavoriteIcon.vue';
 import CartActionButton from './UI/CartActionButton.vue';
+import { getImageUrl } from '../utils/imageUtils.js';
 
 const props = defineProps({
   product: Object
@@ -13,6 +14,9 @@ const props = defineProps({
 const store = useStore();
 const showAddedMessage = ref(false);
 const showMaxQuantityMessage = ref(false);
+
+// Получаем правильный URL изображения
+const correctImageUrl = getImageUrl(props.product?.image);
 
 // Вычисляем процент скидки
 const discountPercentage = computed(() => {
@@ -57,7 +61,7 @@ const handleShowAddedMessage = () => {
       
         <router-link :to="`/catalog/${product.category}/${transliterate(product.name)}/${product.id}`">
           <div class="main__list-item-inner sale-item">
-            <img class="main__list-item-inner-image" :src="product.image" alt="1">
+            <img class="main__list-item-inner-image" :src="correctImageUrl" alt="1">
           </div>
         </router-link>
         <div class="main__list-item-inner-details">
