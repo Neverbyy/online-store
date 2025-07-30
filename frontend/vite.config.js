@@ -26,6 +26,10 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
+    build: {
+      outDir: 'dist',
+      assetsDir: 'assets'
+    },
     define: {
       __VUE_PROD_DEVTOOLS__: false
     }
