@@ -27,7 +27,7 @@ export default {
   actions: {
     async register({ commit, dispatch }, payload) {
       try {
-        const response = await axios.post('http://localhost:5000/api/register', payload);
+        const response = await axios.post('/api/register', payload);
         commit('SET_USER', response.data.user);
         await dispatch('favorite/fetchFavorites', null, { root: true });
         await dispatch('cart/fetchCart', null, { root: true });
@@ -41,7 +41,7 @@ export default {
     },
     async login({ commit, dispatch }, payload) {
       try {
-        const response = await axios.post('http://localhost:5000/api/login', payload);
+        const response = await axios.post('/api/login', payload);
         commit('SET_USER', response.data.user);
         commit('LOGIN');
         await dispatch('favorite/fetchFavorites', null, { root: true });
@@ -62,7 +62,7 @@ export default {
     async checkUserExists({ commit, state }) {
       if (!state.user || !state.user.id) return;
       try {
-        await axios.get(`http://localhost:5000/api/profile/${state.user.id}`);
+        await axios.get(`/api/profile/${state.user.id}`);
       } catch (error) {
         if (error.response && error.response.status === 404) {
           commit('LOGOUT');
