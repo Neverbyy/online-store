@@ -211,6 +211,28 @@ const handleProductClick = () => {
   justify-content: center;
   border: none;
   color: #750DC5;
+  background-color: transparent;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  
+  &:hover:not(.disabled) {
+    background-color: rgba(117, 13, 197, 0.1);
+    transform: scale(1.1);
+  }
+  
+  &:active:not(.disabled) {
+    transform: scale(0.95);
+  }
+  
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    
+    &:hover {
+      background-color: transparent;
+      transform: none;
+    }
+  }
 }
 
 .counter-btn.decrement::before,
@@ -283,6 +305,15 @@ const handleProductClick = () => {
     width: 28px;
     height: 28px;
     font-size: 16px;
+    
+    &:hover:not(.disabled) {
+      background-color: rgba(117, 13, 197, 0.1);
+      transform: scale(1.1);
+    }
+    
+    &:active:not(.disabled) {
+      transform: scale(0.95);
+    }
   }
 }
 
@@ -356,6 +387,15 @@ const handleProductClick = () => {
     width: 32px;
     height: 32px;
     font-size: 18px;
+    
+    &:hover:not(.disabled) {
+      background-color: rgba(117, 13, 197, 0.1);
+      transform: scale(1.1);
+    }
+    
+    &:active:not(.disabled) {
+      transform: scale(0.95);
+    }
   }
 }
 
@@ -415,6 +455,15 @@ const handleProductClick = () => {
     width: 28px;
     height: 28px;
     font-size: 16px;
+    
+    &:hover:not(.disabled) {
+      background-color: rgba(117, 13, 197, 0.1);
+      transform: scale(1.1);
+    }
+    
+    &:active:not(.disabled) {
+      transform: scale(0.95);
+    }
   }
 }
 </style>
