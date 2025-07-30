@@ -1,5 +1,8 @@
 // Конфигурация API
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const isProduction = import.meta.env.PROD;
+const API_URL = isProduction 
+  ? (import.meta.env.VITE_API_URL_PROD || 'https://online-store-ofdm.onrender.com')
+  : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
 
 export const API_CONFIG = {
   BASE_URL: API_URL,
