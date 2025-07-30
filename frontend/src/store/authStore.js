@@ -1,5 +1,6 @@
 import axios from 'axios';
 import router from '../router/router';
+import { getApiUrl, API_CONFIG } from '../config/api';
 
 export default {
   namespaced: true,
@@ -27,7 +28,7 @@ export default {
   actions: {
     async register({ commit, dispatch }, payload) {
       try {
-        const response = await axios.post('/api/register', payload);
+        const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.REGISTER), payload);
         commit('SET_USER', response.data.user);
         await dispatch('favorite/fetchFavorites', null, { root: true });
         await dispatch('cart/fetchCart', null, { root: true });
@@ -41,7 +42,7 @@ export default {
     },
     async login({ commit, dispatch }, payload) {
       try {
-        const response = await axios.post('/api/login', payload);
+        const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.LOGIN), payload);
         commit('SET_USER', response.data.user);
         commit('LOGIN');
         await dispatch('favorite/fetchFavorites', null, { root: true });
@@ -62,7 +63,7 @@ export default {
     async checkUserExists({ commit, state }) {
       if (!state.user || !state.user.id) return;
       try {
-        await axios.get(`/api/profile/${state.user.id}`);
+        await axios.get(getApiUrl(`${API_CONFIG.ENDPOINTS.PROFILE}/${state.user.id}`));
       } catch (error) {
         if (error.response && error.response.status === 404) {
           commit('LOGOUT');

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getApiUrl, API_CONFIG } from '../config/api';
 
 const CART_STORAGE_KEY = 'cart';
 
@@ -56,7 +57,7 @@ const actions = {
     if (user && user.id) {
       // Серверная корзина
       try {
-        const { data } = await axios.get('http://localhost:5000/api/cart', { params: { userId: user.id } });
+        const { data } = await axios.get(getApiUrl(API_CONFIG.ENDPOINTS.CART), { params: { userId: user.id } });
         commit('SET_CART', data.cart);
       } catch {
         commit('SET_CART', []);
@@ -74,7 +75,7 @@ const actions = {
       const existing = state.cart.find(i => i.id === product.id);
       const quantity = existing ? Math.min(existing.quantity + 1, 20) : 1;
       try {
-        const { data } = await axios.post('http://localhost:5000/api/cart', { userId: user.id, product, quantity });
+        const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART), { userId: user.id, product, quantity });
         commit('SET_CART', data.cart);
       } catch {}
     } else {
@@ -86,7 +87,7 @@ const actions = {
     const user = rootGetters['auth/getUser'];
     if (user && user.id) {
       try {
-        const { data } = await axios.delete('http://localhost:5000/api/cart', { data: { userId: user.id, productId: id } });
+        const { data } = await axios.delete(getApiUrl(API_CONFIG.ENDPOINTS.CART), { data: { userId: user.id, productId: id } });
         commit('SET_CART', data.cart);
       } catch {}
     } else {
@@ -99,7 +100,7 @@ const actions = {
       const item = state.cart.find(i => i.id === id);
       if (item && item.quantity < 20) {
         try {
-          const { data } = await axios.post('http://localhost:5000/api/cart', { userId: user.id, product: item, quantity: item.quantity + 1 });
+          const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART), { userId: user.id, product: item, quantity: item.quantity + 1 });
           commit('SET_CART', data.cart);
         } catch {}
       }
@@ -113,7 +114,7 @@ const actions = {
       const item = state.cart.find(i => i.id === id);
       if (item && item.quantity > 1) {
         try {
-          const { data } = await axios.post('http://localhost:5000/api/cart', { userId: user.id, product: item, quantity: item.quantity - 1 });
+          const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART), { userId: user.id, product: item, quantity: item.quantity - 1 });
           commit('SET_CART', data.cart);
         } catch {}
       }
@@ -125,7 +126,7 @@ const actions = {
     const user = rootGetters['auth/getUser'];
     if (user && user.id) {
       try {
-        const { data } = await axios.post('http://localhost:5000/api/cart/clear', { userId: user.id });
+        const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART_CLEAR), { userId: user.id });
         commit('SET_CART', data.cart);
       } catch {
         commit('SET_CART', []);

@@ -55,6 +55,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useStore } from 'vuex';
 import axios from 'axios';
+import { getApiUrl, API_CONFIG } from '../config/api';
 import OrderDetailsModal from './OrderDetailsModal.vue';
 
 const store = useStore();
@@ -78,7 +79,7 @@ const closeOrderModal = () => {
 const checkOrderStatus = async (order) => {
   if (order.status === 'Ожидает оплаты' && order.paymentId) {
     try {
-      const response = await axios.post('http://localhost:5000/api/orders/check-status', {
+              const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.ORDERS_CHECK_STATUS), {
         orderId: order.id
       });
       const updatedOrder = response.data.order;
@@ -102,7 +103,7 @@ const loadOrders = async () => {
   
   isLoading.value = true;
   const user = store.getters['profile/getUser'] || {};
-  let url = 'http://localhost:5000/api/orders';
+        let url = getApiUrl(API_CONFIG.ENDPOINTS.ORDERS);
   if (user.id) {
     url += `?userId=${user.id}`;
   } else if (user.phone) {

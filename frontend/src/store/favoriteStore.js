@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getApiUrl, API_CONFIG } from '../config/api';
 
 const FAVORITES_KEY = 'favorites';
 
@@ -34,7 +35,7 @@ const actions = {
     }
     // Авторизованный — сервер
     try {
-      const { data } = await axios.get('http://localhost:5000/api/favorites', { params: { userId: user.id } });
+      const { data } = await axios.get(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { params: { userId: user.id } });
       commit('SET_FAVORITES', data.favorites);
     } catch (e) {
       commit('SET_FAVORITES', []);
@@ -49,7 +50,7 @@ const actions = {
     }
     // Авторизованный — сервер
     try {
-      const { data } = await axios.post('http://localhost:5000/api/favorites', { userId: user.id, product });
+      const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { userId: user.id, product });
       commit('SET_FAVORITES', data.favorites);
     } catch (e) {}
   },
@@ -62,7 +63,7 @@ const actions = {
     }
     // Авторизованный — сервер
     try {
-      const { data } = await axios.delete('http://localhost:5000/api/favorites', { data: { userId: user.id, productId } });
+      const { data } = await axios.delete(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { data: { userId: user.id, productId } });
       commit('SET_FAVORITES', data.favorites);
     } catch (e) {}
   },

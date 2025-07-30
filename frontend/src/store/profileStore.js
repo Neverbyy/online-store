@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getApiUrl, API_CONFIG } from '../config/api'
 
 export default {
   namespaced: true,
@@ -30,7 +31,7 @@ export default {
       try {
         const user = JSON.parse(localStorage.getItem('user')) || { name: '', email: '', phone: '', addresses: [] };
         if (user && user.id) {
-          const response = await axios.get(`http://localhost:5000/api/profile/${user.id}`);
+          const response = await axios.get(getApiUrl(`${API_CONFIG.ENDPOINTS.PROFILE}/${user.id}`));
           commit('SET_USER', response.data.user);
         } else {
           commit('SET_USER', user);
@@ -43,7 +44,7 @@ export default {
       try {
         const user = JSON.parse(localStorage.getItem('user')) || { name: '', email: '', phone: '', addresses: [] };
         if (user && user.id) {
-          const response = await axios.put('http://localhost:5000/api/profile', { id: user.id, phone, name, email, addresses: addresses || user.addresses });
+          const response = await axios.put(getApiUrl(API_CONFIG.ENDPOINTS.PROFILE), { id: user.id, phone, name, email, addresses: addresses || user.addresses });
           commit('SET_USER', response.data.user);
         } else {
           // Если пользователь не авторизован, просто обновляем localStorage
@@ -62,7 +63,7 @@ export default {
         const addresses = [...(state.user.addresses || [])];
         if (!addresses.some(a => JSON.stringify(a) === JSON.stringify(address))) {
           addresses.push(address);
-          await axios.put('http://localhost:5000/api/profile', { ...state.user, addresses });
+          await axios.put(getApiUrl(API_CONFIG.ENDPOINTS.PROFILE), { ...state.user, addresses });
           commit('ADD_ADDRESS', address);
         }
       }

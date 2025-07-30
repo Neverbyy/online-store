@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import buttonCart from '/src/components/UI/buttonCart.vue'
 import FormInput from '../components/UI/FormInput.vue';
 import axios from 'axios';
+import { getApiUrl, API_CONFIG } from '../config/api';
 
 const store = useStore();
 const router = useRouter();
@@ -63,7 +64,7 @@ const submitForm = async () => {
     };
 
     // Создаем заказ
-    const orderResponse = await axios.post('http://localhost:5000/api/orders', order);
+            const orderResponse = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.ORDERS), order);
     const createdOrder = orderResponse.data.order;
 
     // Добавление адреса в профиль пользователя, если выбран курьер
@@ -81,12 +82,12 @@ const submitForm = async () => {
       userId: user.id || null
     };
 
-    const paymentResponse = await axios.post('http://localhost:5000/api/payment', paymentData);
+            const paymentResponse = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.PAYMENT), paymentData);
     const payment = paymentResponse.data.payment;
 
     // Обновляем заказ с paymentId
     if (payment.id) {
-      await axios.put(`http://localhost:5000/api/orders/${createdOrder.id}`, {
+              await axios.put(getApiUrl(`${API_CONFIG.ENDPOINTS.ORDERS}/${createdOrder.id}`), {
         paymentId: payment.id
       });
     }
