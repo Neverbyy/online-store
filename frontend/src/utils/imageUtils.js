@@ -10,6 +10,7 @@ import pc3 from '../assets/pc3.png'
 import pc4 from '../assets/pc4.png'
 import laptop from '../assets/laptop.png'
 import macbook from '../assets/macbook.png'
+import phone from '../assets/phone.png'
 import tablet1 from '../assets/tablet1.png'
 import tablet2 from '../assets/tablet2.png'
 import tablet3 from '../assets/tablet3.png'
@@ -28,6 +29,13 @@ import console3 from '../assets/console3.png'
 import watch1 from '../assets/watch1.png'
 import watch2 from '../assets/watch2.png'
 import watch3 from '../assets/watch3.png'
+import slide1 from '../assets/slide1.png'
+import slide2 from '../assets/slide2.png'
+import slide3 from '../assets/slide3.png'
+import slide4 from '../assets/slide4.png'
+import cart from '../assets/cart.png'
+import add from '../assets/add.png'
+import remove from '../assets/remove.png'
 
 // Маппинг путей к импортированным изображениям
 const imageMap = {
@@ -42,6 +50,7 @@ const imageMap = {
   '/src/assets/pc4.png': pc4,
   '/src/assets/laptop.png': laptop,
   '/src/assets/macbook.png': macbook,
+  '/src/assets/phone.png': phone,
   '/src/assets/tablet1.png': tablet1,
   '/src/assets/tablet2.png': tablet2,
   '/src/assets/tablet3.png': tablet3,
@@ -60,6 +69,13 @@ const imageMap = {
   '/src/assets/watch1.png': watch1,
   '/src/assets/watch2.png': watch2,
   '/src/assets/watch3.png': watch3,
+  '/src/assets/slide1.png': slide1,
+  '/src/assets/slide2.png': slide2,
+  '/src/assets/slide3.png': slide3,
+  '/src/assets/slide4.png': slide4,
+  '/src/assets/cart.png': cart,
+  '/src/assets/add.png': add,
+  '/src/assets/remove.png': remove,
 }
 
 /**

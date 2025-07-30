@@ -4,7 +4,7 @@ import { defineProps } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { transliterate } from '../helpers/translit';
-import { getImageUrl } from '../utils/imageUtils.js';
+import { getImageUrl, getImageUrlForCSS } from '../utils/imageUtils.js';
 
 const props = defineProps({
     item: Object,
@@ -16,6 +16,10 @@ const router = useRouter();
 
 // Получаем правильный URL изображения
 const correctImageUrl = getImageUrl(props.item?.image);
+
+// Получаем URL для CSS изображений
+const addImageUrl = getImageUrlForCSS('/src/assets/add.png');
+const removeImageUrl = getImageUrlForCSS('/src/assets/remove.png');
 
 const increment = async () => {
     if (props.item.quantity < 20) {
@@ -218,10 +222,10 @@ const handleProductClick = () => {
 }
 
 .counter-btn.increment::before {
-  background-image: url('@/assets/add.png');
+  background-image: v-bind(addImageUrl);
 }
 .counter-btn.decrement::before {
-  background-image: url('@/assets/remove.png');
+  background-image: v-bind(removeImageUrl);
   align-self: flex-end;
 }
 
