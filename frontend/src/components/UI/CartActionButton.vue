@@ -70,4 +70,10 @@ const handleClick = () => {
     }
   }
 }
+
+@media (max-width: 400px) {
+  .cart-action-btn{
+    padding: 12px 20px;
+  }
+}
 </style> 

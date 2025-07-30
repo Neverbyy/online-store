@@ -30,4 +30,10 @@ input {
   font-weight: 200;
   outline: none;
 }
+
+@media (max-width: 400px) {
+  input {
+    max-width: 165px;
+  }
+}
 </style>
