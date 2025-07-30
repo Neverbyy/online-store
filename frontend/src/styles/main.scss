@@ -1,2 +1,7 @@
-@import 'variables', 'global', 'normalize', 'fonts';
-@import 'blocks/header', 'blocks/main', 'blocks/catalog';
+@use 'variables';
+@use 'global';
+@use 'normalize';
+@use 'fonts';
+@use 'blocks/header';
+@use 'blocks/main';
+@use 'blocks/catalog';
