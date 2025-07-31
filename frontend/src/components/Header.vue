@@ -4,6 +4,7 @@ import { useStore } from 'vuex';
 import search from './search.vue';
 import AuthModal from './AuthModal.vue';
 import { transliterate } from '../helpers/translit';
+import { getImageUrl } from '../utils/imageUtils';
 
 const store = useStore();
 const cart = computed(() => store.getters['cart/getCart']);
@@ -171,7 +172,7 @@ const showLoginModal = () => {
     </div>
     <div v-if="filteredItems.length > 0 && isSearchFocused" class="search-results">
       <div v-for="item in filteredItems" :key="item.id" class="search-result-item">
-        <img :src="item.image" alt="item.name">
+        <img :src="getImageUrl(item.image)" alt="item.name">
         <router-link :to="`/catalog/${item.category}/${transliterate(item.name)}/${item.id}`">
           <div>{{ item.name }}</div>
         </router-link>
