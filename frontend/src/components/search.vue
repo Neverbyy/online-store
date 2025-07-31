@@ -1,5 +1,6 @@
 <script setup>
 import { ref, defineEmits } from 'vue';
+import { getImageUrl } from '../utils/imageUtils.js';
 
 const emit = defineEmits(['update:searchText']);
 

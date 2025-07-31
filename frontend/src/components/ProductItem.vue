@@ -48,12 +48,14 @@ const handleShowAddedMessage = () => {
             </div>
           </div>
           <div class="product-card-buy">
-            <div :class="['added-to-cart', { show: showAddedMessage }]">Товар добавлен!</div>
-            <div :class="['max-quantity', { show: showMaxQuantityMessage }]">Лимит достигнут!</div>
             <div class="product-card-price"><h2> {{ product.price }} ₽</h2></div>
             <div class="product-card-buy-row">
               <FavoriteIcon :active="isFavorite" @click="handleToggleFavorite" width="40" height="40" style="cursor:pointer;"/>
-              <div class="product-card-btn"><CartActionButton :product="product" :onAdded="handleShowAddedMessage" /></div>
+              
+              <div class="product-card-btn">
+                <div :class="['added-to-cart', { show: showAddedMessage }]">Товар добавлен!</div>
+                <CartActionButton :product="product" :onAdded="handleShowAddedMessage" />
+              </div>
             </div>
           </div>
         </div>
@@ -66,6 +68,10 @@ const handleShowAddedMessage = () => {
   display: flex;
   justify-content: space-between;
   position: relative;
+
+.product-card-btn{
+  position: relative;
+}
   
   @media (max-width: 600px) {
     flex-direction: column;
@@ -146,6 +152,28 @@ const handleShowAddedMessage = () => {
         border-bottom: 1px solid #eee;
       }
     }
+  }
+}
+
+.added-to-cart{
+  top: -35px;
+}
+
+@media (max-width: 900px) {
+  .added-to-cart{
+    top: -50px
+  }
+}
+
+@media (max-width: 600px) {
+  .added-to-cart{
+    top: -35px
+  }
+}
+
+@media (max-width: 400px) {
+  .added-to-cart{
+    width: 155px;
   }
 }
 
