@@ -73,6 +73,18 @@ const props = defineProps({
   }
 }
 
+@media (max-width: 400px) {
+  .mobile-scroll-container {
+    .main__list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 0 12px;
+      place-items: center;
+    }
+  }
+}
+
 @media (max-width: 900px) {
   .main-title {
     padding-left: 16px;

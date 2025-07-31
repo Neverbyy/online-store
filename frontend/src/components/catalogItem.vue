@@ -29,4 +29,17 @@ const correctImageUrl = getImageUrl(props.imageUrl);
     text-align: center;
     display: block;
   }
+
+  @media (max-width: 400px) {
+    .main__list{
+      &-item{
+        width: 100%;
+        &-inner{
+          &-image{
+            height: 100%;
+          }
+        }
+      }
+    }
+  }
 </style>
