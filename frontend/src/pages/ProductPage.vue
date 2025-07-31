@@ -135,11 +135,6 @@ onMounted(() => {
     font-size: 14px;
   }
   
-  .breadcrumb-item:not(:last-child)::after {
-    content: ">";
-    margin-left: 8px;
-    color: #666;
-  }
   
   h1 {
     padding: 0 16px;
