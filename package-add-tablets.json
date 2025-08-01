@@ -1,0 +1,12 @@
+{
+  "name": "add-tablets-script",
+  "version": "1.0.0",
+  "description": "Script to add tablets to API",
+  "main": "add-tablets.js",
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "scripts": {
+    "start": "node add-tablets.js"
+  }
+} 

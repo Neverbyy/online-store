@@ -9,11 +9,29 @@ import pc2 from '../assets/pc2.png'
 import pc3 from '../assets/pc3.png'
 import pc4 from '../assets/pc4.png'
 import laptop from '../assets/laptop.png'
+import laptop1 from '../assets/laptop1.png'
+import laptop2 from '../assets/laptop2.png'
+import laptop3 from '../assets/laptop3.png'
+import laptop4 from '../assets/laptop4.png'
+import laptop5 from '../assets/laptop5.png'
+import laptop6 from '../assets/laptop6.png'
+import laptop7 from '../assets/laptop7.png'
+import laptop8 from '../assets/laptop8.png'
 import macbook from '../assets/macbook.png'
+import macbook1 from '../assets/macbook1.png'
+import macbook2 from '../assets/macbook2.png'
+import macbook3 from '../assets/macbook3.png'
+import macbook4 from '../assets/macbook4.png'
 import phone from '../assets/phone.png'
 import tablet1 from '../assets/tablet1.png'
 import tablet2 from '../assets/tablet2.png'
 import tablet3 from '../assets/tablet3.png'
+import tablet4 from '../assets/tablet4.png'
+import tablet5 from '../assets/tablet5.png'
+import tablet6 from '../assets/tablet6.png'
+import tablet7 from '../assets/tablet7.png'
+import tablet8 from '../assets/tablet8.png'
+import tablet9 from '../assets/tablet9.png'
 import tv1 from '../assets/tv1.png'
 import tv2 from '../assets/tv2.png'
 import tv3 from '../assets/tv3.png'
@@ -49,11 +67,29 @@ const imageMap = {
   '/src/assets/pc3.png': pc3,
   '/src/assets/pc4.png': pc4,
   '/src/assets/laptop.png': laptop,
+  '/src/assets/laptop1.png': laptop1,
+  '/src/assets/laptop2.png': laptop2,
+  '/src/assets/laptop3.png': laptop3,
+  '/src/assets/laptop4.png': laptop4,
+  '/src/assets/laptop5.png': laptop5,
+  '/src/assets/laptop6.png': laptop6,
+  '/src/assets/laptop7.png': laptop7,
+  '/src/assets/laptop8.png': laptop8,
   '/src/assets/macbook.png': macbook,
+  '/src/assets/macbook1.png': macbook1,
+  '/src/assets/macbook2.png': macbook2,
+  '/src/assets/macbook3.png': macbook3,
+  '/src/assets/macbook4.png': macbook4,
   '/src/assets/phone.png': phone,
   '/src/assets/tablet1.png': tablet1,
   '/src/assets/tablet2.png': tablet2,
   '/src/assets/tablet3.png': tablet3,
+  '/src/assets/tablet4.png': tablet4,
+  '/src/assets/tablet5.png': tablet5,
+  '/src/assets/tablet6.png': tablet6,
+  '/src/assets/tablet7.png': tablet7,
+  '/src/assets/tablet8.png': tablet8,
+  '/src/assets/tablet9.png': tablet9,
   '/src/assets/tv1.png': tv1,
   '/src/assets/tv2.png': tv2,
   '/src/assets/tv3.png': tv3,

@@ -345,9 +345,9 @@ onMounted(() => {
 .sidebar-input input[type="checkbox"]::after {
   content: '';
   position: absolute;
-  top: 5px;
+  top: 3px;
   left: 8px;
-  width: 6px;
+  width: 7px;
   height: 12px;
   border: solid #0018A8;
   border-width: 0 2px 2px 0;
