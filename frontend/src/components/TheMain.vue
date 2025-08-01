@@ -11,8 +11,8 @@ const props = defineProps({
   products: Array
 })
 
-// Получаем товары со скидками через getter
-const saleItems = computed(() => store.getters.getSaleItems);
+// Получаем товары со скидками через getter (ограничиваем до 6)
+const saleItems = computed(() => store.getters.getSaleItems.slice(0, 6));
 
 </script>
 
