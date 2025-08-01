@@ -154,6 +154,13 @@ app.post('/api/register', async (req, res) => {
     favorites: [], // Добавляем поле избранного
     addresses: [] // Добавляем поле адресов
   };
+  
+  // Дополнительная проверка перед добавлением (защита от race condition)
+  const userExistsAfterCheck = users.some(user => user.phone === phone);
+  if (userExistsAfterCheck) {
+    return res.status(400).json({ message: 'Пользователь с таким номером уже существует' });
+  }
+  
   users.push(newUser);
 
   res.status(201).json({ message: 'Пользователь успешно зарегистрирован', user: newUser });

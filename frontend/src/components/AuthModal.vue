@@ -25,31 +25,43 @@ const store = useStore();
 const phone = ref('');
 const password = ref('');
 const confirmPassword = ref('');
+const loading = ref(false);
 
 const isRegister = computed(() => props.type === 'register');
 const modalTitle = computed(() => (isRegister.value ? 'Регистрация' : 'Войти'));
 
 const handleSubmit = async () => {
+  // Предотвращаем множественные клики
+  if (loading.value) return;
+  
   if (isRegister.value && password.value !== confirmPassword.value) {
     alert('Пароли не совпадают!');
     return;
   }
 
-  const payload = {
-    phone: phone.value,
-    password: password.value,
-  };
+  loading.value = true;
+  
+  try {
+    const payload = {
+      phone: phone.value,
+      password: password.value,
+    };
 
-  if (isRegister.value) {
-    const success = await store.dispatch('auth/register', payload);
-    if (success) {
-      emit('switch', 'login');
+    if (isRegister.value) {
+      const success = await store.dispatch('auth/register', payload);
+      if (success) {
+        emit('switch', 'login');
+      }
+    } else {
+      const success = await store.dispatch('auth/login', payload);
+      if (success) {
+        emit('close'); // Закрываем модальное окно только при успешном входе
+      }
     }
-  } else {
-    const success = await store.dispatch('auth/login', payload);
-    if (success) {
-      emit('close'); // Закрываем модальное окно только при успешном входе
-    }
+  } catch (error) {
+    console.error('Ошибка при авторизации:', error);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -96,7 +108,9 @@ const switchLinkText = computed(() =>
         <div v-if="isRegister" class="form-group">
           <FormInput type="password" v-model="confirmPassword" placeholder="Подтвердите пароль" required />
         </div>
-        <buttonCart type="submit">{{ modalTitle }}</buttonCart>
+        <buttonCart type="submit" :disabled="loading">
+          {{ loading ? 'Загрузка...' : modalTitle }}
+        </buttonCart>
       </form>
       <p class="switch-text">
         {{ switchText }} 
