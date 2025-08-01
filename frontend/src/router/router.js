@@ -47,7 +47,11 @@ const routes = [
     })
   },
   { path: '/favorites', name: 'Favorites', component: FavoritePage },
-  { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFoundPage }
+  { path: '/:pathMatch(.*)*', 
+    name: 'NotFound', 
+    component: NotFoundPage,
+    meta: { showHeader: false }
+   }
 ];
 
 const router = createRouter({

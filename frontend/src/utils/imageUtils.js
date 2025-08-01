@@ -54,6 +54,7 @@ import slide4 from '../assets/slide4.png'
 import cart from '../assets/cart.png'
 import add from '../assets/add.png'
 import remove from '../assets/remove.png'
+import error404 from '../assets/404.png'
 
 // Маппинг путей к импортированным изображениям
 const imageMap = {
@@ -112,6 +113,7 @@ const imageMap = {
   '/src/assets/cart.png': cart,
   '/src/assets/add.png': add,
   '/src/assets/remove.png': remove,
+  '/src/assets/404.png': error404,
 }
 
 /**

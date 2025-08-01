@@ -74,6 +74,10 @@ const handleShowAddedMessage = () => {
   </template>
 
 <style lang="scss" scoped>
+
+.two{
+  color: #000;
+}
 .product-card__inner{
   display: flex;
   justify-content: space-between;
@@ -83,7 +87,7 @@ const handleShowAddedMessage = () => {
   position: relative;
 }
   
-  @media (max-width: 600px) {
+  @media (max-width: 900px) {
     flex-direction: column;
     gap: 20px;
   }
@@ -94,7 +98,7 @@ const handleShowAddedMessage = () => {
   align-items: center;
   position: relative;
   
-  @media (max-width: 600px) {
+  @media (max-width: 900px) {
     padding: 0 16px;
     margin-top: 20px;
   }
@@ -123,7 +127,7 @@ const handleShowAddedMessage = () => {
   &-image{
     width: 350px;
     
-    @media (max-width: 600px) {
+    @media (max-width: 900px) {
       width: 80%;
       max-width: 300px;
       height: auto;
@@ -145,7 +149,7 @@ const handleShowAddedMessage = () => {
     flex-direction: column;
     row-gap: 20px;
     
-    @media (max-width: 600px) {
+    @media (max-width: 900px) {
       row-gap: 16px;
       padding: 0 16px;
     }
@@ -155,7 +159,7 @@ const handleShowAddedMessage = () => {
       grid-template-columns: 1fr 1fr;
       grid-gap: 16px;
       
-      @media (max-width: 600px) {
+      @media (max-width: 900px) {
         grid-template-columns: 1fr;
         grid-gap: 12px;
         padding: 12px 0;
