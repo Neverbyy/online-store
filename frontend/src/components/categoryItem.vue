@@ -5,6 +5,7 @@ import { useStore } from 'vuex';
 import { transliterate } from '../helpers/translit';
 import FavoriteIcon from './UI/FavoriteIcon.vue';
 import { getImageUrl } from '../utils/imageUtils.js';
+import { useDiscount } from '../composables/useDiscount.js';
 
 const props = defineProps({
   product: Object
@@ -17,17 +18,8 @@ const showMaxQuantityMessage = ref(false);
 // Получаем правильный URL изображения
 const correctImageUrl = getImageUrl(props.product?.image);
 
-// Вычисляем процент скидки
-const discountPercentage = computed(() => {
-  if (!props.product.oldPrice || !props.product.price || !props.product.isSale) return 0;
-  
-  const oldPrice = parseInt(props.product.oldPrice.replace(/\s/g, ''));
-  const currentPrice = parseInt(props.product.price.replace(/\s/g, ''));
-  
-  if (oldPrice <= currentPrice) return 0;
-  
-  return Math.round(((oldPrice - currentPrice) / oldPrice) * 100);
-});
+// Используем composable для вычисления скидки и экономии
+const { discountPercentage } = useDiscount(computed(() => props.product));
 
 const isFavorite = computed(() => store.getters['favorite/isFavorite'](props.product.id));
 const handleToggleFavorite = async () => {

@@ -4,6 +4,7 @@ import CartActionButton from './UI/CartActionButton.vue';
 import { useStore } from 'vuex';
 import FavoriteIcon from './UI/FavoriteIcon.vue';
 import { getImageUrl } from '../utils/imageUtils.js';
+import { useDiscount } from '../composables/useDiscount.js';
 
 const props = defineProps({
   product: Object
@@ -11,10 +12,12 @@ const props = defineProps({
 
 const store = useStore();
 const showAddedMessage = ref(false);
-const showMaxQuantityMessage = ref(false);
 
 // Получаем правильный URL изображения
 const correctImageUrl = getImageUrl(props.product?.image);
+
+// Используем composable для вычисления скидки и экономии
+const { discountPercentage, savingsAmount } = useDiscount(computed(() => props.product));
 
 // Удаляю addToCart из props и handleAddToCart
 
@@ -48,7 +51,14 @@ const handleShowAddedMessage = () => {
             </div>
           </div>
           <div class="product-card-buy">
-            <div class="product-card-price"><h2> {{ product.price }} ₽</h2></div>
+                         <div class="product-card-price">
+                 <h2 class="current-price">{{ product.price }} ₽</h2>
+                 <span v-if="product.oldPrice && product.isSale" class="old-price">{{ product.oldPrice }} ₽</span>
+             </div>
+             <div v-if="product.oldPrice && product.isSale" class="discount-widgets">
+               <div class="discount-percentage">-{{ discountPercentage }}%</div>
+               <div class="savings-amount">Экономия {{ savingsAmount.toLocaleString() }} ₽</div>
+             </div>
             <div class="product-card-buy-row">
               <FavoriteIcon :active="isFavorite" @click="handleToggleFavorite" width="40" height="40" style="cursor:pointer;"/>
               
@@ -152,6 +162,73 @@ const handleShowAddedMessage = () => {
         border-bottom: 1px solid #eee;
       }
     }
+  }
+}
+
+// Стили для цен
+.product-card-price {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.current-price {
+  margin: 0;
+  color: #333;
+  font-weight: 700;
+}
+
+.old-price {
+  font-size: 16px;
+  color: #888;
+  font-weight: 400;
+  text-decoration: line-through;
+  
+  @media (max-width: 600px) {
+    font-size: 14px;
+  }
+}
+
+// Стили для виджетов скидки
+.discount-widgets {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  
+  @media (max-width: 600px) {
+    margin-top: 10px;
+    gap: 6px;
+  }
+}
+
+.discount-percentage {
+  background-color: #000;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  
+  @media (max-width: 600px) {
+    padding: 5px 10px;
+    font-size: 13px;
+  }
+}
+
+.savings-amount {
+  background-color: #90EE90;
+  color: #333;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  
+  @media (max-width: 600px) {
+    padding: 5px 10px;
+    font-size: 13px;
   }
 }
 
