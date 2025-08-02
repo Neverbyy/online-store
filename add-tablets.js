@@ -477,7 +477,7 @@ const selectAction = () => {
   switch(action) {
     case '1':
       console.log('🎵 Добавляем новую аудиотехнику...');
-      addLaptops();
+addLaptops(); 
       break;
     case '2':
       console.log('🔄 Полное обновление всех товаров...');

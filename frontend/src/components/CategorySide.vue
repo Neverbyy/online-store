@@ -12,7 +12,9 @@ const props = defineProps({
       sale: [],
       os: [],
       resolution: [],
-      refreshRate: []
+      refreshRate: [],
+      processor: [],
+      gpu: []
     })
   },
   priceRange: {
@@ -60,6 +62,14 @@ const props = defineProps({
     default: false
   },
   categoryProcessors: {
+    type: Array,
+    default: () => []
+  },
+  showGpuFilter: {
+    type: Boolean,
+    default: false
+  },
+  categoryGpu: {
     type: Array,
     default: () => []
   }
@@ -136,6 +146,7 @@ const resetFilters = () => {
   emit('filterChange', 'resolution', []);
   emit('filterChange', 'refreshRate', []);
   emit('filterChange', 'processor', []);
+  emit('filterChange', 'gpu', []);
 };
 
 const handleFilterChange = (filterKey, value, checked) => {
@@ -216,6 +227,13 @@ const filters = ref([
     options: props.categoryProcessors.length > 0 ? props.categoryProcessors : [],
     showAll: false,
     show: props.showProcessorFilter
+  },
+  {
+    name: 'Видеокарта',
+    key: 'gpu',
+    options: props.categoryGpu.length > 0 ? props.categoryGpu : [],
+    showAll: false,
+    show: props.showGpuFilter
   },
   {
     name: 'Производитель',

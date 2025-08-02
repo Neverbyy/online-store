@@ -10,7 +10,8 @@ export const useCategoryFilters = (items, category) => {
     os: [],
     resolution: [],
     refreshRate: [],
-    processor: []
+    processor: [],
+    gpu: []
   });
   
   const priceRange = ref([0, 300000]); // Диапазон цен
@@ -114,6 +115,9 @@ export const useCategoryFilters = (items, category) => {
     // Фильтрация по процессору
     filtered = applyFeatureFilter(filtered, selectedFilters.value.processor, 'Процессор', 'includes');
     
+    // Фильтрация по видеокарте
+    filtered = applyFeatureFilter(filtered, selectedFilters.value.gpu, 'Видеокарта', 'includes');
+    
     return filtered;
   });
 
@@ -145,6 +149,9 @@ export const useCategoryFilters = (items, category) => {
   // Собираем процессоры для текущей категории
   const categoryProcessors = computed(() => createCategoryOptions('Процессор'));
 
+  // Собираем видеокарты для текущей категории
+  const categoryGpu = computed(() => createCategoryOptions('Видеокарта'));
+
   // Проверяем, нужно ли показывать фильтр разрешения для текущей категории
   const showResolutionFilter = computed(() => categoryResolution.value.length > 0);
 
@@ -159,6 +166,9 @@ export const useCategoryFilters = (items, category) => {
 
   // Проверяем, нужно ли показывать фильтр процессора для текущей категории
   const showProcessorFilter = computed(() => hasFeature('Процессор'));
+
+  // Проверяем, нужно ли показывать фильтр видеокарты для текущей категории
+  const showGpuFilter = computed(() => hasFeature('Видеокарта'));
 
   // Обработчики фильтров
   const handleFilterChange = (filterType, values) => {
@@ -261,6 +271,22 @@ export const useCategoryFilters = (items, category) => {
         'google tensor g3': 'Google Tensor G3',
         'exynos w930': 'Exynos W930',
         'apple s9': 'Apple S9'
+      },
+      gpu: {
+        'apple gpu': 'Apple GPU',
+        'adreno 740': 'Adreno 740',
+        'adreno 730': 'Adreno 730',
+        'mali-g610': 'Mali-G610',
+        'mali-g78': 'Mali-G78',
+        'powervr gx6450': 'PowerVR GX6450',
+        'nvidia geforce rtx 4060': 'NVIDIA GeForce RTX 4060',
+        'nvidia geforce rtx 4070': 'NVIDIA GeForce RTX 4070',
+        'nvidia geforce rtx 4080': 'NVIDIA GeForce RTX 4080',
+        'nvidia geforce rtx 4090': 'NVIDIA GeForce RTX 4090',
+        'amd radeon rx 7600': 'AMD Radeon RX 7600',
+        'amd radeon rx 7700': 'AMD Radeon RX 7700',
+        'intel uhd graphics': 'Intel UHD Graphics',
+        'intel iris xe graphics': 'Intel Iris Xe Graphics'
       }
     };
     
@@ -310,6 +336,8 @@ export const useCategoryFilters = (items, category) => {
     showRamFilter,
     showProcessorFilter,
     categoryProcessors,
+    showGpuFilter,
+    categoryGpu,
     getActiveFilters,
     
     // Методы

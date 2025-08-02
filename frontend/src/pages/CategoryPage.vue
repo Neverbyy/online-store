@@ -33,6 +33,8 @@ const {
   showRamFilter,
   showProcessorFilter,
   categoryProcessors,
+  showGpuFilter,
+  categoryGpu,
   getActiveFilters,
   handleFilterChange,
   handlePriceChange,
@@ -104,6 +106,8 @@ const props = defineProps({
           :showRamFilter="showRamFilter"
           :showProcessorFilter="showProcessorFilter"
           :categoryProcessors="categoryProcessors"
+          :showGpuFilter="showGpuFilter"
+          :categoryGpu="categoryGpu"
           @filterChange="handleFilterChange"
           @priceChange="handlePriceChange"
         />
@@ -170,6 +174,8 @@ const props = defineProps({
                 :showRamFilter="showRamFilter"
                 :showProcessorFilter="showProcessorFilter"
                 :categoryProcessors="categoryProcessors"
+                :showGpuFilter="showGpuFilter"
+                :categoryGpu="categoryGpu"
                 @filterChange="handleFilterChange"
                 @priceChange="handlePriceChange"
               />

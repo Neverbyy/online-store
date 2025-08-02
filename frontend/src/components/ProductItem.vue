@@ -154,6 +154,7 @@ onUnmounted(() => {
                </transition>
              </div>
           </div>
+          
           <div class="product-card-details">
             <h1>Характеристики:</h1>
             <div class="product-card-details-inner"
@@ -258,7 +259,8 @@ onUnmounted(() => {
   
   @media (max-width: 900px) {
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
+    align-items: center;
   }
 }
 
@@ -274,6 +276,8 @@ onUnmounted(() => {
     gap: 8px;
     overflow-x: auto;
     padding-bottom: 8px;
+    justify-content: center;
+    min-width: auto;
   }
 }
 
@@ -317,6 +321,8 @@ onUnmounted(() => {
    
    @media (max-width: 900px) {
      order: 1;
+     width: 100%;
+     justify-content: center;
    }
  }
 
@@ -411,11 +417,19 @@ onUnmounted(() => {
     
     @media (max-width: 900px) {
       width: 100%;
-      max-width: 300px;
+      max-width: 400px;
       height: auto;
       border-radius: 8px;
       margin: 0 auto;
       display: block;
+    }
+    
+    @media (max-width: 600px) {
+      max-width: 350px;
+    }
+    
+    @media (max-width: 480px) {
+      max-width: 300px;
     }
   }
 
@@ -624,6 +638,7 @@ onUnmounted(() => {
   max-height: 100%;
   object-fit: contain;
   border-radius: 8px;
+
 }
 
 // Стили для стрелок навигации
