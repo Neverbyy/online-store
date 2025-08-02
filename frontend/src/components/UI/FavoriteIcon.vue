@@ -6,6 +6,7 @@
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     v-bind="$attrs"
+    class="favorite-icon"
   >
     <g filter="url(#filter0_d_518_90)">
       <rect x="19" y="19" width="40" height="40" rx="8" fill="#F6F6F6"/>
@@ -16,6 +17,7 @@
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
+        class="heart-path"
       />
     </g>
     <defs>
@@ -48,4 +50,30 @@ const props = defineProps({
     default: false
   }
 });
-</script> 
+</script>
+
+<style scoped>
+.favorite-icon {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.favorite-icon:hover {
+  transform: scale(1.05);
+}
+
+.heart-path {
+  transition: all 0.2s ease;
+}
+
+.favorite-icon:hover .heart-path {
+  stroke: #750DC5;
+  fill: rgba(117, 13, 197, 0.4);
+}
+
+/* Если иконка уже активна, hover эффект не применяется */
+.favorite-icon:hover .heart-path[fill="#750DC5"] {
+  stroke: #750DC5;
+  fill: #750DC5;
+}
+</style> 

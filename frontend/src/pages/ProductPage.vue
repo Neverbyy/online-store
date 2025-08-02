@@ -19,9 +19,7 @@ const reviews = computed(() => store.getters.getReviewsByProductId(productId.val
 const isReviewModalActive = ref(false);
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
 
-const addToCart = (product) => {
-  store.dispatch('cart/addToCart', product);
-};
+
 
 const openReviewModal = () => {
   isReviewModalActive.value = true;
@@ -62,7 +60,6 @@ onMounted(() => {
     <div v-if="product">
       <ProductItem 
         :product="product"
-        :addToCart="addToCart"
       />
     </div>
     <div class="reviews-section">

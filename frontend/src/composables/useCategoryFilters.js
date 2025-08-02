@@ -13,15 +13,74 @@ export const useCategoryFilters = (items, category) => {
     processor: []
   });
   
-  const priceRange = ref([0, 300000]); // Диапазон цен по умолчанию
+  const priceRange = ref([0, 300000]); // Диапазон цен
+
+  // Утилитарные функции для оптимизации
+  const getFilteredItems = () => {
+    if (!items.value || !Array.isArray(items.value)) return [];
+    return items.value.filter(item => item.category === category.value);
+  };
+
+  const createCategoryOptions = (featureKey, transformValue = (value) => value) => {
+    const filtered = getFilteredItems();
+    const optionsMap = new Map();
+    
+    filtered.forEach(item => {
+      const value = item.features?.[featureKey];
+      if (value) {
+        const normalizedValue = value.trim().toLowerCase();
+        const originalValue = value.trim();
+        optionsMap.set(normalizedValue, transformValue(originalValue));
+      }
+    });
+    
+    return Array.from(optionsMap.entries()).map(([key, label]) => ({
+      label: label,
+      value: key
+    }));
+  };
+
+  const hasFeature = (featureKey) => {
+    const filtered = getFilteredItems();
+    return filtered.some(item => item.features && item.features[featureKey]);
+  };
+
+  // Универсальная функция фильтрации по характеристикам
+  const applyFeatureFilter = (items, filterValues, featureKey, comparisonType = 'includes') => {
+    if (filterValues.length === 0) return items;
+    
+    return items.filter(item => {
+      const featureValue = item.features?.[featureKey];
+      if (!featureValue) return false;
+      
+      const normalizedFeatureValue = featureValue.trim().toLowerCase();
+      
+      return filterValues.some(filter => {
+        const normalizedFilter = filter.toLowerCase();
+        
+        switch (comparisonType) {
+          case 'exact':
+            return normalizedFeatureValue === normalizedFilter;
+          case 'memory':
+            // Специальная обработка для памяти (добавляем пробел перед GB)
+            const normalizedMemoryValue = normalizedFeatureValue.replace(/\s+/g, ' ');
+            const normalizedMemoryFilter = normalizedFilter.replace(/gb$/, ' gb');
+            return normalizedMemoryValue === normalizedMemoryFilter;
+          case 'includes':
+          default:
+            return normalizedFeatureValue.includes(normalizedFilter);
+        }
+      });
+    });
+  };
 
   // Фильтрация товаров по категории и выбранным фильтрам
   const filteredProducts = computed(() => {
-    let filtered = items.value.filter(item => item.category === category.value);
+    let filtered = getFilteredItems();
     
     // Фильтрация по цене
     filtered = filtered.filter(item => {
-      const price = parseInt(item.price.replace(/\s/g, '')); // Убираем пробелы из цены
+      const price = parseInt(item.price.replace(/\s/g, ''));
       return price >= priceRange.value[0] && price <= priceRange.value[1];
     });
     
@@ -32,39 +91,11 @@ export const useCategoryFilters = (items, category) => {
       );
     }
     
-    // Фильтрация по памяти (если есть в features)
-    if (selectedFilters.value.memory.length > 0) {
-      filtered = filtered.filter(item => {
-        const memoryValue = item.features['Встроенная память'];
-        if (!memoryValue) return false;
-        
-        // Нормализуем значение из API (убираем лишние пробелы, приводим к нижнему регистру)
-        const normalizedMemoryValue = memoryValue.trim().toLowerCase().replace(/\s+/g, ' ');
-        
-        return selectedFilters.value.memory.some(filter => {
-          // Нормализуем значение фильтра (добавляем пробел перед GB если его нет)
-          const normalizedFilter = filter.toLowerCase().replace(/gb$/, ' gb');
-          return normalizedMemoryValue === normalizedFilter;
-        });
-      });
-    }
+    // Фильтрация по памяти
+    filtered = applyFeatureFilter(filtered, selectedFilters.value.memory, 'Встроенная память', 'memory');
     
-    // Фильтрация по оперативной памяти (если есть в features)
-    if (selectedFilters.value.ram.length > 0) {
-      filtered = filtered.filter(item => {
-        const ramValue = item.features['Оперативная память'];
-        if (!ramValue) return false;
-        
-        // Нормализуем значение из API (убираем лишние пробелы, приводим к нижнему регистру)
-        const normalizedRamValue = ramValue.trim().toLowerCase().replace(/\s+/g, ' ');
-        
-        return selectedFilters.value.ram.some(filter => {
-          // Нормализуем значение фильтра (добавляем пробел перед GB если его нет)
-          const normalizedFilter = filter.toLowerCase().replace(/gb$/, ' gb');
-          return normalizedRamValue === normalizedFilter;
-        });
-      });
-    }
+    // Фильтрация по оперативной памяти
+    filtered = applyFeatureFilter(filtered, selectedFilters.value.ram, 'Оперативная память', 'memory');
     
     // Фильтрация по акциям
     if (selectedFilters.value.sale.length > 0) {
@@ -72,58 +103,23 @@ export const useCategoryFilters = (items, category) => {
     }
     
     // Фильтрация по операционной системе
-    if (selectedFilters.value.os.length > 0) {
-      filtered = filtered.filter(item => {
-        const osValue = item.features['Операционная система'];
-        return selectedFilters.value.os.some(filter => 
-          osValue && osValue.toLowerCase().includes(filter.toLowerCase())
-        );
-      });
-    }
+    filtered = applyFeatureFilter(filtered, selectedFilters.value.os, 'Операционная система', 'includes');
     
     // Фильтрация по разрешению
-    if (selectedFilters.value.resolution.length > 0) {
-      filtered = filtered.filter(item => {
-        const resolutionValue = item.features['Разрешение'];
-        return selectedFilters.value.resolution.some(filter => 
-          resolutionValue && resolutionValue.toLowerCase().includes(filter.toLowerCase())
-        );
-      });
-    }
+    filtered = applyFeatureFilter(filtered, selectedFilters.value.resolution, 'Разрешение', 'includes');
     
     // Фильтрация по частоте обновления
-    if (selectedFilters.value.refreshRate.length > 0) {
-      filtered = filtered.filter(item => {
-        const refreshRateValue = item.features['Частота обновления'];
-        return selectedFilters.value.refreshRate.some(filter => 
-          refreshRateValue && refreshRateValue.toLowerCase().includes(filter.toLowerCase())
-        );
-      });
-    }
+    filtered = applyFeatureFilter(filtered, selectedFilters.value.refreshRate, 'Частота обновления', 'includes');
     
     // Фильтрация по процессору
-    if (selectedFilters.value.processor.length > 0) {
-      filtered = filtered.filter(item => {
-        const processorValue = item.features['Процессор'];
-        if (!processorValue) return false;
-        
-        // Нормализуем значение из API (убираем лишние пробелы, приводим к нижнему регистру)
-        const normalizedProcessorValue = processorValue.trim().toLowerCase();
-        
-        return selectedFilters.value.processor.some(filter => {
-          // Нормализуем значение фильтра
-          const normalizedFilter = filter.toLowerCase();
-          return normalizedProcessorValue.includes(normalizedFilter);
-        });
-      });
-    }
+    filtered = applyFeatureFilter(filtered, selectedFilters.value.processor, 'Процессор', 'includes');
     
     return filtered;
   });
 
   // Бренды для текущей категории
   const categoryBrands = computed(() => {
-    const filtered = items.value.filter(item => item.category === category.value);
+    const filtered = getFilteredItems();
     const brandsSet = new Set(filtered.map(item => item.brand));
     return Array.from(brandsSet).map(b => ({
       label: b.charAt(0).toUpperCase() + b.slice(1),
@@ -132,25 +128,7 @@ export const useCategoryFilters = (items, category) => {
   });
 
   // Собираем операционные системы для текущей категории
-  const categoryOS = computed(() => {
-    const filtered = items.value.filter(item => item.category === category.value);
-    const osMap = new Map(); // Используем Map для сохранения оригинального значения
-    
-    filtered.forEach(item => {
-      const osValue = item.features['Операционная система'];
-      if (osValue) {
-        // Нормализуем значение для сравнения (убираем лишние пробелы, приводим к нижнему регистру)
-        const normalizedValue = osValue.trim().toLowerCase();
-        // Сохраняем оригинальное значение как label
-        osMap.set(normalizedValue, osValue.trim());
-      }
-    });
-    
-    return Array.from(osMap.entries()).map(([key, label]) => ({
-      label: label,
-      value: key
-    }));
-  });
+  const categoryOS = computed(() => createCategoryOptions('Операционная система'));
 
   // Проверяем, нужно ли показывать фильтр ОС для текущей категории
   const showOSFilter = computed(() => {
@@ -159,95 +137,28 @@ export const useCategoryFilters = (items, category) => {
   });
 
   // Собираем разрешения для текущей категории
-  const categoryResolution = computed(() => {
-    const filtered = items.value.filter(item => item.category === category.value);
-    const resolutionMap = new Map(); // Используем Map для сохранения оригинального значения
-    
-    filtered.forEach(item => {
-      const resolutionValue = item.features['Разрешение'];
-      if (resolutionValue) {
-        // Нормализуем значение для сравнения (убираем лишние пробелы, приводим к нижнему регистру)
-        const normalizedValue = resolutionValue.trim().toLowerCase();
-        // Сохраняем оригинальное значение как label
-        resolutionMap.set(normalizedValue, resolutionValue.trim());
-      }
-    });
-    
-    return Array.from(resolutionMap.entries()).map(([key, label]) => ({
-      label: label,
-      value: key
-    }));
-  });
+  const categoryResolution = computed(() => createCategoryOptions('Разрешение'));
 
   // Собираем частоты обновления для текущей категории
-  const categoryRefreshRate = computed(() => {
-    const filtered = items.value.filter(item => item.category === category.value);
-    const refreshRateMap = new Map(); // Используем Map для сохранения оригинального значения
-    
-    filtered.forEach(item => {
-      const refreshRateValue = item.features['Частота обновления'];
-      if (refreshRateValue) {
-        // Нормализуем значение для сравнения (убираем лишние пробелы, приводим к нижнему регистру)
-        const normalizedValue = refreshRateValue.trim().toLowerCase();
-        // Сохраняем оригинальное значение как label
-        refreshRateMap.set(normalizedValue, refreshRateValue.trim());
-      }
-    });
-    
-    return Array.from(refreshRateMap.entries()).map(([key, label]) => ({
-      label: label,
-      value: key
-    }));
-  });
+  const categoryRefreshRate = computed(() => createCategoryOptions('Частота обновления'));
 
   // Собираем процессоры для текущей категории
-  const categoryProcessors = computed(() => {
-    const filtered = items.value.filter(item => item.category === category.value);
-    const processorMap = new Map(); // Используем Map для сохранения оригинального значения
-    
-    filtered.forEach(item => {
-      const processorValue = item.features['Процессор'];
-      if (processorValue) {
-        // Нормализуем значение для сравнения (убираем лишние пробелы, приводим к нижнему регистру)
-        const normalizedValue = processorValue.trim().toLowerCase();
-        // Сохраняем оригинальное значение как label
-        processorMap.set(normalizedValue, processorValue.trim());
-      }
-    });
-    
-    return Array.from(processorMap.entries()).map(([key, label]) => ({
-      label: label,
-      value: key
-    }));
-  });
+  const categoryProcessors = computed(() => createCategoryOptions('Процессор'));
 
   // Проверяем, нужно ли показывать фильтр разрешения для текущей категории
-  const showResolutionFilter = computed(() => {
-    return categoryResolution.value.length > 0;
-  });
+  const showResolutionFilter = computed(() => categoryResolution.value.length > 0);
 
   // Проверяем, нужно ли показывать фильтр частоты обновления для текущей категории
-  const showRefreshRateFilter = computed(() => {
-    return categoryRefreshRate.value.length > 0;
-  });
+  const showRefreshRateFilter = computed(() => categoryRefreshRate.value.length > 0);
 
   // Проверяем, нужно ли показывать фильтр встроенной памяти для текущей категории
-  const showMemoryFilter = computed(() => {
-    const filtered = items.value.filter(item => item.category === category.value);
-    return filtered.some(item => item.features && item.features['Встроенная память']);
-  });
+  const showMemoryFilter = computed(() => hasFeature('Встроенная память'));
 
   // Проверяем, нужно ли показывать фильтр оперативной памяти для текущей категории
-  const showRamFilter = computed(() => {
-    const filtered = items.value.filter(item => item.category === category.value);
-    return filtered.some(item => item.features && item.features['Оперативная память']);
-  });
+  const showRamFilter = computed(() => hasFeature('Оперативная память'));
 
   // Проверяем, нужно ли показывать фильтр процессора для текущей категории
-  const showProcessorFilter = computed(() => {
-    const filtered = items.value.filter(item => item.category === category.value);
-    return filtered.some(item => item.features && item.features['Процессор']);
-  });
+  const showProcessorFilter = computed(() => hasFeature('Процессор'));
 
   // Обработчики фильтров
   const handleFilterChange = (filterType, values) => {

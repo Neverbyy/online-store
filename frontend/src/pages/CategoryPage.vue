@@ -12,6 +12,7 @@ const router = useRouter();
 
 const categoryExists = ref(false);
 const showFiltersModal = ref(false);
+const isLoading = ref(true); // Добавляем состояние загрузки
 
 const category = computed(() => route.params.category);
 const items = computed(() => store.getters.getItems);
@@ -55,6 +56,7 @@ onMounted(async () => {
   if (!categoryExists.value) {
     router.push({ name: 'NotFound' });
   }
+  isLoading.value = false; // Устанавливаем загрузку завершенной
 });
 
 const props = defineProps({
@@ -87,6 +89,7 @@ const props = defineProps({
 
         <!-- Десктопная боковая панель -->
         <CategorySide 
+          v-if="!isLoading"
           class="desktop-filters"
           :selectedFilters="selectedFilters"
           :priceRange="priceRange"
@@ -104,6 +107,12 @@ const props = defineProps({
           @filterChange="handleFilterChange"
           @priceChange="handlePriceChange"
         />
+
+        <!-- Индикатор загрузки -->
+        <div v-if="isLoading" class="loading-placeholder desktop-filters">
+          <div class="loading-spinner"></div>
+          <p>Загрузка фильтров...</p>
+        </div>
 
         <div class="category-content">
           <div class="results-info">
@@ -147,6 +156,7 @@ const props = defineProps({
             </div>
             <div class="filters-modal-content">
               <CategorySide 
+                v-if="!isLoading"
                 :selectedFilters="selectedFilters"
                 :priceRange="priceRange"
                 :brands="categoryBrands"
@@ -175,6 +185,39 @@ const props = defineProps({
   display: flex;
   gap: 20px;
   margin-top: 20px;
+}
+
+.loading-placeholder {
+  width: 300px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e0e0e0;
+    border-top: 3px solid #750DC5;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .category-content {
