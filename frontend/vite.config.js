@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
   const apiUrl = isProduction 
-    ? (process.env.VITE_API_URL_PROD || 'https://glance-store.onrender.com')
+    ? (process.env.VITE_API_URL_PROD || 'https://online-store-ofdm.onrender.com')
     : (process.env.VITE_API_URL || 'http://localhost:5000');
   
   return {
