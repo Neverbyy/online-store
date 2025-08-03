@@ -54,7 +54,7 @@ app.post('/api/payment', async (req, res) => {
     capture: true,
     confirmation: {
         type: 'redirect',
-        return_url: 'http://localhost:5173/?payment=success'
+        return_url: 'https://online-store-ofdm.onrender.com/?payment=success'
     },
     metadata: {
       orderId: orderId,

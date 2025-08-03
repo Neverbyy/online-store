@@ -97,8 +97,10 @@ const submitForm = async () => {
 
     // Перенаправляем на страницу оплаты YooKassa
     if (payment.confirmation && payment.confirmation.confirmation_url) {
+      console.log('Перенаправление на оплату:', payment.confirmation.confirmation_url);
       window.location.href = payment.confirmation.confirmation_url;
     } else {
+      console.error('Ошибка: confirmation_url не найден в ответе:', payment);
       throw new Error('Не удалось получить ссылку для оплаты');
     }
 
