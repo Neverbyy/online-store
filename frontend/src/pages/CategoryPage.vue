@@ -158,6 +158,30 @@ const props = defineProps({
                 </svg>
               </button>
             </div>
+            
+            <!-- Активные фильтры в модальном окне -->
+            <div v-if="getActiveFilters.length > 0" class="filters-modal-active">
+              <div class="active-filters-mobile">
+                <div class="filter-tags-mobile">
+                  <div 
+                    v-for="filter in getActiveFilters" 
+                    :key="`${filter.type}-${filter.value}`"
+                    class="filter-tag-mobile"
+                  >
+                    <span class="filter-tag-text">{{ filter.label }}</span>
+                    <button 
+                      class="filter-tag-remove"
+                      @click="removeFilter(filter.type, filter.value)"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z" fill="currentColor"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
             <div class="filters-modal-content">
               <CategorySide 
                 v-if="!isLoading"
@@ -388,6 +412,58 @@ const props = defineProps({
     }
   }
   
+  .filters-modal-active {
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+    background-color: #f8f9fa;
+    
+    .active-filters-mobile {
+      .filter-tags-mobile {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        
+        .filter-tag-mobile {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 10px;
+          background-color: #750DC5;
+          color: white;
+          border-radius: 16px;
+          font-size: 12px;
+          font-weight: 500;
+          
+          .filter-tag-text {
+            white-space: nowrap;
+          }
+          
+          .filter-tag-remove {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            padding: 2px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+            
+            &:hover {
+              background-color: rgba(255, 255, 255, 0.2);
+            }
+            
+            svg {
+              width: 10px;
+              height: 10px;
+              color: white;
+            }
+          }
+        }
+      }
+    }
+  }
+  
   .filters-modal-content {
     flex: 1;
     overflow-y: auto;
@@ -525,6 +601,28 @@ const props = defineProps({
       
       h3 {
         font-size: 16px;
+      }
+    }
+    
+    .filters-modal-active {
+      padding: 12px 16px;
+      
+      .active-filters-mobile {
+        .filter-tags-mobile {
+          gap: 6px;
+          
+          .filter-tag-mobile {
+            padding: 5px 8px;
+            font-size: 11px;
+            
+            .filter-tag-remove {
+              svg {
+                width: 8px;
+                height: 8px;
+              }
+            }
+          }
+        }
       }
     }
     
