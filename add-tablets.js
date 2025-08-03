@@ -164,11 +164,43 @@ const itemsToUpdateImages = [
 // Массив товаров для добавления additionalImages
 const itemsToAddAdditionalImages = [
   {
-    id: 50,
+    id: 2,
     additionalImages: [
-      "/src/assets/audio6-1.png",
-      "/src/assets/audio6-2.png",
-      "/src/assets/audio6-3.png"
+      "/src/assets/pc1-1.png",
+      "/src/assets/pc1-2.png",
+      "/src/assets/pc1-3.png"
+    ]
+  },
+  {
+    id: 5,
+    additionalImages: [
+      "/src/assets/pc2-1.png",
+      "/src/assets/pc2-2.png",
+      "/src/assets/pc2-3.png"
+    ]
+  },
+  {
+    id: 9,
+    additionalImages: [
+      "/src/assets/pc3-1.png",
+      "/src/assets/pc3-2.png",
+      "/src/assets/pc3-3.png"
+    ]
+  },
+  {
+    id: 16,
+    additionalImages: [
+      "/src/assets/pc4-1.png",
+      "/src/assets/pc4-2.png",
+      "/src/assets/pc4-3.png"
+    ]
+  },
+  {
+    id: 19,
+    additionalImages: [
+      "/src/assets/pc5-1.png",
+      "/src/assets/pc5-2.png",
+      "/src/assets/pc5-3.png"
     ]
   }
 ];

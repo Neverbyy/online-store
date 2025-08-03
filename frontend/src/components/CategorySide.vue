@@ -530,9 +530,9 @@ onMounted(() => {
     .slider-input {
       position: absolute;
       top: 50%;
-      left: 0;
+      left: -3px;
       right: 0;
-      width: 100%;
+      width: 101%;
       height: 4px;
       background: transparent;
       pointer-events: none;
