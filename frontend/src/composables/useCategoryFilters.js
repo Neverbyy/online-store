@@ -63,7 +63,22 @@ export const useCategoryFilters = (items, category) => {
           case 'exact':
             return normalizedFeatureValue === normalizedFilter;
           case 'memory':
-            // Специальная обработка для памяти (добавляем пробел перед GB)
+            // Специальная обработка для памяти - извлекаем размер из строки
+            const extractMemorySize = (text) => {
+              // Ищем паттерн: число + пробел + GB/ГБ (с возможными дополнительными символами)
+              const match = text.match(/(\d+)\s*(gb|гб)/i);
+              return match ? `${match[1]}gb` : null;
+            };
+            
+            const itemMemorySize = extractMemorySize(normalizedFeatureValue);
+            const filterMemorySize = extractMemorySize(normalizedFilter);
+            
+            // Если удалось извлечь размеры, сравниваем их
+            if (itemMemorySize && filterMemorySize) {
+              return itemMemorySize === filterMemorySize;
+            }
+            
+            // Fallback: обычное сравнение
             const normalizedMemoryValue = normalizedFeatureValue.replace(/\s+/g, ' ');
             const normalizedMemoryFilter = normalizedFilter.replace(/gb$/, ' gb');
             return normalizedMemoryValue === normalizedMemoryFilter;
@@ -218,6 +233,7 @@ export const useCategoryFilters = (items, category) => {
         '32GB': '32 ГБ'
       },
       ram: {
+        '32GB': '32 ГБ',
         '16GB': '16 ГБ',
         '8GB': '8 ГБ',
         '4GB': '4 ГБ',

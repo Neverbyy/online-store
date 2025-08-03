@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue';
+import arrowRightIcon from '../assets/arrow-right.svg';
 
 const props = defineProps({
   selectedFilters: {
@@ -213,6 +214,7 @@ const filters = ref([
     name: 'Оперативная память',
     key: 'ram',
     options: [
+      { label: '32 ГБ', value: '32GB' },
       { label: '16 ГБ', value: '16GB' },
       { label: '8 ГБ', value: '8GB' },
       { label: '4 ГБ', value: '4GB' },
@@ -268,210 +270,229 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="sidebar">
-        <div class="sidebar-inner">
-
-            <div class="sidebar-inner">
-                <h3>Цена, ₽</h3>
-                <div class="price-range">
-                  <div class="price-slider">
-                    <div class="slider-track" ref="sliderTrackRef"></div>
-                    <input 
-                      type="range" 
-                      class="slider-input slider-min"
-                      :min="0"
-                      :max="300000"
-                      :value="priceRange[0]"
-                      @input="updatePriceRange('min', $event.target.value)"
-                      @mousedown="handleSliderStart"
-                      @mouseup="handleSliderEnd"
-                      @touchstart="handleSliderStart"
-                      @touchend="handleSliderEnd"
-                    />
-                    <input 
-                      type="range" 
-                      class="slider-input slider-max"
-                      :min="0"
-                      :max="300000"
-                      :value="priceRange[1]"
-                      @input="updatePriceRange('max', $event.target.value)"
-                      @mousedown="handleSliderStart"
-                      @mouseup="handleSliderEnd"
-                      @touchstart="handleSliderStart"
-                      @touchend="handleSliderEnd"
-                    />
-                  </div>
-                  <div class="price-values">
-                    <span class="price-value">{{ priceRange[0].toLocaleString() }} ₽</span>
-                    <span class="price-value">{{ priceRange[1].toLocaleString() }} ₽</span>
-                  </div>
-                </div>
-                <div 
-                v-for="filter in filters" 
-                :key="filter.key"
-                v-show="!filter.hasOwnProperty('show') || filter.show">
-                <h3>{{ filter.name }}</h3>
-                <transition-group name="expand" tag="div">
-                    <div 
-                    v-for="(option, index) in filter.options" 
-                    :key="option.value"
-                    v-show="filter.showAll || index < 2"
-                    class="sidebar-input">
-
-                    <label>
-                        <input
-                        type="checkbox"
-                        :value="option.value"
-                        :checked="selectedFilters[filter.key].includes(option.value)"
-                        @change="handleFilterChange(filter.key, option.value, $event.target.checked)"
-                        />
-                        {{ option.label }}
-                    </label>
-                    </div>
-                </transition-group>
-                    <button v-if="filter.options.length > 2" class="btn-more" @click="toggleShowAll(filter.key)">
-                    {{ filter.showAll ? 'Скрыть' : 'Ещё' }}
-                    </button>
-                </div>
-                
-                <div class="sidebar-btns">
-                  <button class="btn-reset" @click="resetFilters">Сбросить фильтры</button>
-                </div>
-            </div>
+  <div class="filters-container">
+    <!-- Ценовой диапазон -->
+    <div class="filter-category">
+      <h3>Цена, ₽</h3>
+      <div class="price-range">
+        <div class="price-slider">
+          <div class="slider-track" ref="sliderTrackRef"></div>
+          <input 
+            type="range" 
+            class="slider-input slider-min"
+            :min="0"
+            :max="300000"
+            :value="priceRange[0]"
+            @input="updatePriceRange('min', $event.target.value)"
+            @mousedown="handleSliderStart"
+            @mouseup="handleSliderEnd"
+            @touchstart="handleSliderStart"
+            @touchend="handleSliderEnd"
+          />
+          <input 
+            type="range" 
+            class="slider-input slider-max"
+            :min="0"
+            :max="300000"
+            :value="priceRange[1]"
+            @input="updatePriceRange('max', $event.target.value)"
+            @mousedown="handleSliderStart"
+            @mouseup="handleSliderEnd"
+            @touchstart="handleSliderStart"
+            @touchend="handleSliderEnd"
+          />
         </div>
+        <div class="price-values">
+          <span class="price-value">{{ priceRange[0].toLocaleString() }} ₽</span>
+          <span class="price-value">{{ priceRange[1].toLocaleString() }} ₽</span>
+        </div>
+      </div>
     </div>
+
+    <!-- Фильтры -->
+    <div class="filter-categories">
+      <div 
+        v-for="filter in filters" 
+        :key="filter.key"
+        v-show="!filter.hasOwnProperty('show') || filter.show"
+        class="filter-category"
+      >
+        <div class="filter-header" @click="toggleShowAll(filter.key)">
+          <span class="filter-arrow" :class="{ 'expanded': filter.showAll }">
+            <img :src="arrowRightIcon" alt=">" />
+          </span>
+          <h3 class="filter-title">{{ filter.name }}</h3>
+        </div>
+        <transition name="expand" appear>
+          <div class="filter-options" v-if="filter.showAll">
+            <div class="options-grid">
+              <div 
+                v-for="(option, index) in filter.options" 
+                :key="option.value"
+                class="filter-option"
+              >
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    :value="option.value"
+                    :checked="selectedFilters[filter.key].includes(option.value)"
+                    @change="handleFilterChange(filter.key, option.value, $event.target.checked)"
+                  />
+                  <span class="checkbox-text">{{ option.label }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
+    </div>
+    
+    <div class="filter-actions">
+      <button class="btn-reset" @click="resetFilters">Сбросить фильтры</button>
+    </div>
+  </div>
 </template>
 
-
 <style lang="scss" scoped>
-.sidebar-input input[type="checkbox"] {
+.filters-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 300px;
+  height: fit-content;
+}
+
+.filter-category {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 16px 0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  
+  &:hover {
+    .filter-arrow {
+      color: #666;
+    }
+  }
+}
+
+.filter-arrow {
+  font-size: 14px;
+  color: #999;
+  margin-right: 12px;
+  font-weight: 400;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  
+  img {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+  }
+  
+  &.expanded {
+    color: #333;
+    
+    img {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+.filter-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  flex: 1;
+}
+
+.filter-options {
+  margin-top: 12px;
+  padding-left: 24px;
+}
+
+.options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px 16px;
+  
+  .filter-option:nth-child(odd):last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+.filter-option {
+  margin-bottom: 8px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  font-weight: 400;
+  
+  &:hover {
+    .checkbox-text {
+      color: #666;
+    }
+  }
+}
+
+.checkbox-text {
+  margin-left: 8px;
+  transition: color 0.2s ease;
+}
+
+.checkbox-label input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
-  border: 2px solid #0018A8;
-  border-radius: 6px;
-  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background-color: white;
   cursor: pointer;
   position: relative;
-  background-color: white;
-  vertical-align: middle;
   transition: all 0.2s ease;
-}
-
-/* Галочка */
-.sidebar-input input[type="checkbox"]::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 8px;
-  width: 7px;
-  height: 12px;
-  border: solid #0018A8;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.sidebar-input input[type="checkbox"]:checked::after {
-  opacity: 1;
-}
-    .sidebar{
-        padding: 16px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: #f9f9f9;
-        width: 300px;
-        height: fit-content;
-
-        input{
-            margin-right: 8px;
-        }
-
-        .btn-more{
-            margin-top: 12px;
-            color: #750DC5;
-        }
-    }
+  
+  &:checked {
+    background-color: #750DC5;
+    border-color: #750DC5;
     
-    // Адаптивные стили для средних экранов (1200px-1400px)
-    @media (max-width: 1400px) and (min-width: 901px) {
-        .sidebar {
-            width: 280px;
-            padding: 14px;
-        }
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 5px;
+      width: 4px;
+      height: 8px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
     }
-    
-    // Адаптивные стили для малых экранов (900px-1200px)
-    @media (max-width: 1200px) and (min-width: 901px) {
-        .sidebar {
-            width: 260px;
-            padding: 12px;
-            
-            h3 {
-                font-size: 16px;
-                margin-bottom: 12px;
-            }
-            
-            .sidebar-input {
-                font-size: 14px;
-                margin-bottom: 8px;
-            }
-            
-            .btn-more {
-                font-size: 13px;
-                margin-top: 10px;
-            }
-            
-            .btn-reset {
-                font-size: 14px;
-            }
-        }
-        
-        .price-range {
-            .price-slider {
-                height: 36px;
-                margin: 16px 0;
-            }
-            
-            .price-values {
-                margin-top: 8px;
-                
-                .price-value {
-                    font-size: 13px;
-                }
-            }
-        }
-    }
-    .sidebar-btns{
-      margin-top: 30px;
-    }
-    .btn-accept, .btn-reset{
-        color: #750DC5;
-        padding-bottom: 10px;
-    }
-
-    .expand-enter-active, 
-    .expand-leave-active {
-    transition: all 0.3s ease;
-    }
-
-    .expand-enter-from, 
-    .expand-leave-to {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    }
-
-    .expand-enter-to, 
-    .expand-leave-from {
-    max-height: 40px; /* Adjust based on the height of your elements */
-    opacity: 1;
   }
-    
+  
+  &:hover {
+    border-color: #750DC5;
+  }
+}
+
 .price-range {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   
   .price-slider {
     position: relative;
@@ -588,11 +609,96 @@ onMounted(() => {
   }
 }
 
+.filter-actions {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.btn-reset {
+  color: #750DC5;
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+// Адаптивные стили для средних экранов (1200px-1400px)
+@media (max-width: 1400px) and (min-width: 901px) {
+  .filters-container {
+    width: 280px;
+    padding: 16px;
+  }
+}
+
+// Адаптивные стили для малых экранов (900px-1200px)
+@media (max-width: 1200px) and (min-width: 901px) {
+  .filters-container {
+    width: 260px;
+    padding: 14px;
+    
+    h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .filter-title {
+      font-size: 15px;
+    }
+    
+    .checkbox-text {
+      font-size: 13px;
+    }
+  }
+  
+  .price-range {
+    .price-slider {
+      height: 36px;
+      margin: 16px 0;
+    }
+    
+    .price-values {
+      margin-top: 8px;
+      
+      .price-value {
+        font-size: 13px;
+      }
+    }
+  }
+}
+
 .range-values {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
   color: #666;
   margin-top: 8px;
+}
+
+// Анимация расширения списка
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.37s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+.expand-enter-to,
+.expand-leave-from {
+  max-height: 500px;
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
