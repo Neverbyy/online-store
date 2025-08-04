@@ -115,8 +115,8 @@ const handleShowAddedMessage = () => {
 // Виджет скидки
 .discount-widget {
   position: absolute;
-  top: 45px;
-  right: 25px;
+  top: 5px;
+  right: 5px;
   background-color: #FFD700;
   color: #000;
   font-weight: bold;
@@ -159,5 +159,15 @@ const handleShowAddedMessage = () => {
   display: block;
   margin: 0 auto;
   object-fit: contain;
+}
+
+@media (max-width: 600px) {
+  .main__list-item-inner-price-wrapper {
+    gap: 5px;
+  }
+
+  .main__list-item-inner-image {
+    max-height: 120px;
+  }
 }
 </style>

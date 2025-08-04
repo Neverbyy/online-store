@@ -13,7 +13,10 @@ const props = defineProps({
 </script>
 
 <template>
-    <div :class="['main__list', { 'catalog__list': !isHomePage }]">
+    <div :class="['main__list', 
+    { 
+      'catalog__list': !isHomePage 
+    }]">
 
         <catalogItem 
         v-for="product in products"

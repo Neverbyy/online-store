@@ -1,6 +1,25 @@
 .catalog__list{
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 24px;
+    padding: 20px 0;
+}
+
+// Адаптивные стили для каталога
+@media (max-width: 768px) {
+    .catalog__list {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+        padding: 16px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .catalog__list {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 12px;
+        padding: 12px 0;
+    }
 }
 
 .category-page{

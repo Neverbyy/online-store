@@ -6,7 +6,7 @@
 
 const store = useStore();
 const route = useRoute();
-const products = computed(() => store.getters.getLimitedProducts)
+const products = computed(() => store.getters.getProducts)
 
 onMounted(() => {
   store.dispatch('fetchProducts');

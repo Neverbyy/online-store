@@ -71,9 +71,9 @@ const handleClick = () => {
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 600px) {
   .cart-action-btn{
-    padding: 12px 20px;
+    padding: 12px 10px;
   }
 }
 </style> 

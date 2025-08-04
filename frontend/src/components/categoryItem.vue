@@ -824,8 +824,8 @@ const handleShowAddedMessage = () => {
   }
   
   .discount-widget {
-    top: 6px;
-    right: 6px;
+    top: -15px;
+    right: -15px;
     font-size: 14px;
     padding: 6px 10px;
     border-radius: 6px;

@@ -302,7 +302,6 @@ onUnmounted(() => {
   
   img {
     width: 100%;
-    height: 100%;
     object-fit: cover;
   }
   
@@ -410,7 +409,7 @@ onUnmounted(() => {
   }
 
   &-image{
-    width: 350px;
+    width: 320px;
     height: auto;
     border-radius: 8px;
     object-fit: contain;

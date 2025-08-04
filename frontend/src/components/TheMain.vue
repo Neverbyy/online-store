@@ -11,8 +11,8 @@ const props = defineProps({
   products: Array
 })
 
-// Получаем товары со скидками через getter (ограничиваем до 6)
-const saleItems = computed(() => store.getters.getSaleItems.slice(0, 6));
+// Получаем товары со скидками через getter (ограничиваем до 5)
+const saleItems = computed(() => store.getters.getSaleItems.slice(0, 5));
 
 </script>
 
@@ -44,14 +44,14 @@ const saleItems = computed(() => store.getters.getSaleItems.slice(0, 6));
     overflow: visible;
     
     .main__list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 24px;
+      padding: 20px 0;
       min-width: auto;
       
       &-item {
-        width: auto;
+        width: 100%;
         min-width: auto;
         
         .cart-action-btn {
@@ -62,28 +62,29 @@ const saleItems = computed(() => store.getters.getSaleItems.slice(0, 6));
     }
   }
   
-  @media (max-width: 900px) {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  @media (max-width: 900px) and (min-width: 601px) {
+    overflow: visible;
     
     .main__list {
-      display: flex;
-      flex-wrap: nowrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 16px;
-      padding: 0 16px;
-      min-width: max-content;
+      padding: 16px 0;
+      min-width: auto;
       
       &-item {
-        width: 200px;
-        min-width: 200px;
+        width: 100%;
+        min-width: auto;
         
         .cart-action-btn {
-          width: 100%;
+          width: auto;
           margin-top: 10px;
         }
       }
     }
   }
+  
+
   
   @media (max-width: 600px) {
     overflow-x: auto;
@@ -116,6 +117,35 @@ const saleItems = computed(() => store.getters.getSaleItems.slice(0, 6));
   
   .main {
     padding-bottom: 80px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-title {
+    padding-left: 16px;
+  }
+  
+  .mobile-scroll-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    .main__list {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 16px;
+      padding: 0 16px;
+      min-width: max-content;
+      
+      &-item {
+        width: 200px;
+        min-width: 200px;
+        
+        .cart-action-btn {
+          width: 100%;
+          margin-top: 10px;
+        }
+      }
+    }
   }
 }
 </style>

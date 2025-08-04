@@ -52,19 +52,11 @@ const itemsToUpdateImages = [
 // Массив товаров для добавления additionalImages
 const itemsToAddAdditionalImages = [
   {
-    id: 48,
+    id: 12,
     additionalImages: [
-      "/src/assets/audio4-1.png",
-      "/src/assets/audio4-2.png",
-      "/src/assets/audio4-3.png"
-    ]
-  },
-  {
-    id: 49,
-    additionalImages: [
-      "/src/assets/audio5-1.png",
-      "/src/assets/audio5-2.png",
-      "/src/assets/audio5-3.png"
+      "/src/assets/samsung1-1.png",
+      "/src/assets/samsung1-2.png",
+      "/src/assets/samsung1-3.png"
     ]
   }
 ];

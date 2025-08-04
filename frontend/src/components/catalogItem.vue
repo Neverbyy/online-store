@@ -15,7 +15,7 @@ const correctImageUrl = getImageUrl(props.imageUrl);
       <div class="main__list-item">
         <router-link :to="`/catalog/${category}`">
         <div class="main__list-item-inner">
-          <img class="main__list-item-inner-image" :src="correctImageUrl" alt="1">
+          <img class="main__list-item-inner-image" :src="correctImageUrl" :alt="name">
         </div>
         <span class="main__list-item-inner-name">{{name}}</span>
       </router-link>
