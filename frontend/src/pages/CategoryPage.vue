@@ -13,6 +13,7 @@ const router = useRouter();
 const categoryExists = ref(false);
 const showFiltersModal = ref(false);
 const isLoading = ref(true); // Добавляем состояние загрузки
+const sortDirection = ref('none'); // none, asc, desc
 
 const category = computed(() => route.params.category);
 const items = computed(() => store.getters.getItems);
@@ -35,6 +36,10 @@ const {
   categoryProcessors,
   showGpuFilter,
   categoryGpu,
+  showDiagonalFilter,
+  categoryDiagonal,
+  showTypeFilter,
+  categoryTypes,
   getActiveFilters,
   handleFilterChange,
   handlePriceChange,
@@ -43,6 +48,37 @@ const {
 } = useCategoryFilters(items, category);
 
 const categoryName = computed(() => store.getters.getCategoryNameById(category.value));
+
+// Отсортированные товары
+const sortedProducts = computed(() => {
+  if (sortDirection.value === 'none') {
+    return filteredProducts.value;
+  }
+  
+  const sorted = [...filteredProducts.value];
+  sorted.sort((a, b) => {
+    const priceA = parseInt(a.price.replace(/\s/g, ''));
+    const priceB = parseInt(b.price.replace(/\s/g, ''));
+    
+    if (sortDirection.value === 'asc') {
+      return priceA - priceB;
+    } else {
+      return priceB - priceA;
+    }
+  });
+  
+  return sorted;
+});
+
+const handleSortByPrice = () => {
+  if (sortDirection.value === 'none') {
+    sortDirection.value = 'desc'; // От самых дорогих
+  } else if (sortDirection.value === 'desc') {
+    sortDirection.value = 'asc'; // От самых дешёвых
+  } else {
+    sortDirection.value = 'none'; // Без сортировки
+  }
+};
 
 const handleOpenFilters = () => {
   showFiltersModal.value = true;
@@ -108,6 +144,10 @@ const props = defineProps({
           :categoryProcessors="categoryProcessors"
           :showGpuFilter="showGpuFilter"
           :categoryGpu="categoryGpu"
+          :showDiagonalFilter="showDiagonalFilter"
+          :categoryDiagonal="categoryDiagonal"
+          :showTypeFilter="showTypeFilter"
+          :categoryTypes="categoryTypes"
           @filterChange="handleFilterChange"
           @priceChange="handlePriceChange"
         />
@@ -120,7 +160,22 @@ const props = defineProps({
 
         <div class="category-content">
           <div class="results-info">
-            <p>Найдено товаров: {{ filteredProducts.length }}</p>
+            <div class="results-header">
+              <p>Найдено товаров: {{ filteredProducts.length }}</p>
+              <button 
+                class="sort-button" 
+                @click="handleSortByPrice"
+                :class="{ 
+                  'sort-asc': sortDirection === 'asc',
+                  'sort-desc': sortDirection === 'desc'
+                }"
+              >
+                <span>Цена</span>
+                <svg class="sort-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7 14L12 9L17 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
             <div v-if="getActiveFilters.length > 0" class="active-filters">
               <span class="filters-label">Применённые фильтры:</span>
               <div class="filter-tags">
@@ -142,7 +197,7 @@ const props = defineProps({
             </div>
           </div>
           <CategoryList 
-          :products="filteredProducts"
+          :products="sortedProducts"
           />
         </div>
         </div>
@@ -200,6 +255,10 @@ const props = defineProps({
                 :categoryProcessors="categoryProcessors"
                 :showGpuFilter="showGpuFilter"
                 :categoryGpu="categoryGpu"
+                :showDiagonalFilter="showDiagonalFilter"
+                :categoryDiagonal="categoryDiagonal"
+                :showTypeFilter="showTypeFilter"
+                :categoryTypes="categoryTypes"
                 @filterChange="handleFilterChange"
                 @priceChange="handlePriceChange"
               />
@@ -260,10 +319,62 @@ const props = defineProps({
   background-color: #f5f5f5;
   border-radius: 4px;
   
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+  }
+  
   p {
     margin: 0;
     color: #666;
     font-size: 14px;
+  }
+}
+
+.sort-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #f8f8f8;
+    border-color: #750DC5;
+  }
+  
+  .sort-icon {
+    transition: transform 0.2s ease;
+  }
+  
+  &.sort-desc {
+    background-color: #750DC5;
+    color: white;
+    border-color: #750DC5;
+    
+    .sort-icon {
+      transform: rotate(180deg);
+    }
+  }
+  
+  &.sort-asc {
+    background-color: #750DC5;
+    color: white;
+    border-color: #750DC5;
   }
 }
 
@@ -559,6 +670,18 @@ const props = defineProps({
   
   .category-content {
     width: 100%;
+  }
+  
+  .results-info {
+    .results-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }
+  
+  .sort-button {
+    align-self: flex-start;
   }
 }
 

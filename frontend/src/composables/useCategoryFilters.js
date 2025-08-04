@@ -11,7 +11,9 @@ export const useCategoryFilters = (items, category) => {
     resolution: [],
     refreshRate: [],
     processor: [],
-    gpu: []
+    gpu: [],
+    diagonal: [],
+    type: []
   });
   
   const priceRange = ref([0, 300000]); // Диапазон цен
@@ -82,6 +84,53 @@ export const useCategoryFilters = (items, category) => {
             const normalizedMemoryValue = normalizedFeatureValue.replace(/\s+/g, ' ');
             const normalizedMemoryFilter = normalizedFilter.replace(/gb$/, ' gb');
             return normalizedMemoryValue === normalizedMemoryFilter;
+          case 'diagonal':
+            // Специальная обработка для диагонали - извлекаем число из строки
+            const extractDiagonalSize = (text) => {
+              // Ищем паттерн: число + дюйм (с возможными дополнительными символами)
+              const match = text.match(/(\d+)\s*[""]/i);
+              return match ? `${match[1]}"` : null;
+            };
+            
+            const itemDiagonalSize = extractDiagonalSize(normalizedFeatureValue);
+            const filterDiagonalSize = extractDiagonalSize(normalizedFilter);
+            
+            // Если удалось извлечь размеры, сравниваем их
+            if (itemDiagonalSize && filterDiagonalSize) {
+              return itemDiagonalSize === filterDiagonalSize;
+            }
+            
+            // Fallback: обычное сравнение
+            return normalizedFeatureValue.includes(normalizedFilter);
+          case 'type':
+            // Специальная обработка для типа товара - извлекаем основной тип из названия
+            const extractProductType = (text) => {
+              const normalizedText = text.toLowerCase();
+              
+              // Определяем основные типы аудиотехники
+              if (normalizedText.includes('наушники')) {
+                return 'наушники';
+              } else if (normalizedText.includes('колонки') || normalizedText.includes('динамики') || normalizedText.includes('колонка')) {
+                return 'колонки';
+              } else if (normalizedText.includes('сабвуфер')) {
+                return 'сабвуфер';
+              } else if (normalizedText.includes('микрофон')) {
+                return 'микрофон';
+              } else if (normalizedText.includes('усилитель')) {
+                return 'усилитель';
+              } else if (normalizedText.includes('ресивер')) {
+                return 'ресивер';
+              } else if (normalizedText.includes('плеер')) {
+                return 'плеер';
+              }
+              
+              return normalizedText;
+            };
+            
+            const itemType = extractProductType(normalizedFeatureValue);
+            const filterType = extractProductType(normalizedFilter);
+            
+            return itemType === filterType;
           case 'includes':
           default:
             return normalizedFeatureValue.includes(normalizedFilter);
@@ -133,6 +182,12 @@ export const useCategoryFilters = (items, category) => {
     // Фильтрация по видеокарте
     filtered = applyFeatureFilter(filtered, selectedFilters.value.gpu, 'Видеокарта', 'includes');
     
+    // Фильтрация по диагонали
+    filtered = applyFeatureFilter(filtered, selectedFilters.value.diagonal, 'Диагональ', 'diagonal');
+    
+    // Фильтрация по типу
+    filtered = applyFeatureFilter(filtered, selectedFilters.value.type, 'Тип', 'type');
+    
     return filtered;
   });
 
@@ -167,6 +222,77 @@ export const useCategoryFilters = (items, category) => {
   // Собираем видеокарты для текущей категории
   const categoryGpu = computed(() => createCategoryOptions('Видеокарта'));
 
+  // Собираем диагонали для текущей категории
+  const categoryDiagonal = computed(() => {
+    const filtered = getFilteredItems();
+    const diagonalMap = new Map();
+    
+    filtered.forEach(item => {
+      const diagonalValue = item.features?.['Диагональ'];
+      if (diagonalValue) {
+        // Извлекаем размер диагонали из строки
+        const match = diagonalValue.match(/(\d+)\s*[""]/i);
+        if (match) {
+          const diagonalSize = `${match[1]}"`;
+          diagonalMap.set(diagonalSize, diagonalSize);
+        }
+      }
+    });
+    
+    return Array.from(diagonalMap.entries()).map(([key, label]) => ({
+      label: label,
+      value: key
+    })).sort((a, b) => {
+      // Сортируем по размеру диагонали (числовое сравнение)
+      const sizeA = parseInt(a.value);
+      const sizeB = parseInt(b.value);
+      return sizeA - sizeB;
+    });
+  });
+
+  // Собираем типы товаров для текущей категории
+  const categoryTypes = computed(() => {
+    const filtered = getFilteredItems();
+    const typeMap = new Map();
+    
+    filtered.forEach(item => {
+      const typeValue = item.features?.['Тип'];
+      if (typeValue) {
+        // Извлекаем основной тип из названия
+        const extractProductType = (text) => {
+          const normalizedText = text.toLowerCase();
+          
+          if (normalizedText.includes('наушники')) {
+            return 'наушники';
+          } else if (normalizedText.includes('колонки') || normalizedText.includes('динамики') || normalizedText.includes('колонка')) {
+            return 'колонки';
+          } else if (normalizedText.includes('сабвуфер')) {
+            return 'сабвуфер';
+          } else if (normalizedText.includes('микрофон')) {
+            return 'микрофон';
+          } else if (normalizedText.includes('усилитель')) {
+            return 'усилитель';
+          } else if (normalizedText.includes('ресивер')) {
+            return 'ресивер';
+          } else if (normalizedText.includes('плеер')) {
+            return 'плеер';
+          }
+          
+          return normalizedText;
+        };
+        
+        const mainType = extractProductType(typeValue);
+        const displayName = getTypeDisplayName(mainType);
+        typeMap.set(mainType, displayName);
+      }
+    });
+    
+    return Array.from(typeMap.entries()).map(([key, label]) => ({
+      label: label,
+      value: key
+    })).sort((a, b) => a.label.localeCompare(b.label, 'ru'));
+  });
+
   // Проверяем, нужно ли показывать фильтр разрешения для текущей категории
   const showResolutionFilter = computed(() => categoryResolution.value.length > 0);
 
@@ -184,6 +310,27 @@ export const useCategoryFilters = (items, category) => {
 
   // Проверяем, нужно ли показывать фильтр видеокарты для текущей категории
   const showGpuFilter = computed(() => hasFeature('Видеокарта'));
+
+  // Проверяем, нужно ли показывать фильтр диагонали для текущей категории
+  const showDiagonalFilter = computed(() => hasFeature('Диагональ'));
+
+  // Проверяем, нужно ли показывать фильтр типа для текущей категории
+  const showTypeFilter = computed(() => hasFeature('Тип'));
+
+  // Функция для получения отображаемого названия типа
+  const getTypeDisplayName = (type) => {
+    const typeNames = {
+      'наушники': 'Наушники',
+      'колонки': 'Колонки',
+      'сабвуфер': 'Сабвуфер',
+      'микрофон': 'Микрофоны',
+      'усилитель': 'Усилитель',
+      'ресивер': 'Ресивер',
+      'плеер': 'Плеер'
+    };
+    
+    return typeNames[type] || type.charAt(0).toUpperCase() + type.slice(1);
+  };
 
   // Обработчики фильтров
   const handleFilterChange = (filterType, values) => {
@@ -303,6 +450,28 @@ export const useCategoryFilters = (items, category) => {
         'amd radeon rx 7700': 'AMD Radeon RX 7700',
         'intel uhd graphics': 'Intel UHD Graphics',
         'intel iris xe graphics': 'Intel Iris Xe Graphics'
+      },
+      diagonal: {
+        '55"': '55"',
+        '65"': '65"',
+        '75"': '75"',
+        '85"': '85"',
+        '32"': '32"',
+        '43"': '43"',
+        '50"': '50"',
+        '58"': '58"',
+        '70"': '70"',
+        '77"': '77"',
+        '83"': '83"'
+      },
+      type: {
+        'наушники': 'Наушники',
+        'колонки': 'Колонки',
+        'сабвуфер': 'Сабвуфер',
+        'микрофон': 'Микрофоны',
+        'усилитель': 'Усилитель',
+        'ресивер': 'Ресивер',
+        'плеер': 'Плеер'
       }
     };
     
@@ -354,6 +523,10 @@ export const useCategoryFilters = (items, category) => {
     categoryProcessors,
     showGpuFilter,
     categoryGpu,
+    showDiagonalFilter,
+    categoryDiagonal,
+    showTypeFilter,
+    categoryTypes,
     getActiveFilters,
     
     // Методы

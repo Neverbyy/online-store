@@ -1,118 +1,6 @@
 const axios = require('axios');
 
 const laptops = [
-  {
-    id: 48,
-    name: "Apple AirPods Pro",
-    image: "/src/assets/aud1.png",
-    category: "Audio",
-    price: "24 990",
-    brand: "Apple",
-    features: {
-      "Тип": "Беспроводные наушники",
-      "Время работы": "4.5 часа",
-      "Шумоподавление": "Активное",
-      "Зарядка": "Lightning"
-    }
-  },
-  {
-    id: 49,
-    name: "Sony WH-1000XM4",
-    image: "/src/assets/aud2.png",
-    category: "Audio",
-    price: "34 990",
-    brand: "Sony",
-    features: {
-      "Тип": "Беспроводные наушники",
-      "Время работы": "30 часов",
-      "Шумоподавление": "Активное",
-      "Зарядка": "USB-C"
-    }
-  },
-  {
-    id: 50,
-    name: "JBL Flip 6",
-    image: "/src/assets/audio3.png",
-    category: "Audio",
-    price: "11 990",
-    brand: "JBL",
-    features: {
-      "Тип": "Bluetooth колонка",
-      "Мощность": "30 Вт",
-      "Водонепроницаемость": "IPX7",
-      "Время работы": "12 часов"
-    }
-  },
-  {
-    id: 51,
-    name: "Bose SoundLink",
-    image: "/src/assets/aud1.png",
-    category: "Audio",
-    price: "44 990",
-    brand: "Bose",
-    features: {
-      "Тип": "Домашняя акустика",
-      "Мощность": "50 Вт",
-      "Подключение": "Bluetooth/AUX",
-      "Время работы": "8 часов"
-    }
-  },
-  {
-    id: 52,
-    name: "Blue Yeti",
-    image: "/src/assets/aud2.png",
-    category: "Audio",
-    price: "17 990",
-    brand: "Blue",
-    features: {
-      "Тип": "USB микрофон",
-      "Диафрагма": "Конденсаторная",
-      "Частотный диапазон": "20Hz-20kHz",
-      "Чувствительность": "-46 dB"
-    }
-  },
-  {
-    id: 53,
-    name: "Shure SM58",
-    image: "/src/assets/audio3.png",
-    category: "Audio",
-    price: "14 990",
-    brand: "Shure",
-    features: {
-      "Тип": "Динамический микрофон",
-      "Подключение": "XLR",
-      "Частотный диапазон": "50Hz-15kHz",
-      "Чувствительность": "-54.5 dB"
-    }
-  },
-  {
-    id: 54,
-    name: "Razer Kraken",
-    image: "/src/assets/aud1.png",
-    category: "Audio",
-    price: "7 990",
-    brand: "Razer",
-    features: {
-      "Тип": "Игровые наушники",
-      "Подключение": "3.5mm/USB",
-      "Микрофон": "Выдвижной",
-      "Частотный диапазон": "12Hz-28kHz"
-    }
-  },
-  {
-    id: 55,
-    name: "Anker Soundcore",
-    image: "/src/assets/aud2.png",
-    category: "Audio",
-    price: "4 990",
-    brand: "Anker",
-    features: {
-      "Тип": "Портативная колонка",
-      "Мощность": "16 Вт",
-      "Водонепроницаемость": "IPX5",
-      "Время работы": "24 часа"
-    }
-  }
 ];
 
 // Новые поля для добавления к существующим товарам
@@ -129,7 +17,7 @@ const additionalFields = {
 };
 
 const addLaptops = async () => {
-  console.log('🎵 Начинаю добавление аудиотехники...');
+  console.log('📺 Начинаю добавление телевизоров...');
   
   for (const item of laptops) {
     try {
@@ -144,7 +32,7 @@ const addLaptops = async () => {
     await new Promise(resolve => setTimeout(resolve, 500));
   }
   
-  console.log('🎵 Добавление аудиотехники завершено!');
+  console.log('📺 Добавление телевизоров завершено!');
   console.log('Проверьте результат: https://48e8b1c201ae4e29.mokky.dev/items');
 };
 // Новые поля для features товара с ID = 25
@@ -164,43 +52,19 @@ const itemsToUpdateImages = [
 // Массив товаров для добавления additionalImages
 const itemsToAddAdditionalImages = [
   {
-    id: 2,
+    id: 48,
     additionalImages: [
-      "/src/assets/pc1-1.png",
-      "/src/assets/pc1-2.png",
-      "/src/assets/pc1-3.png"
+      "/src/assets/audio4-1.png",
+      "/src/assets/audio4-2.png",
+      "/src/assets/audio4-3.png"
     ]
   },
   {
-    id: 5,
+    id: 49,
     additionalImages: [
-      "/src/assets/pc2-1.png",
-      "/src/assets/pc2-2.png",
-      "/src/assets/pc2-3.png"
-    ]
-  },
-  {
-    id: 9,
-    additionalImages: [
-      "/src/assets/pc3-1.png",
-      "/src/assets/pc3-2.png",
-      "/src/assets/pc3-3.png"
-    ]
-  },
-  {
-    id: 16,
-    additionalImages: [
-      "/src/assets/pc4-1.png",
-      "/src/assets/pc4-2.png",
-      "/src/assets/pc4-3.png"
-    ]
-  },
-  {
-    id: 19,
-    additionalImages: [
-      "/src/assets/pc5-1.png",
-      "/src/assets/pc5-2.png",
-      "/src/assets/pc5-3.png"
+      "/src/assets/audio5-1.png",
+      "/src/assets/audio5-2.png",
+      "/src/assets/audio5-3.png"
     ]
   }
 ];
@@ -492,7 +356,7 @@ const findXiaomiItem = async () => {
 // Функция для выбора действия
 const selectAction = () => {
   console.log('🚀 Выберите действие:');
-  console.log('1. Добавить новую аудиотехнику');
+  console.log('1. Добавить новые телевизоры');
   console.log('2. Полное обновление всех товаров (добавить дополнительные поля)');
   console.log('3. Частичное обновление всех товаров (только новые поля)');
   console.log('4. Обновить конкретный товар (Xiaomi Redmi)');
@@ -508,7 +372,7 @@ const selectAction = () => {
   
   switch(action) {
     case '1':
-      console.log('🎵 Добавляем новую аудиотехнику...');
+      console.log('📺 Добавляем новые телевизоры...');
 addLaptops(); 
       break;
     case '2':
@@ -549,7 +413,7 @@ addLaptops();
       break;
     default:
       console.log('❌ Неверный выбор. Используйте:');
-      console.log('   node add-tablets.js 1 - Добавить новую аудиотехнику');
+      console.log('   node add-tablets.js 1 - Добавить новые телевизоры');
       console.log('   node add-tablets.js 2 - Полное обновление');
       console.log('   node add-tablets.js 3 - Частичное обновление');
       console.log('   node add-tablets.js 4 - Обновить Xiaomi');

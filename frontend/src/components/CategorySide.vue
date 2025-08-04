@@ -73,6 +73,22 @@ const props = defineProps({
   categoryGpu: {
     type: Array,
     default: () => []
+  },
+  showDiagonalFilter: {
+    type: Boolean,
+    default: false
+  },
+  categoryDiagonal: {
+    type: Array,
+    default: () => []
+  },
+  showTypeFilter: {
+    type: Boolean,
+    default: false
+  },
+  categoryTypes: {
+    type: Array,
+    default: () => []
   }
 });
 
@@ -148,6 +164,8 @@ const resetFilters = () => {
   emit('filterChange', 'refreshRate', []);
   emit('filterChange', 'processor', []);
   emit('filterChange', 'gpu', []);
+  emit('filterChange', 'diagonal', []);
+  emit('filterChange', 'type', []);
 };
 
 const handleFilterChange = (filterKey, value, checked) => {
@@ -236,6 +254,20 @@ const filters = ref([
     options: props.categoryGpu.length > 0 ? props.categoryGpu : [],
     showAll: false,
     show: props.showGpuFilter
+  },
+  {
+    name: 'Диагональ',
+    key: 'diagonal',
+    options: props.categoryDiagonal.length > 0 ? props.categoryDiagonal : [],
+    showAll: false,
+    show: props.showDiagonalFilter
+  },
+  {
+    name: 'Тип',
+    key: 'type',
+    options: props.categoryTypes.length > 0 ? props.categoryTypes : [],
+    showAll: false,
+    show: props.showTypeFilter
   },
   {
     name: 'Производитель',
