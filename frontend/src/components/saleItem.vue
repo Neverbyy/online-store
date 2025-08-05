@@ -92,12 +92,18 @@ const handleShowAddedMessage = () => {
     position: absolute;
     top: 15px;
     right: 15px;
-    background-color: #4caf50;
+    background-color: #750DC5;
     color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: opacity 0.5s ease-in-out;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
     z-index: 10;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(117, 13, 197, 0.3);
 }
 
 .max-quantity {
