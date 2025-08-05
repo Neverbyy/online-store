@@ -63,7 +63,6 @@ const handleShowAddedMessage = () => {
       </div>
       <div class="category__main-details-right">
         <div :class="['added-to-cart', { show: showAddedMessage }]" >Товар добавлен!</div>
-        <div :class="['max-quantity', { show: showMaxQuantityMessage }]">Лимит достигнут!</div>
         <div class="category__main-details-right-price-wrapper">
           <div class="in-stock-label">В наличии</div>
           <h2 class="category__main-details-right-price">{{ props.product.price }} Руб.</h2>
