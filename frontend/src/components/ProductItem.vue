@@ -32,11 +32,6 @@ const productImages = computed(() => {
     });
   }
   
-  // Если нет дополнительных изображений, дублируем основное для демонстрации
-  if (images.length === 1) {
-    images.push(images[0], images[0], images[0]); // Добавляем еще 3 копии для демо
-  }
-  
   return images;
 });
 
@@ -128,8 +123,8 @@ onUnmounted(() => {
         <div class="product-card__inner">
           <!-- Галерея изображений -->
           <div class="product-gallery">
-            <!-- Миниатюры слева -->
-            <div class="gallery-thumbnails">
+            <!-- Миниатюры слева (показываем только если есть больше одного изображения) -->
+            <div v-if="productImages.length > 1" class="gallery-thumbnails">
               <div 
                 v-for="(image, index) in productImages" 
                 :key="index"
@@ -214,7 +209,7 @@ onUnmounted(() => {
               
               <!-- Стрелка влево -->
               <button 
-                v-if="selectedImageIndex > 0"
+                v-if="productImages.length > 1 && selectedImageIndex > 0"
                 class="fullscreen-arrow fullscreen-arrow-left" 
                 @click="handlePrevious"
                 aria-label="Предыдущее изображение"
@@ -226,7 +221,7 @@ onUnmounted(() => {
               
               <!-- Стрелка вправо -->
               <button 
-                v-if="selectedImageIndex < productImages.length - 1"
+                v-if="productImages.length > 1 && selectedImageIndex < productImages.length - 1"
                 class="fullscreen-arrow fullscreen-arrow-right" 
                 @click="handleNext"
                 aria-label="Следующее изображение"
@@ -261,6 +256,14 @@ onUnmounted(() => {
     flex-direction: column;
     gap: 20px;
     align-items: center;
+  }
+  
+  // Если нет миниатюр, основное изображение занимает всю ширину
+  &:not(:has(.gallery-thumbnails)) {
+    .gallery-main {
+      width: 100%;
+      justify-content: center;
+    }
   }
 }
 
