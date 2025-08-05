@@ -2,6 +2,19 @@
 import { ref, watch, onMounted, nextTick } from 'vue';
 import arrowRightIcon from '../assets/arrow-right.svg';
 
+// Функция для дебаунсинга
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
 const props = defineProps({
   selectedFilters: {
     type: Object,
@@ -101,9 +114,31 @@ watch(() => props.priceRange, (newRange) => {
   });
 }, { deep: true });
 
+// Функция для применения фильтра цены
+const applyPriceFilter = (newRange) => {
+  emit('priceChange', newRange);
+};
+
+// Локальное состояние для отображения цены
+const localPriceRange = ref([0, 300000]);
+
+// Инициализируем локальное состояние при монтировании
+onMounted(() => {
+  localPriceRange.value = [...props.priceRange];
+  updateSliderTrack(props.priceRange);
+});
+
+// Обновляем локальное состояние при изменении props
+watch(() => props.priceRange, (newRange) => {
+  localPriceRange.value = [...newRange];
+  nextTick(() => {
+    updateSliderTrack(newRange);
+  });
+}, { deep: true });
+
 const updatePriceRange = (type, value) => {
   const numValue = parseInt(value) || 0;
-  const newRange = [...props.priceRange];
+  const newRange = [...localPriceRange.value];
   
   if (type === 'min') {
     // Минимальная цена не может быть больше максимальной
@@ -115,9 +150,13 @@ const updatePriceRange = (type, value) => {
     newRange[1] = minValue;
   }
   
+  // Обновляем локальное состояние немедленно для отображения
+  localPriceRange.value = newRange;
+  
   // Обновляем трек немедленно для синхронизации
   updateSliderTrack(newRange);
-  emit('priceChange', newRange);
+  
+  // НЕ применяем фильтр здесь - только обновляем отображение
 };
 
 const sliderTrackRef = ref(null);
@@ -144,12 +183,24 @@ const handleSliderEnd = () => {
   if (sliderTrackRef.value) {
     sliderTrackRef.value.classList.remove('dragging');
   }
+  
+  // Применяем фильтр только при отпускании ползунка
+  // Проверяем, что значения действительно изменились
+  const currentRange = [localPriceRange.value[0], localPriceRange.value[1]];
+  const originalRange = [props.priceRange[0], props.priceRange[1]];
+  
+  if (currentRange[0] !== originalRange[0] || currentRange[1] !== originalRange[1]) {
+    applyPriceFilter([...currentRange]);
+  }
 };
 
 const resetFilters = () => {
   // Сброс диапазона цен
   const newPriceRange = [0, 300000];
-  emit('priceChange', newPriceRange);
+  // Обновляем локальное состояние немедленно
+  localPriceRange.value = [...newPriceRange];
+  // Немедленно применяем сброс цены
+  applyPriceFilter(newPriceRange);
   // Обновляем визуальное отображение ползунка
   nextTick(() => {
     updateSliderTrack(newPriceRange);
@@ -314,7 +365,7 @@ onMounted(() => {
             class="slider-input slider-min"
             :min="0"
             :max="300000"
-            :value="priceRange[0]"
+            :value="localPriceRange[0]"
             @input="updatePriceRange('min', $event.target.value)"
             @mousedown="handleSliderStart"
             @mouseup="handleSliderEnd"
@@ -326,7 +377,7 @@ onMounted(() => {
             class="slider-input slider-max"
             :min="0"
             :max="300000"
-            :value="priceRange[1]"
+            :value="localPriceRange[1]"
             @input="updatePriceRange('max', $event.target.value)"
             @mousedown="handleSliderStart"
             @mouseup="handleSliderEnd"
@@ -335,8 +386,8 @@ onMounted(() => {
           />
         </div>
         <div class="price-values">
-          <span class="price-value">{{ priceRange[0].toLocaleString() }} ₽</span>
-          <span class="price-value">{{ priceRange[1].toLocaleString() }} ₽</span>
+          <span class="price-value">{{ localPriceRange[0].toLocaleString() }} ₽</span>
+          <span class="price-value">{{ localPriceRange[1].toLocaleString() }} ₽</span>
         </div>
       </div>
     </div>
@@ -556,6 +607,10 @@ onMounted(() => {
       
       &.dragging::before {
         transition: none;
+      }
+      
+      &.dragging {
+        cursor: grabbing;
       }
     }
     

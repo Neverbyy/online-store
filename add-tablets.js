@@ -52,11 +52,10 @@ const itemsToUpdateImages = [
 // Массив товаров для добавления additionalImages
 const itemsToAddAdditionalImages = [
   {
-    id: 18,
+    id: 23,
     additionalImages: [
-      "/src/assets/oneplus1-1.png",
-      "/src/assets/oneplus1-2.png",
-      "/src/assets/oneplus1-3.png"
+      "/src/assets/iphone6-1.png",
+      "/src/assets/iphone6-2.png"
     ]
   }
 ];
