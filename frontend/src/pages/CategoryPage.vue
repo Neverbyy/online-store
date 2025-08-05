@@ -14,6 +14,7 @@ const categoryExists = ref(false);
 const showFiltersModal = ref(false);
 const isLoading = ref(true); // Добавляем состояние загрузки
 const sortDirection = ref('none'); // none, asc, desc
+const isFiltering = ref(false); // Состояние фильтрации
 
 const category = computed(() => route.params.category);
 const items = computed(() => store.getters.getItems);
@@ -41,11 +42,33 @@ const {
   showTypeFilter,
   categoryTypes,
   getActiveFilters,
-  handleFilterChange,
-  handlePriceChange,
-  removeFilter,
+  handleFilterChange: originalHandleFilterChange,
+  handlePriceChange: originalHandlePriceChange,
+  removeFilter: originalRemoveFilter,
   getFilterLabel
 } = useCategoryFilters(items, category);
+
+// Обертываем функции фильтрации с анимацией
+const handleFilterChange = async (filterType, values) => {
+  isFiltering.value = true;
+  await new Promise(resolve => setTimeout(resolve, 300));
+  originalHandleFilterChange(filterType, values);
+  isFiltering.value = false;
+};
+
+const handlePriceChange = async (newRange) => {
+  isFiltering.value = true;
+  await new Promise(resolve => setTimeout(resolve, 300));
+  originalHandlePriceChange(newRange);
+  isFiltering.value = false;
+};
+
+const removeFilter = async (filterType, value) => {
+  isFiltering.value = true;
+  await new Promise(resolve => setTimeout(resolve, 300));
+  originalRemoveFilter(filterType, value);
+  isFiltering.value = false;
+};
 
 const categoryName = computed(() => store.getters.getCategoryNameById(category.value));
 
@@ -70,7 +93,12 @@ const sortedProducts = computed(() => {
   return sorted;
 });
 
-const handleSortByPrice = () => {
+const handleSortByPrice = async () => {
+  isFiltering.value = true;
+  
+  // Небольшая задержка для анимации
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
   if (sortDirection.value === 'none') {
     sortDirection.value = 'desc'; // От самых дорогих
   } else if (sortDirection.value === 'desc') {
@@ -78,6 +106,8 @@ const handleSortByPrice = () => {
   } else {
     sortDirection.value = 'none'; // Без сортировки
   }
+  
+  isFiltering.value = false;
 };
 
 const handleOpenFilters = () => {
@@ -159,6 +189,12 @@ const props = defineProps({
         </div>
 
         <div class="category-content">
+          <!-- Индикатор фильтрации -->
+          <div v-if="isFiltering" class="filtering-overlay">
+            <div class="filtering-spinner"></div>
+            <p>Применяем фильтры...</p>
+          </div>
+          
           <div class="results-info">
             <div class="results-header">
               <p>Найдено товаров: {{ filteredProducts.length }}</p>
@@ -166,14 +202,19 @@ const props = defineProps({
                 class="sort-button" 
                 @click="handleSortByPrice"
                 :class="{ 
-                  'sort-asc': sortDirection === 'asc',
-                  'sort-desc': sortDirection === 'desc'
+                  'sort-active': sortDirection !== 'none'
                 }"
+                :disabled="isFiltering"
               >
                 <span>Цена</span>
-                <svg class="sort-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7 14L12 9L17 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+                <transition name="sort-icon">
+                  <img 
+                    v-show="sortDirection !== 'none'"
+                    :src="'/src/assets/sort.svg'" 
+                    :class="['sort-icon', { 'rotated': sortDirection === 'asc' }]"
+                    alt="Сортировка"
+                  />
+                </transition>
               </button>
             </div>
             <div v-if="getActiveFilters.length > 0" class="active-filters">
@@ -309,8 +350,73 @@ const props = defineProps({
   100% { transform: rotate(360deg); }
 }
 
+// Адаптивные стили для спиннера
+@media (max-width: 768px) {
+  .filtering-overlay {
+    padding-top: 80px;
+    
+    .filtering-spinner {
+      width: 35px;
+      height: 35px;
+    }
+    
+    p {
+      font-size: 13px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .filtering-overlay {
+    padding-top: 60px;
+    
+    .filtering-spinner {
+      width: 30px;
+      height: 30px;
+    }
+    
+    p {
+      font-size: 12px;
+    }
+  }
+}
+
 .category-content {
   flex: 1;
+  position: relative;
+}
+
+.filtering-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 300px;
+  z-index: 10;
+  border-radius: 8px;
+  
+  .filtering-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f0f0f0;
+    border-top: 3px solid #750DC5;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+  }
 }
 
 .results-info {
@@ -357,24 +463,47 @@ const props = defineProps({
     border-color: #750DC5;
   }
   
-  .sort-icon {
-    transition: transform 0.2s ease;
-  }
-  
-  &.sort-desc {
-    background-color: #750DC5;
-    color: white;
-    border-color: #750DC5;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
     
-    .sort-icon {
-      transform: rotate(180deg);
+    &:hover {
+      background-color: white;
+      border-color: #ddd;
     }
   }
   
-  &.sort-asc {
-    background-color: #750DC5;
-    color: white;
+  .sort-icon {
+    width: 16px;
+    height: 16px;
+    transition: all 0.3s ease;
+    filter: brightness(0) saturate(100%) invert(40%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0.8) contrast(1);
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  &.sort-active {
     border-color: #750DC5;
+  }
+  
+  .sort-icon.rotated {
+    transform: rotate(180deg) scale(1);
+  }
+  
+  // Анимации для v-show
+  .sort-icon-enter-active,
+  .sort-icon-leave-active {
+    transition: all 0.3s ease;
+  }
+  
+  .sort-icon-enter-from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  
+  .sort-icon-leave-to {
+    opacity: 0;
+    transform: scale(0.8);
   }
 }
 
