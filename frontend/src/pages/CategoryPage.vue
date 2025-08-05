@@ -126,6 +126,10 @@ onMounted(async () => {
     router.push({ name: 'NotFound' });
   }
   isLoading.value = false; // Устанавливаем загрузку завершенной
+  
+  // Отладочная информация для иконки сортировки
+  console.log('Sort icon available:', isImageAvailable('/src/assets/sort.svg'));
+  console.log('Sort icon URL:', getImageUrl('/src/assets/sort.svg'));
 });
 
 const props = defineProps({

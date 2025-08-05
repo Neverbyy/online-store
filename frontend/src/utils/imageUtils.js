@@ -1,9 +1,13 @@
 // Автоматический импорт всех изображений из папки assets
-const images = import.meta.glob('../assets/*.png', { eager: true })
+const pngImages = import.meta.glob('../assets/*.png', { eager: true })
+const svgImages = import.meta.glob('../assets/*.svg', { eager: true })
+
+// Объединяем все изображения
+const allImages = { ...pngImages, ...svgImages }
 
 // Создание маппинга автоматически
 const imageMap = Object.fromEntries(
-  Object.entries(images).map(([path, module]) => [
+  Object.entries(allImages).map(([path, module]) => [
     path.replace('../assets/', '/src/assets/'),
     module.default
   ])
@@ -48,4 +52,4 @@ export const getImageUrlForCSS = (imagePath) => {
  */
 export const getAvailableImages = () => {
   return Object.keys(imageMap)
-} 
+}
