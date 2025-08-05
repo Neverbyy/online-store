@@ -5,6 +5,7 @@ import {useStore} from 'vuex';
 import CategoryList from '../components/CategoryList.vue';
 import CategorySide from '../components/CategorySide.vue';
 import { useCategoryFilters } from '../composables/useCategoryFilters.js';
+import { getImageUrl } from '../utils/imageUtils.js';
 
 const store = useStore();
 const route = useRoute();
@@ -210,7 +211,7 @@ const props = defineProps({
                 <transition name="sort-icon">
                   <img 
                     v-show="sortDirection !== 'none'"
-                    :src="'/src/assets/sort.svg'" 
+                    :src="getImageUrl('/src/assets/sort.svg')" 
                     :class="['sort-icon', { 'rotated': sortDirection === 'asc' }]"
                     alt="Сортировка"
                   />
