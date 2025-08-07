@@ -10,7 +10,7 @@
 cd backend
 npm install
 cp env.example .env
-# Отредактируйте .env файл с вашими настройками
+
 npm run dev
 ```
 
@@ -53,12 +53,12 @@ npm run dev
 
 ## Разработка
 
-Для разработки запустите оба сервера:
+Для разработки запустить оба сервера:
 
-1. Бэкенд: `cd backend && npm run dev` (порт 5000)
-2. Фронтенд: `cd frontend && npm run dev` (порт 5173)
+1. Бэкенд: `cd backend && npm run dev`
+2. Фронтенд: `cd frontend && npm run dev`
 
 ## Продакшен
 
-1. Соберите фронтенд: `cd frontend && npm run build`
-2. Запустите бэкенд: `cd backend && npm start` 
+1. Собрать фронтенд: `cd frontend && npm run build`
+2. Запустить бэкенд: `cd backend && npm start` 
