@@ -1,103 +1,106 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
-import search from './search.vue';
-import AuthModal from './AuthModal.vue';
-import { transliterate } from '../helpers/translit';
-import { getImageUrl } from '../utils/imageUtils';
+import { ref, computed, onMounted } from 'vue'
+import { useCartStore, useFavoriteStore, useAuthStore, useMainStore } from '../store'
+import search from './search.vue'
+import AuthModal from './AuthModal.vue'
+import { transliterate } from '../helpers/translit'
+import { getImageUrl } from '../utils/imageUtils'
 
-const store = useStore();
-const cart = computed(() => store.getters['cart/getCart']);
-const cartLength = computed(() => cart.value.length);
-const favoriteLength = computed(() => store.getters['favorite/getFavorites'].length);
+const cartStore = useCartStore()
+const favoriteStore = useFavoriteStore()
+const authStore = useAuthStore()
+const mainStore = useMainStore()
 
-const isModalVisible = ref(false);
-const modalType = ref('');
-const authMessage = ref('');
+const cart = computed(() => cartStore.getCart)
+const cartLength = computed(() => cart.value.length)
+const favoriteLength = computed(() => favoriteStore.getFavorites.length)
 
-const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
+const isModalVisible = ref(false)
+const modalType = ref('')
+const authMessage = ref('')
+
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const openModal = (type) => {
-  modalType.value = type;
-  isModalVisible.value = true;
-};
+  modalType.value = type
+  isModalVisible.value = true
+}
 
 const closeModal = () => {
-  isModalVisible.value = false;
-  authMessage.value = '';
-};
+  isModalVisible.value = false
+  authMessage.value = ''
+}
 
 const handleAuthSubmit = async (payload) => {
   try {
     if (modalType.value === 'register') {
-      await store.dispatch('auth/register', payload);
-      closeModal();
-      alert('Регистрация успешна! Пожалуйста, войдите.');
-      openModal('login'); // Открытие модального окна логина после успешной регистрации
+      await authStore.register(payload)
+      closeModal()
+      alert('Регистрация успешна! Пожалуйста, войдите.')
+      openModal('login') // Открытие модального окна логина после успешной регистрации
     } else {
-      await store.dispatch('auth/login', payload);
-      closeModal();
+      await authStore.loginUser(payload)
+      closeModal()
     }
   } catch (error) {
     if (error.message === 'User already exists') {
-      alert('Данный пользователь уже существует');
+      alert('Данный пользователь уже существует')
     } else if (error.message === 'Invalid credentials') {
-      alert('Неверный телефон или пароль. Попробуйте снова.');
+      alert('Неверный телефон или пароль. Попробуйте снова.')
     } else {
-      alert('Произошла ошибка. Пожалуйста, попробуйте снова.');
+      alert('Произошла ошибка. Пожалуйста, попробуйте снова.')
     }
   }
-};
+}
 
 const handleAuthWarning = (event) => {
-  authMessage.value = event.detail;
-  showLoginModal();
-};
+  authMessage.value = event.detail
+  showLoginModal()
+}
 
-const searchText = ref('');
-const isSearchFocused = ref(false);
+const searchText = ref('')
+const isSearchFocused = ref(false)
 
-const items = computed(() => store.getters.getItems);
+const items = computed(() => mainStore.getItems)
 const filteredItems = computed(() => {
   if (searchText.value === '') {
-    return [];
+    return []
   }
   return items.value.filter(item =>
     item.name.toLowerCase().includes(searchText.value.toLowerCase())
-  );
-});
+  )
+})
 
 const updateSearchText = (newSearchText) => {
-  searchText.value = newSearchText;
-};
+  searchText.value = newSearchText
+}
 
 const onSearchFocus = () => {
-  isSearchFocused.value = true;
-};
+  isSearchFocused.value = true
+}
 
 const onSearchBlur = () => {
   setTimeout(() => {
-    isSearchFocused.value = false;
-  }, 200);
-};
+    isSearchFocused.value = false
+  }, 200)
+}
 
 const switchModalType = (type) => {
-  modalType.value = type;
-};
+  modalType.value = type
+}
 
 onMounted(() => {
-  window.addEventListener('open-auth-modal', showLoginModal);
-  window.addEventListener('auth-warning', handleAuthWarning);
-  store.dispatch('fetchItems');
-  if (store.getters['auth/isAuthenticated']) {
-    store.dispatch('favorite/fetchFavorites');
+  window.addEventListener('open-auth-modal', showLoginModal)
+  window.addEventListener('auth-warning', handleAuthWarning)
+  mainStore.fetchItems()
+  if (authStore.isAuthenticated) {
+    favoriteStore.fetchFavorites()
   }
-});
-
+})
 
 const showLoginModal = () => {
-  openModal('login');
-};
+  openModal('login')
+}
 </script>
 
 <template>

@@ -1,53 +1,52 @@
 <script setup>
-import ButtonCart from './UI/buttonCart.vue';
-import { defineProps } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
-import { transliterate } from '../helpers/translit';
-import { getImageUrl, getImageUrlForCSS } from '../utils/imageUtils.js';
+import ButtonCart from './UI/buttonCart.vue'
+import { defineProps } from 'vue'
+import { useCartStore } from '../store'
+import { useRouter } from 'vue-router'
+import { transliterate } from '../helpers/translit'
+import { getImageUrl, getImageUrlForCSS } from '../utils/imageUtils.js'
 
 const props = defineProps({
     item: Object,
     removeFromCart: Function
-});
+})
 
-const store = useStore();
-const router = useRouter();
+const cartStore = useCartStore()
+const router = useRouter()
 
 // Получаем правильный URL изображения
-const correctImageUrl = getImageUrl(props.item?.image);
+const correctImageUrl = getImageUrl(props.item?.image)
 
 // Получаем URL для CSS изображений
-const addImageUrl = getImageUrlForCSS('/src/assets/add.png');
-const removeImageUrl = getImageUrlForCSS('/src/assets/remove.png');
+const addImageUrl = getImageUrlForCSS('/src/assets/add.png')
+const removeImageUrl = getImageUrlForCSS('/src/assets/remove.png')
 
 const increment = async () => {
     if (props.item.quantity < 20) {
-        await store.dispatch('cart/incrementQuantity', props.item.id);
+        await cartStore.incrementQuantity(props.item.id)
     }
-};
+}
 
 const decrement = async () => {
     if (props.item.quantity > 1) {
-        await store.dispatch('cart/decrementQuantity', props.item.id);
+        await cartStore.decrementQuantity(props.item.id)
     }
-};
+}
 
 const handleRemoveFromCart = async () => {
-    await props.removeFromCart(props.item.id);
-};
+    await props.removeFromCart(props.item.id)
+}
 
 const handleProductClick = () => {
     // Проверяем, есть ли у товара категория
     if (!props.item.category) {
-        console.warn('Товар не имеет категории:', props.item);
-        return;
+        console.warn('Товар не имеет категории:', props.item)
+        return
     }
     
     // Переходим на страницу товара
-    router.push(`/catalog/${props.item.category}/${transliterate(props.item.name)}/${props.item.id}`);
-};
-
+    router.push(`/catalog/${props.item.category}/${transliterate(props.item.name)}/${props.item.id}`)
+}
 </script>
 
 <template>

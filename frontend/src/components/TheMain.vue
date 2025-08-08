@@ -1,19 +1,18 @@
 <script setup>
-import catalog from './catalog.vue';
-import SalesList from './salesList.vue';
-import Slider from './slider.vue';
-import { useStore } from 'vuex';
-import { computed } from 'vue';
+import Slider from './slider.vue'
+import catalog from './catalog.vue'
+import SalesList from './salesList.vue'
+import { computed } from 'vue'
+import { useMainStore } from '../store'
 
-const store = useStore();
+const mainStore = useMainStore()
 
 const props = defineProps({
   products: Array
 })
 
 // Получаем товары со скидками через getter (ограничиваем до 5)
-const saleItems = computed(() => store.getters.getSaleItems.slice(0, 5));
-
+const saleItems = computed(() => mainStore.getSaleItems.slice(0, 5))
 </script>
 
 <template>

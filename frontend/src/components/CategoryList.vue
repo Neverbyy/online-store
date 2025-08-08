@@ -1,17 +1,16 @@
 <script setup>
-import CategoryItem from './categoryItem.vue';
-import { useStore } from 'vuex';
+import CategoryItem from './categoryItem.vue'
+import { useCartStore } from '../store'
 
-const store = useStore();
+const cartStore = useCartStore()
 
 const addToCart = (product) => {
-  store.dispatch('cart/addToCart', product);
+  cartStore.addToCartAsync(product)
 }
 
 const props = defineProps({
   products: Array
 })
-
 </script>
 
 <template>

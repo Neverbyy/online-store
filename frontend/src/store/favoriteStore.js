@@ -1,93 +1,94 @@
-import axios from 'axios';
-import { getApiUrl, API_CONFIG } from '../config/api';
+import { defineStore } from 'pinia'
+import axios from 'axios'
+import { getApiUrl, API_CONFIG } from '../config/api'
 
-const FAVORITES_KEY = 'favorites';
+const FAVORITES_KEY = 'favorites'
 
-const state = () => ({
-  favorites: JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]')
-});
+export const useFavoriteStore = defineStore('favorite', {
+  state: () => ({
+    favorites: JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]')
+  }),
 
-const mutations = {
-  SET_FAVORITES(state, favorites) {
-    state.favorites = favorites;
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+  getters: {
+    getFavorites: (state) => state.favorites,
+    isFavorite: (state) => (id) => state.favorites.some(item => item.id === id)
   },
-  ADD_TO_FAVORITES(state, product) {
-    if (!state.favorites.find(item => item.id === product.id)) {
-      state.favorites.push(product);
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(state.favorites));
+
+  actions: {
+    setFavorites(favorites) {
+      this.favorites = favorites
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites))
+    },
+
+    addToFavorites(product) {
+      if (!this.favorites.find(item => item.id === product.id)) {
+        this.favorites.push(product)
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(this.favorites))
+      }
+    },
+
+    removeFromFavorites(productId) {
+      this.favorites = this.favorites.filter(item => item.id !== productId)
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(this.favorites))
+    },
+
+    clearFavorites() {
+      this.favorites = []
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify([]))
+    },
+
+    async fetchFavorites() {
+      const { useAuthStore } = await import('./authStore')
+      const authStore = useAuthStore()
+      const user = authStore.getUser
+
+      if (!user || !user.id) {
+        // Неавторизованный — localStorage
+        const favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]')
+        this.setFavorites(favorites)
+        return
+      }
+      // Авторизованный — сервер
+      try {
+        const { data } = await axios.get(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { params: { userId: user.id } })
+        this.setFavorites(data.favorites)
+      } catch (e) {
+        this.setFavorites([])
+      }
+    },
+
+    async addToFavoritesAsync(product) {
+      const { useAuthStore } = await import('./authStore')
+      const authStore = useAuthStore()
+      const user = authStore.getUser
+
+      if (!user || !user.id) {
+        // Неавторизованный — localStorage
+        this.addToFavorites(product)
+        return
+      }
+      // Авторизованный — сервер
+      try {
+        const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { userId: user.id, product })
+        this.setFavorites(data.favorites)
+      } catch (e) {}
+    },
+
+    async removeFromFavoritesAsync(productId) {
+      const { useAuthStore } = await import('./authStore')
+      const authStore = useAuthStore()
+      const user = authStore.getUser
+
+      if (!user || !user.id) {
+        // Неавторизованный — localStorage
+        this.removeFromFavorites(productId)
+        return
+      }
+      // Авторизованный — сервер
+      try {
+        const { data } = await axios.delete(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { data: { userId: user.id, productId } })
+        this.setFavorites(data.favorites)
+      } catch (e) {}
     }
-  },
-  REMOVE_FROM_FAVORITES(state, productId) {
-    state.favorites = state.favorites.filter(item => item.id !== productId);
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(state.favorites));
   }
-};
-
-const actions = {
-  async fetchFavorites({ commit, rootGetters }) {
-    const user = rootGetters['auth/getUser'];
-    if (!user || !user.id) {
-      // Неавторизованный — localStorage
-      const favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
-      commit('SET_FAVORITES', favorites);
-      return;
-    }
-    // Авторизованный — сервер
-    try {
-      const { data } = await axios.get(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { params: { userId: user.id } });
-      commit('SET_FAVORITES', data.favorites);
-    } catch (e) {
-      commit('SET_FAVORITES', []);
-    }
-  },
-  async addToFavorites({ commit, rootGetters }, product) {
-    const user = rootGetters['auth/getUser'];
-    if (!user || !user.id) {
-      // Неавторизованный — localStorage
-      commit('ADD_TO_FAVORITES', product);
-      return;
-    }
-    // Авторизованный — сервер
-    try {
-      const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { userId: user.id, product });
-      commit('SET_FAVORITES', data.favorites);
-    } catch (e) {}
-  },
-  async removeFromFavorites({ commit, rootGetters }, productId) {
-    const user = rootGetters['auth/getUser'];
-    if (!user || !user.id) {
-      // Неавторизованный — localStorage
-      commit('REMOVE_FROM_FAVORITES', productId);
-      return;
-    }
-    // Авторизованный — сервер
-    try {
-      const { data } = await axios.delete(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { data: { userId: user.id, productId } });
-      commit('SET_FAVORITES', data.favorites);
-    } catch (e) {}
-  },
-  clearFavorites({ commit, rootGetters }) {
-    const user = rootGetters['auth/getUser'];
-    if (!user || !user.id) {
-      // Неавторизованный — localStorage
-      commit('SET_FAVORITES', []);
-      return;
-    }
-    // Авторизованный — сервер
-    commit('SET_FAVORITES', []);
-  }
-};
-
-const getters = {
-  getFavorites: state => state.favorites,
-  isFavorite: state => id => state.favorites.some(item => item.id === id)
-};
-
-export default {
-  namespaced: true,
-  state,
-  mutations,
-  actions,
-  getters
-}; 
+}) 

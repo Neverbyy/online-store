@@ -1,16 +1,17 @@
 <script setup>
-import { defineProps, ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { transliterate } from '../helpers/translit'
+import { getImageUrl } from '../utils/imageUtils.js'
+import { useDiscount } from '../composables/useDiscount.js'
+import { useFavoriteStore } from '../store'
 import CartActionButton from './UI/CartActionButton.vue';
-import { useStore } from 'vuex';
 import FavoriteIcon from './UI/FavoriteIcon.vue';
-import { getImageUrl } from '../utils/imageUtils.js';
-import { useDiscount } from '../composables/useDiscount.js';
 
 const props = defineProps({
   product: Object
 });
 
-const store = useStore();
 const showAddedMessage = ref(false);
 const selectedImageIndex = ref(0);
 const slideDirection = ref('right'); // Направление анимации
@@ -52,12 +53,13 @@ const selectImage = (index) => {
 // Используем composable для вычисления скидки и экономии
 const { discountPercentage, savingsAmount } = useDiscount(computed(() => props.product));
 
-const isFavorite = computed(() => store.getters['favorite/isFavorite'](props.product.id));
+const favoriteStore = useFavoriteStore()
+const isFavorite = computed(() => favoriteStore.isFavorite(props.product.id));
 const handleToggleFavorite = async () => {
   if (isFavorite.value) {
-    await store.dispatch('favorite/removeFromFavorites', props.product.id);
+    await favoriteStore.removeFromFavoritesAsync(props.product.id)
   } else {
-    await store.dispatch('favorite/addToFavorites', props.product);
+    await favoriteStore.addToFavoritesAsync(props.product)
   }
 };
 

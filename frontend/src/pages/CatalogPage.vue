@@ -1,14 +1,14 @@
 <script setup>
-import { onMounted, computed } from 'vue';
-import { useStore } from 'vuex';
-import catalog from '../components/catalog.vue';
+import { onMounted, computed } from 'vue'
+import { useMainStore } from '../store'
+import catalog from '../components/catalog.vue'
 
-const store = useStore();
-const products = computed(() => store.getters.getProducts);
+const mainStore = useMainStore()
+const products = computed(() => mainStore.getProducts)
 
 onMounted(() => {
-  store.dispatch('fetchProducts');
-});
+  mainStore.fetchProducts()
+})
 
 const props = defineProps({
   products: Array

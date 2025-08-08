@@ -19,7 +19,7 @@
         v-for="product in favorites"
         :key="product.id"
         :product="product"
-        :addToCart="() => store.dispatch('cart/addToCart', product)"
+        :addToCart="() => cartStore.addToCartAsync(product)"
         class="favorite-card"
       />
     </div>
@@ -27,16 +27,17 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
-import saleItem from '../components/saleItem.vue';
+import { computed, onMounted } from 'vue'
+import { useFavoriteStore, useCartStore } from '../store'
+import saleItem from '../components/saleItem.vue'
 
-const store = useStore();
-const favorites = computed(() => store.getters['favorite/getFavorites']);
+const favoriteStore = useFavoriteStore()
+const cartStore = useCartStore()
+const favorites = computed(() => favoriteStore.getFavorites)
 
 onMounted(() => {
-  store.dispatch('favorite/fetchFavorites');
-});
+  favoriteStore.fetchFavorites()
+})
 </script>
 
 <style lang="scss" scoped>

@@ -1,21 +1,20 @@
 <script setup>
-import CartList from './CartList.vue';
-import {computed} from 'vue';
-import ButtonCart from './UI/buttonCart.vue';
-import {useStore} from 'vuex';
-import { getImageUrl } from '../utils/imageUtils.js';
+import CartList from './CartList.vue'
+import {computed} from 'vue'
+import ButtonCart from './UI/buttonCart.vue'
+import {useCartStore} from '../store'
+import { getImageUrl } from '../utils/imageUtils.js'
 
-const store = useStore();
-const cart = computed(() => store.state.cart.cart);
-const formattedTotalPrice = computed(() => store.getters['cart/formattedTotalPrice']);
+const cartStore = useCartStore()
+const cart = computed(() => cartStore.getCart)
+const formattedTotalPrice = computed(() => cartStore.formattedTotalPrice)
 
 // Получаем правильный URL изображения корзины
-const cartImageUrl = getImageUrl('/src/assets/cart.png');
+const cartImageUrl = getImageUrl('/src/assets/cart.png')
 
 const clearCart = () => {
-    store.dispatch('cart/clearCart');
-};
-
+    cartStore.clearCart()
+}
 </script>
 
 <template>

@@ -1,18 +1,26 @@
-import { createApp } from 'vue';
-import './styles/main.scss';
-import App from './App.vue';
-import store from './store/store';
-import router from './router/router';
-import VueTheMask from 'vue-the-mask';
+import { createApp } from 'vue'
+import './styles/main.scss'
+import App from './App.vue'
+import pinia from './store'
+import router from './router/router'
+import VueTheMask from 'vue-the-mask'
 
-createApp(App)
-    .use(VueTheMask)
-    .use(store)
-    .use(router)
-    .mount('#app');
+const app = createApp(App)
 
-if (store.getters['auth/isAuthenticated']) {
-    store.dispatch('auth/checkUserExists');
+app.use(VueTheMask)
+app.use(pinia)
+app.use(router)
+app.mount('#app')
+
+// Инициализация после монтирования приложения
+import { useAuthStore } from './store'
+import { useCartStore } from './store'
+
+const authStore = useAuthStore()
+const cartStore = useCartStore()
+
+if (authStore.isAuthenticated) {
+    authStore.checkUserExists()
 }
 
-store.dispatch('cart/fetchCart');
+cartStore.fetchCart()

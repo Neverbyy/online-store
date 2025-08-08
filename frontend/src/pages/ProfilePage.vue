@@ -1,13 +1,14 @@
 <script setup>
-import { computed, onMounted, watch } from 'vue';
-import { useStore } from 'vuex';
-import ProfileSection from '../components/ProfileSection.vue';
-import { useRouter } from 'vue-router';
+import { computed, onMounted, watch } from 'vue'
+import { useProfileStore, useAuthStore } from '../store'
+import ProfileSection from '../components/ProfileSection.vue'
+import { useRouter } from 'vue-router'
 
-const store = useStore();
+const profileStore = useProfileStore()
+const authStore = useAuthStore()
 
-// Получаем текущее активное состояние из Vuex Store
-const activeItem = computed(() => store.state.profile.activeItem);
+// Получаем текущее активное состояние из Pinia Store
+const activeItem = computed(() => profileStore.getActiveItem)
 
 // Массив пунктов меню
 const menuItems = [
@@ -15,31 +16,30 @@ const menuItems = [
     'Заказы',
     'Мои адреса',
     'Мои отзывы'
-];
+]
 
 // Метод для установки активного элемента
 const setActiveItem = (index) => {
-    store.dispatch('profile/setActiveItem', index);
-};
+    profileStore.setActiveItem(index)
+}
 
-const router = useRouter();
-const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
+const router = useRouter()
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 watch(isAuthenticated, (newVal) => {
   if (!newVal) {
-    router.push({ name: 'Home' });
+    router.push({ name: 'Home' })
   }
-});
+})
 
 onMounted(() => {
-    store.dispatch('auth/checkUserExists');
+    authStore.checkUserExists()
     
     // Если активна вкладка "Заказы", обновляем их статус
-    if (store.state.profile.activeItem === 1) {
-        window.dispatchEvent(new CustomEvent('refresh-orders'));
+    if (profileStore.getActiveItem === 1) {
+        window.dispatchEvent(new CustomEvent('refresh-orders'))
     }
-});
-
+})
 </script>
 
 <template>

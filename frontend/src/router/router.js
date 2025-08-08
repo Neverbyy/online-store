@@ -1,15 +1,15 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import store from '../store/store';
+import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore, useCartStore } from '../store'
 
-import Home from '../pages/Home.vue';
-import CatalogPage from '../pages/CatalogPage.vue';
-import ProfilePage from '../pages/ProfilePage.vue';
-import CartPage from '../pages/CartPage.vue';
-import OrderPage from '../pages/OrderPage.vue';
-import CategoryPage from '../pages/CategoryPage.vue';
-import ProductPage from '../pages/ProductPage.vue';
-import NotFoundPage from '../pages/NotFoundPage.vue';
-import FavoritePage from '../pages/FavoritePage.vue';
+import Home from '../pages/Home.vue'
+import CatalogPage from '../pages/CatalogPage.vue'
+import ProfilePage from '../pages/ProfilePage.vue'
+import CartPage from '../pages/CartPage.vue'
+import OrderPage from '../pages/OrderPage.vue'
+import CategoryPage from '../pages/CategoryPage.vue'
+import ProductPage from '../pages/ProductPage.vue'
+import NotFoundPage from '../pages/NotFoundPage.vue'
+import FavoritePage from '../pages/FavoritePage.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -26,12 +26,13 @@ const routes = [
     name: 'Profile',
     component: ProfilePage,
     beforeEnter: (to, from, next) => {
-      // здесь useStore() всё ещё работает, если компонент в setup(), но лучше так:
-      const isAuthenticated = store.getters['auth/isAuthenticated'];
+      // Используем Pinia store
+      const authStore = useAuthStore()
+      const isAuthenticated = authStore.isAuthenticated
       if (!isAuthenticated) {
-        next({ name: 'Home' });
+        next({ name: 'Home' })
       } else {
-        next();
+        next()
       }
     }
   },
@@ -52,33 +53,38 @@ const routes = [
     component: NotFoundPage,
     meta: { showHeader: false }
    }
-];
+]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
-});
+})
 
 // ⬇️ ⬇️ ⬇️ ВАЖНО: only после создания router
 router.beforeEach((to, from, next) => {
-  const requiresAuth = to.meta.requiresAuth;
-  const requiresCart = to.meta.requiresCart;
-  const isAuthenticated = store.getters['auth/isAuthenticated'];
-  const cartNotEmpty = store.getters['cart/getCart'].length > 0;
+  const requiresAuth = to.meta.requiresAuth
+  const requiresCart = to.meta.requiresCart
+  
+  // Используем Pinia stores
+  const authStore = useAuthStore()
+  const cartStore = useCartStore()
+  
+  const isAuthenticated = authStore.isAuthenticated
+  const cartNotEmpty = cartStore.getCart.length > 0
 
   if (requiresAuth && !isAuthenticated) {
-    window.dispatchEvent(new CustomEvent('open-auth-modal'));
+    window.dispatchEvent(new CustomEvent('open-auth-modal'))
     window.dispatchEvent(new CustomEvent('auth-warning', {
       detail: 'Пожалуйста, авторизуйтесь перед оформлением заказа.',
-    }));
-    return next({ name: 'Home'});
+    }))
+    return next({ name: 'Home'})
   }
 
   if (requiresCart && !cartNotEmpty) {
-    return next({ name: 'Cart' });
+    return next({ name: 'Cart' })
   }
 
-  next();
-});
+  next()
+})
 
-export default router;
+export default router

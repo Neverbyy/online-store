@@ -51,24 +51,24 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
+import { computed } from 'vue'
+import { useProfileStore } from '../store'
 
-const store = useStore();
+const profileStore = useProfileStore()
 
 const props = defineProps({
   order: { type: Object, required: true },
   onClose: { type: Function, required: true }
-});
+})
 
 const handleClose = () => {
-  props.onClose();
-};
+  props.onClose()
+}
 
-const formatPrice = price => Number(price).toLocaleString('ru-RU');
+const formatPrice = price => Number(price).toLocaleString('ru-RU')
 
 // Получаем имя из профиля пользователя
-const userName = computed(() => store.getters['profile/getName']);
+const userName = computed(() => profileStore.getName)
 </script>
 
 <style lang="scss" scoped>

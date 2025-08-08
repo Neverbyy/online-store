@@ -1,17 +1,16 @@
 <script setup>
-import SaleItem from './saleItem.vue';
-import { useStore } from 'vuex';
+import SaleItem from './saleItem.vue'
+import { useCartStore } from '../store'
 
-const store = useStore();
+const cartStore = useCartStore()
 
 const addToCart = (sale) => {
-  store.dispatch('cart/addToCart', sale);
+  cartStore.addToCartAsync(sale)
 }
 
 const props = defineProps({
   sales: Array
 })
-
 </script>
 
 <template>

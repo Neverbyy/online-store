@@ -1,13 +1,13 @@
 <script setup>
-import { computed, watch, nextTick } from 'vue';
-import { useStore } from 'vuex';
+import { computed, watch, nextTick } from 'vue'
+import { useProfileStore } from '../store'
 
-import ProfileSettings from '../components/ProfileSettings.vue';
-import Orders from '../components/Orders.vue';
-import Addresses from '../components/Addresses.vue';
-import Reviews from '../components/Reviews.vue';
+import ProfileSettings from '../components/ProfileSettings.vue'
+import Orders from '../components/Orders.vue'
+import Addresses from '../components/Addresses.vue'
+import Reviews from '../components/Reviews.vue'
 
-const store = useStore();
+const profileStore = useProfileStore()
 
 // Массив компонентов для отображения
 const components = [
@@ -15,21 +15,21 @@ const components = [
     Orders,
     Addresses,
     Reviews
-];
+]
 
-// Вычисляемое свойство для получения текущего компонента из Vuex Store
+// Вычисляемое свойство для получения текущего компонента из Pinia Store
 const currentComponent = computed(() => {
-    return components[store.state.profile.activeItem];
-});
+    return components[profileStore.getActiveItem]
+})
 
 // Следим за изменением активного элемента и обновляем заказы при переходе на вкладку "Заказы"
-watch(() => store.state.profile.activeItem, async (newIndex) => {
+watch(() => profileStore.getActiveItem, async (newIndex) => {
     if (newIndex === 1) { // Индекс 1 соответствует вкладке "Заказы"
-        await nextTick();
+        await nextTick()
         // Эмитим событие для обновления заказов
-        window.dispatchEvent(new CustomEvent('refresh-orders'));
+        window.dispatchEvent(new CustomEvent('refresh-orders'))
     }
-});
+})
 </script>
 
 <template>

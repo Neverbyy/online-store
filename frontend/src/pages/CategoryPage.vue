@@ -1,24 +1,22 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter  } from 'vue-router';
-import {useStore} from 'vuex';
-import CategoryList from '../components/CategoryList.vue';
-import CategorySide from '../components/CategorySide.vue';
-import { useCategoryFilters } from '../composables/useCategoryFilters.js';
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useMainStore } from '../store'
+import CategoryList from '../components/CategoryList.vue'
+import CategorySide from '../components/CategorySide.vue'
+import { useCategoryFilters } from '../composables/useCategoryFilters'
 import { getImageUrl } from '../utils/imageUtils.js';
 
-const store = useStore();
-const route = useRoute();
-const router = useRouter();
+const route = useRoute()
+const mainStore = useMainStore()
 
-const categoryExists = ref(false);
-const showFiltersModal = ref(false);
-const isLoading = ref(true); // Добавляем состояние загрузки
-const sortDirection = ref('none'); // none, asc, desc
-const isFiltering = ref(false); // Состояние фильтрации
+const showFiltersModal = ref(false)
+const isLoading = ref(true) // Добавляем состояние загрузки
+const sortDirection = ref('none') // none, asc, desc
+const isFiltering = ref(false) // Состояние фильтрации
 
-const category = computed(() => route.params.category);
-const items = computed(() => store.getters.getItems);
+const category = computed(() => route.params.category)
+const items = computed(() => mainStore.getItems)
 
 // Используем composable для фильтров
 const {
@@ -47,69 +45,69 @@ const {
   handlePriceChange: originalHandlePriceChange,
   removeFilter: originalRemoveFilter,
   getFilterLabel
-} = useCategoryFilters(items, category);
+} = useCategoryFilters(items, category)
 
 // Обертываем функции фильтрации с анимацией
 const handleFilterChange = async (filterType, values) => {
-  isFiltering.value = true;
-  await new Promise(resolve => setTimeout(resolve, 300));
-  originalHandleFilterChange(filterType, values);
-  isFiltering.value = false;
-};
+  isFiltering.value = true
+  await new Promise(resolve => setTimeout(resolve, 300))
+  originalHandleFilterChange(filterType, values)
+  isFiltering.value = false
+}
 
 const handlePriceChange = async (newRange) => {
-  isFiltering.value = true;
-  await new Promise(resolve => setTimeout(resolve, 300));
-  originalHandlePriceChange(newRange);
-  isFiltering.value = false;
-};
+  isFiltering.value = true
+  await new Promise(resolve => setTimeout(resolve, 300))
+  originalHandlePriceChange(newRange)
+  isFiltering.value = false
+}
 
 const removeFilter = async (filterType, value) => {
-  isFiltering.value = true;
-  await new Promise(resolve => setTimeout(resolve, 300));
-  originalRemoveFilter(filterType, value);
-  isFiltering.value = false;
-};
+  isFiltering.value = true
+  await new Promise(resolve => setTimeout(resolve, 300))
+  originalRemoveFilter(filterType, value)
+  isFiltering.value = false
+}
 
-const categoryName = computed(() => store.getters.getCategoryNameById(category.value));
+const categoryName = computed(() => mainStore.getCategoryNameById(category.value))
 
 // Отсортированные товары
 const sortedProducts = computed(() => {
   if (sortDirection.value === 'none') {
-    return filteredProducts.value;
+    return filteredProducts.value
   }
   
-  const sorted = [...filteredProducts.value];
+  const sorted = [...filteredProducts.value]
   sorted.sort((a, b) => {
-    const priceA = parseInt(a.price.replace(/\s/g, ''));
-    const priceB = parseInt(b.price.replace(/\s/g, ''));
+    const priceA = parseInt(a.price.replace(/\s/g, ''))
+    const priceB = parseInt(b.price.replace(/\s/g, ''))
     
     if (sortDirection.value === 'asc') {
-      return priceA - priceB;
+      return priceA - priceB
     } else {
-      return priceB - priceA;
+      return priceB - priceA
     }
-  });
+  })
   
-  return sorted;
-});
+  return sorted
+})
 
 const handleSortByPrice = async () => {
-  isFiltering.value = true;
+  isFiltering.value = true
   
   // Небольшая задержка для анимации
-  await new Promise(resolve => setTimeout(resolve, 300));
+  await new Promise(resolve => setTimeout(resolve, 300))
   
   if (sortDirection.value === 'none') {
-    sortDirection.value = 'desc'; // От самых дорогих
+    sortDirection.value = 'desc' // От самых дорогих
   } else if (sortDirection.value === 'desc') {
-    sortDirection.value = 'asc'; // От самых дешёвых
+    sortDirection.value = 'asc' // От самых дешёвых
   } else {
-    sortDirection.value = 'none'; // Без сортировки
+    sortDirection.value = 'none' // Без сортировки
   }
   
-  isFiltering.value = false;
-};
+  isFiltering.value = false
+}
 
 const handleOpenFilters = () => {
   showFiltersModal.value = true;
@@ -120,11 +118,11 @@ const handleCloseFilters = () => {
 };
 
 onMounted(async () => {
-  await store.dispatch('fetchItems');
-  categoryExists.value = items.value.some(item => item.category === category.value);
-  if (!categoryExists.value) {
-    router.push({ name: 'NotFound' });
-  }
+  await mainStore.fetchItems();
+  // categoryExists.value = items.value.some(item => item.category === category.value);
+  // if (!categoryExists.value) {
+  //   router.push({ name: 'NotFound' });
+  // }
   isLoading.value = false; // Устанавливаем загрузку завершенной
 });
 

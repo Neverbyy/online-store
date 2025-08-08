@@ -1,41 +1,44 @@
-// reviewStore.js
-import axios from 'axios';
-import { getApiUrl, API_CONFIG } from '../config/api';
+import { defineStore } from 'pinia'
+import axios from 'axios'
+import { getApiUrl, API_CONFIG } from '../config/api'
 
-export default {
-  state: {
+export const useReviewStore = defineStore('review', {
+  state: () => ({
     reviews: []
-  },
+  }),
+
   getters: {
     getReviewsByProductId: (state) => (productId) => {
-      return state.reviews.filter(review => review.productId === productId);
+      return state.reviews.filter(review => review.productId === productId)
     }
   },
-  mutations: {
-    setReviews(state, reviews) {
-      state.reviews = reviews;
-    },
-    addReview(state, review) {
-      state.reviews.push(review);
-    }
-  },
+
   actions: {
-    async fetchReviews({ commit }) {
+    setReviews(reviews) {
+      this.reviews = reviews
+    },
+
+    addReview(review) {
+      this.reviews.push(review)
+    },
+
+    async fetchReviews() {
       try {
-        const response = await axios.get(getApiUrl(API_CONFIG.ENDPOINTS.REVIEWS));
-        commit('setReviews', response.data);
+        const response = await axios.get(getApiUrl(API_CONFIG.ENDPOINTS.REVIEWS))
+        this.setReviews(response.data)
       } catch (error) {
-        console.error('Ошибка при загрузке отзывов:', error);
+        console.error('Ошибка при загрузке отзывов:', error)
       }
     },
-    async addReview({ commit }, newReview) {
+
+    async addReviewAsync(newReview) {
       try {
-        const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.REVIEWS), newReview);
-        commit('addReview', response.data); // Добавляем новый отзыв в хранилище
+        const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.REVIEWS), newReview)
+        this.addReview(response.data)
       } catch (error) {
-        console.error('Ошибка при добавлении отзыва:', error);
-        throw error; // Передача ошибки выше для обработки в компонентах или в другом месте
+        console.error('Ошибка при добавлении отзыва:', error)
+        throw error
       }
     }
   }
-};
+})

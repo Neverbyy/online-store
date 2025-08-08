@@ -1,50 +1,47 @@
 <script setup>
+import { ref, computed, onMounted, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
+import { useMainStore, useReviewStore, useAuthStore } from '../store'
 import ProductItem from '../components/ProductItem.vue'
-import buttonCart from '../components/UI/buttonCart.vue';
-import reviewsList from '../components/reviewsList.vue';
-import reviewForm from '../components/reviewForm.vue';
-import reviewModal from '../components/reviewModal.vue';
-import { computed, watchEffect, onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { useStore } from 'vuex';
+import reviewsList from '../components/reviewsList.vue'
+import reviewModal from '../components/reviewModal.vue'
+import reviewForm from '../components/reviewForm.vue'
+import buttonCart from '../components/UI/buttonCart.vue'
 
-const route = useRoute();
-const store = useStore();
+const route = useRoute()
+const mainStore = useMainStore()
+const reviewStore = useReviewStore()
+const authStore = useAuthStore()
 
-const category = computed(() => route.params.category);
-const categoryName = computed(() => store.getters.getCategoryNameById(category.value));
-const productId = computed(() => Number(route.params.productId));
-const product = computed(() => store.getters.getItemById(productId.value));
-const reviews = computed(() => store.getters.getReviewsByProductId(productId.value));
-const isReviewModalActive = ref(false);
-const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
-
-
+const category = computed(() => route.params.category)
+const categoryName = computed(() => mainStore.getCategoryNameById(category.value))
+const productId = computed(() => Number(route.params.productId))
+const product = computed(() => mainStore.getItemById(productId.value))
+const reviews = computed(() => reviewStore.getReviewsByProductId(productId.value))
+const isReviewModalActive = ref(false)
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 const openReviewModal = () => {
-  isReviewModalActive.value = true;
-};
+  isReviewModalActive.value = true
+}
 
 const closeReviewModal = () => {
-  isReviewModalActive.value = false;
-};
-
-
+  isReviewModalActive.value = false
+}
 
 const loadProductData = async (id) => {
   if (id) {
-    await store.dispatch('loadProductData', id);
+    await mainStore.loadProductData(id)
   }
-};
+}
 
 watchEffect(() => {
-  loadProductData(productId.value);
-});
+  loadProductData(productId.value)
+})
 
 onMounted(() => {
-  store.dispatch('fetchReviews');
-});
-
+  reviewStore.fetchReviews()
+})
 </script>
 
 <template>

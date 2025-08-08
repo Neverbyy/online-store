@@ -1,17 +1,16 @@
 <script setup>
-import { ref, computed } from 'vue';
-import CartActionButton from './UI/CartActionButton.vue';
-import { useStore } from 'vuex';
-import { transliterate } from '../helpers/translit';
-import FavoriteIcon from './UI/FavoriteIcon.vue';
-import { getImageUrl } from '../utils/imageUtils.js';
-import { useDiscount } from '../composables/useDiscount.js';
+import { ref, computed } from 'vue'
+import { transliterate } from '../helpers/translit'
+import { getImageUrl } from '../utils/imageUtils.js'
+import { useDiscount } from '../composables/useDiscount.js'
+import { useFavoriteStore } from '../store'
+import CartActionButton from './UI/CartActionButton.vue'
+import FavoriteIcon from './UI/FavoriteIcon.vue'
 
 const props = defineProps({
   product: Object
 });
 
-const store = useStore();
 const showAddedMessage = ref(false);
 const showMaxQuantityMessage = ref(false);
 
@@ -21,12 +20,13 @@ const correctImageUrl = getImageUrl(props.product?.image);
 // Используем composable для вычисления скидки и экономии
 const { discountPercentage } = useDiscount(computed(() => props.product));
 
-const isFavorite = computed(() => store.getters['favorite/isFavorite'](props.product.id));
+const favoriteStore = useFavoriteStore();
+const isFavorite = computed(() => favoriteStore.isFavorite(props.product.id));
 const handleToggleFavorite = async () => {
   if (isFavorite.value) {
-    await store.dispatch('favorite/removeFromFavorites', props.product.id);
+    await favoriteStore.removeFromFavoritesAsync(props.product.id);
   } else {
-    await store.dispatch('favorite/addToFavorites', props.product);
+    await favoriteStore.addToFavoritesAsync(props.product);
   }
 };
 

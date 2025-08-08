@@ -1,8 +1,8 @@
 <script setup>
-import { ref, computed } from 'vue';
-import { useStore } from 'vuex';
-import FormInput from './UI/FormInput.vue';
-import buttonCart from '/src/components/UI/buttonCart.vue';
+import { ref, computed } from 'vue'
+import { useAuthStore } from '../store'
+import FormInput from './UI/FormInput.vue'
+import buttonCart from '/src/components/UI/buttonCart.vue'
 
 const props = defineProps({
   visible: {
@@ -17,69 +17,69 @@ const props = defineProps({
     type: String,
     default: '',
   }
-});
+})
 
-const emit = defineEmits(['close', 'submit', 'switch']);
-const store = useStore();
+const emit = defineEmits(['close', 'submit', 'switch'])
+const authStore = useAuthStore()
 
-const phone = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const loading = ref(false);
+const phone = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+const loading = ref(false)
 
-const isRegister = computed(() => props.type === 'register');
-const modalTitle = computed(() => (isRegister.value ? 'Регистрация' : 'Войти'));
+const isRegister = computed(() => props.type === 'register')
+const modalTitle = computed(() => (isRegister.value ? 'Регистрация' : 'Войти'))
 
 const handleSubmit = async () => {
   // Предотвращаем множественные клики
-  if (loading.value) return;
+  if (loading.value) return
   
   if (isRegister.value && password.value !== confirmPassword.value) {
-    alert('Пароли не совпадают!');
-    return;
+    alert('Пароли не совпадают!')
+    return
   }
 
-  loading.value = true;
+  loading.value = true
   
   try {
     const payload = {
       phone: phone.value,
       password: password.value,
-    };
+    }
 
     if (isRegister.value) {
-      const success = await store.dispatch('auth/register', payload);
+      const success = await authStore.register(payload)
       if (success) {
-        emit('switch', 'login');
+        emit('switch', 'login')
       }
     } else {
-      const success = await store.dispatch('auth/login', payload);
+      const success = await authStore.loginUser(payload)
       if (success) {
-        emit('close'); // Закрываем модальное окно только при успешном входе
+        emit('close') // Закрываем модальное окно только при успешном входе
       }
     }
   } catch (error) {
-    console.error('Ошибка при авторизации:', error);
+    console.error('Ошибка при авторизации:', error)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 
 const closeModal = () => {
-  emit('close');
-};
+  emit('close')
+}
 
 const switchModal = () => {
-  emit('switch', isRegister.value ? 'login' : 'register');
-};
+  emit('switch', isRegister.value ? 'login' : 'register')
+}
 
 const switchText = computed(() =>
   isRegister.value ? 'Уже есть аккаунт?' : 'Еще нет аккаунта?'
-);
+)
 
 const switchLinkText = computed(() =>
   isRegister.value ? 'Войти' : 'Зарегистрироваться'
-);
+)
 </script>
 
 <template>

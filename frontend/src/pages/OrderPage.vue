@@ -1,56 +1,56 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
-import {useStore} from 'vuex';
-import { useRouter } from 'vue-router';
-import buttonCart from '/src/components/UI/buttonCart.vue'
-import FormInput from '../components/UI/FormInput.vue';
-import axios from 'axios';
-import { getApiUrl, API_CONFIG } from '../config/api';
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useOrderStore, useCartStore, useProfileStore } from '../store'
+import { getApiUrl, API_CONFIG } from '../config/api'
+import axios from 'axios'
 
-const store = useStore();
-const router = useRouter();
-const isLoading = ref(false);
+const orderStore = useOrderStore()
+const cartStore = useCartStore()
+const profileStore = useProfileStore()
+const router = useRouter()
+const isLoading = ref(false)
 
 const deliveryMethod = computed({
-  get: () => store.getters.getDeliveryMethod,
-  set: value => store.dispatch('setDeliveryMethod', value)
-});
+  get: () => orderStore.getDeliveryMethod,
+  set: value => orderStore.setDeliveryMethod(value)
+})
 
 const contact = computed({
-  get: () => store.getters.getContact,
-  set: value => store.dispatch('setContact', value)
-});
+  get: () => orderStore.getContact,
+  set: value => orderStore.setContact(value)
+})
 
 const address = computed({
-  get: () => store.getters.getAddress,
-  set: value => store.dispatch('setAddress', value)
-});
+  get: () => orderStore.getAddress,
+  set: value => orderStore.setAddress(value)
+})
 
-const formattedTotalPrice = computed(() => store.getters['cart/formattedTotalPrice']);
+const formattedTotalPrice = computed(() => cartStore.formattedTotalPrice)
 
 // Автоматическое заполнение адреса из профиля пользователя
 const fillAddressFromProfile = () => {
-  const profileUser = store.getters['profile/getUser'];
+  const profileUser = profileStore.getUser
   if (profileUser && profileUser.addresses && profileUser.addresses.length > 0) {
-    const lastAddress = profileUser.addresses[profileUser.addresses.length - 1];
-    store.dispatch('setAddress', {
+    const lastAddress = profileUser.addresses[profileUser.addresses.length - 1]
+    orderStore.setAddress({
       city: lastAddress.city || '',
       street: lastAddress.street || '',
       home: lastAddress.home || '',
       flat: lastAddress.flat || ''
-    });
+    })
   }
-};
+}
 
 const submitForm = async () => {
-  if (isLoading.value) return;
+  if (isLoading.value) return
   
-  isLoading.value = true;
+  isLoading.value = true
   try {
     // --- Создание заказа на сервере ---
-    const cartItems = store.getters['cart/getCart'];
-    const totalPrice = store.getters['cart/getTotalPrice'];
-    const user = store.getters['profile/getUser'] || {};
+    const cartItems = cartStore.getCart
+    const totalPrice = cartStore.getTotalPrice
+    const user = profileStore.getUser || {}
     const order = {
       date: new Date().toLocaleString('ru-RU'),
       deliveryMethod: deliveryMethod.value,
@@ -61,47 +61,47 @@ const submitForm = async () => {
       status: 'Ожидает оплаты',
       userId: user.id || null,
       userPhone: user.phone || null
-    };
+    }
 
     // Создаем заказ
-            const orderResponse = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.ORDERS), order);
-    const createdOrder = orderResponse.data.order;
+    const orderResponse = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.ORDERS), order)
+    const createdOrder = orderResponse.data.order
 
     // Добавление адреса в профиль пользователя, если выбран курьер
     if (deliveryMethod.value === 'courier' && user.id) {
-      await store.dispatch('profile/addAddress', address.value);
+      await profileStore.addAddressAsync(address.value)
     }
 
     // НЕ очищаем корзину до подтверждения оплаты
-    // store.dispatch('cart/clearCart');
+    // cartStore.clearCart()
 
     // --- Создание платежа через YooKassa ---
     const paymentData = {
       value: totalPrice.toString(),
       orderId: createdOrder.id,
       userId: user.id || null
-    };
+    }
 
-            const paymentResponse = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.PAYMENT), paymentData);
-    const payment = paymentResponse.data.payment;
+    const paymentResponse = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.PAYMENT), paymentData)
+    const payment = paymentResponse.data.payment
 
     // Обновляем заказ с paymentId
     if (payment.id) {
-              await axios.put(getApiUrl(`${API_CONFIG.ENDPOINTS.ORDERS}/${createdOrder.id}`), {
+      await axios.put(getApiUrl(`${API_CONFIG.ENDPOINTS.ORDERS}/${createdOrder.id}`), {
         paymentId: payment.id
-      });
+      })
     }
 
     // Очищаем корзину после создания заказа и перенаправления на оплату
-    store.dispatch('cart/clearCart');
+    cartStore.clearCart()
 
     // Перенаправляем на страницу оплаты YooKassa
     if (payment.confirmation && payment.confirmation.confirmation_url) {
-      console.log('Перенаправление на оплату:', payment.confirmation.confirmation_url);
-      window.location.href = payment.confirmation.confirmation_url;
+      console.log('Перенаправление на оплату:', payment.confirmation.confirmation_url)
+      window.location.href = payment.confirmation.confirmation_url
     } else {
-      console.error('Ошибка: confirmation_url не найден в ответе:', payment);
-      throw new Error('Не удалось получить ссылку для оплаты');
+      console.error('Ошибка: confirmation_url не найден в ответе:', payment)
+      throw new Error('Не удалось получить ссылку для оплаты')
     }
 
   } catch (error) {
@@ -113,12 +113,12 @@ const submitForm = async () => {
 };
 
 onMounted(() => {
-  const profileUser = store.getters['profile/getUser'];
-  const contactData = store.getters.getContact;
+  const profileUser = profileStore.getUser;
+  const contactData = orderStore.getContact;
   
   // Если пользователь авторизован, заполняем данные из профиля
   if (profileUser && profileUser.phone) {
-    store.dispatch('setContact', {
+    orderStore.setContact({
       phone: profileUser.phone || contactData.phone || '',
       email: profileUser.email || contactData.email || ''
     });

@@ -1,52 +1,55 @@
 <script setup>
 import buttonCart from './UI/buttonCart.vue';
-import { ref, defineProps, defineEmits, computed } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore, useProfileStore, useReviewStore } from '../store'
 
 const props = defineProps({
   productId: {
-    type: Number,
+    type: [String, Number],
     required: true
   }
-});
+})
 
-const emit = defineEmits(['reviewAdded']);
+const emit = defineEmits(['reviewAdded'])
 
-const store = useStore();
-const router = useRouter();
-const userId = computed(() => store.getters['auth/getUser']?.id);
-const userName = computed(() => store.getters['profile/getName']);
-const advantages = ref('');
-const disadvantages = ref('');
-const text = ref('');
-const rating = ref(0);
-const hoverRating = ref(0);
-const ratingError = ref(false);
-const profileError = ref(false);
+const authStore = useAuthStore()
+const profileStore = useProfileStore()
+const reviewStore = useReviewStore()
+const router = useRouter()
+
+const userId = computed(() => authStore.getUser?.id)
+const userName = computed(() => profileStore.getName)
+const advantages = ref('')
+const disadvantages = ref('')
+const text = ref('')
+const rating = ref(0)
+const hoverRating = ref(0)
+const ratingError = ref(false)
+const profileError = ref(false)
 
 const getCurrentDate = () => {
-  const now = new Date();
-  const day = String(now.getDate()).padStart(2, '0');
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  return `${day}.${month}`;
-};
+  const now = new Date()
+  const day = String(now.getDate()).padStart(2, '0')
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  return `${day}.${month}`
+}
 
 const handleSubmit = async () => {
   // Сброс ошибок
-  ratingError.value = false;
-  profileError.value = false;
+  ratingError.value = false
+  profileError.value = false
 
   // Проверка рейтинга
   if (rating.value === 0) {
-    ratingError.value = true;
-    return;
+    ratingError.value = true
+    return
   }
 
   // Проверка имени пользователя
   if (!userName.value || userName.value.trim() === '') {
-    profileError.value = true;
-    return;
+    profileError.value = true
+    return
   }
 
   const newReview = {
@@ -58,38 +61,38 @@ const handleSubmit = async () => {
     userId: userId.value,
     userName: userName.value,
     date: getCurrentDate()
-  };
+  }
 
   try {
-    await store.dispatch('addReview', newReview);
-    resetForm();
-    emit('reviewAdded');
+    await reviewStore.addReviewAsync(newReview)
+    resetForm()
+    emit('reviewAdded')
   } catch (error) {
-    console.error('Ошибка при добавлении отзыва:', error);
+    console.error('Ошибка при добавлении отзыва:', error)
   }
-};
+}
 
 const setRating = (value) => {
-  rating.value = value;
-  ratingError.value = false;
-};
+  rating.value = value
+  ratingError.value = false
+}
 
 const setHoverRating = (value) => {
-  hoverRating.value = value;
-};
+  hoverRating.value = value
+}
 
 const resetForm = () => {
-  advantages.value = '';
-  disadvantages.value = '';
-  text.value = '';
-  rating.value = 0;
-  ratingError.value = false;
-  profileError.value = false;
-};
+  advantages.value = ''
+  disadvantages.value = ''
+  text.value = ''
+  rating.value = 0
+  ratingError.value = false
+  profileError.value = false
+}
 
 const goToProfile = () => {
-  router.push({ name: 'Profile' });
-};
+  router.push({ name: 'Profile' })
+}
 </script>
 
 <template>

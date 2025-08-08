@@ -1,23 +1,24 @@
 <script setup>
-  import TheMain from '../components/TheMain.vue';
-  import { onMounted, computed } from 'vue';
-  import {useStore} from 'vuex';
-  import { useRoute } from 'vue-router';
+  import TheMain from '../components/TheMain.vue'
+  import { onMounted, computed } from 'vue'
+  import { useMainStore, useCartStore } from '../store'
+  import { useRoute } from 'vue-router'
 
-const store = useStore();
-const route = useRoute();
-const products = computed(() => store.getters.getProducts)
+const mainStore = useMainStore()
+const cartStore = useCartStore()
+const route = useRoute()
+const products = computed(() => mainStore.getProducts)
 
 onMounted(() => {
-  store.dispatch('fetchProducts');
-  store.dispatch('fetchItems');
+  mainStore.fetchProducts()
+  mainStore.fetchItems()
   
   // Проверяем, если пользователь вернулся с оплаты
   if (route.query.payment === 'success') {
     // Очищаем корзину при успешном возврате с оплаты
-    store.dispatch('cart/clearCart');
+    cartStore.clearCart()
   }
-});
+})
 
 const props = defineProps({
   products: Array

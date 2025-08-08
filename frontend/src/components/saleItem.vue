@@ -1,19 +1,18 @@
 <script setup>
-import ButtonCart from './UI/buttonCart.vue';
-import { useStore } from 'vuex';
 import { ref, computed } from 'vue';
 import { transliterate } from '../helpers/translit';
 import FavoriteIcon from './UI/FavoriteIcon.vue';
 import CartActionButton from './UI/CartActionButton.vue';
 import { getImageUrl } from '../utils/imageUtils.js';
+import { useFavoriteStore } from '../store';
 
 const props = defineProps({
   product: Object
 })
 
-const store = useStore();
 const showAddedMessage = ref(false);
 const showMaxQuantityMessage = ref(false);
+const favoriteStore = useFavoriteStore();
 
 // Получаем правильный URL изображения
 const correctImageUrl = getImageUrl(props.product?.image);
@@ -30,21 +29,21 @@ const discountPercentage = computed(() => {
   return Math.round(((oldPrice - currentPrice) / oldPrice) * 100);
 });
 
-const isFavorite = computed(() => store.getters['favorite/isFavorite'](props.product.id));
+const isFavorite = computed(() => favoriteStore.isFavorite(props.product.id))
 const handleToggleFavorite = async () => {
   if (isFavorite.value) {
-    await store.dispatch('favorite/removeFromFavorites', props.product.id);
+    await favoriteStore.removeFromFavoritesAsync(props.product.id)
   } else {
-    await store.dispatch('favorite/addToFavorites', props.product);
+    await favoriteStore.addToFavoritesAsync(props.product)
   }
-};
+}
 
 const handleShowAddedMessage = () => {
-  showAddedMessage.value = true;
+  showAddedMessage.value = true
   setTimeout(() => {
-    showAddedMessage.value = false;
-  }, 1500);
-};
+    showAddedMessage.value = false
+  }, 1500)
+}
 
 </script>
 

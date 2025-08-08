@@ -8,10 +8,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
-const store = useStore();
-const addresses = computed(() => store.getters['profile/getUser'].addresses || []);
+import { computed } from 'vue'
+import { useProfileStore } from '../store'
+
+const profileStore = useProfileStore()
+const addresses = computed(() => profileStore.getUser.addresses || [])
 </script>
 
 <style scoped>

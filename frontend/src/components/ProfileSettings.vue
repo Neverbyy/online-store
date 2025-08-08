@@ -1,53 +1,53 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
-import FormInput from '../components/UI/FormInput.vue';
-import buttonCart from '../components/UI/buttonCart.vue';
+import { ref, computed, onMounted } from 'vue'
+import { useProfileStore, useAuthStore } from '../store'
+import { useRouter } from 'vue-router'
+import FormInput from '../components/UI/FormInput.vue'
+import buttonCart from '../components/UI/buttonCart.vue'
 
-const store = useStore();
-const router = useRouter();
+const profileStore = useProfileStore()
+const authStore = useAuthStore()
+const router = useRouter()
 
-const name = ref('');
-const email = ref('');
-const contact = ref('');
-const errorMessage = ref('');
+const name = ref('')
+const email = ref('')
+const contact = ref('')
+const errorMessage = ref('')
 
-const storeUser = computed(() => store.getters['profile/getUser']);
-const storeName = computed(() => store.getters['profile/getName']);
-const storeEmail = computed(() => store.getters['profile/getEmail']);
-const storeContact = computed(() => store.getters['profile/getContact']);
+const storeUser = computed(() => profileStore.getUser)
+const storeName = computed(() => profileStore.getName)
+const storeEmail = computed(() => profileStore.getEmail)
+const storeContact = computed(() => profileStore.getContact)
 
 onMounted(() => {
-  store.dispatch('profile/fetchContact').then(() => {
-    name.value = storeUser.value.name || '';
-    email.value = storeUser.value.email || '';
-    contact.value = storeUser.value.phone || '';
-  });
-});
+  profileStore.fetchContact().then(() => {
+    name.value = storeUser.value.name || ''
+    email.value = storeUser.value.email || ''
+    contact.value = storeUser.value.phone || ''
+  })
+})
 
 const submitForm = async () => {
-  errorMessage.value = '';
+  errorMessage.value = ''
   try {
-    await store.dispatch('profile/updateContact', {
+    await profileStore.updateContact({
       phone: contact.value,
       name: name.value,
       email: email.value
-    });
-    alert('Изменения сохранены!');
+    })
+    alert('Изменения сохранены!')
   } catch (e) {
-    errorMessage.value = e.message;
-    alert(errorMessage.value);
-    errorMessage.value = '';
-    contact.value = storeUser.value.phone || '';
+    errorMessage.value = e.message
+    alert(errorMessage.value)
+    errorMessage.value = ''
+    contact.value = storeUser.value.phone || ''
   }
-};
+}
 
 const logout = async () => {
-  await store.dispatch('auth/logout');
-  router.push('/'); // Перенаправление на главную страницу после выхода
-};
-
+  await authStore.logoutUser()
+  router.push('/') // Перенаправление на главную страницу после выхода
+}
 </script>
 
 <template>

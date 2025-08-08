@@ -1,79 +1,112 @@
-import axios from 'axios';
-import router from '../router/router';
-import { getApiUrl, API_CONFIG } from '../config/api';
+import { defineStore } from 'pinia'
+import axios from 'axios'
+import router from '../router/router'
+import { getApiUrl, API_CONFIG } from '../config/api'
 
-export default {
-  namespaced: true,
-  state: {
-    user: JSON.parse(localStorage.getItem('user')) || null, // Восстанавливаем пользователя из localStorage
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    user: JSON.parse(localStorage.getItem('user')) || null,
     isLoggedIn: (() => {
-      const user = JSON.parse(localStorage.getItem('user'));
-      return !!(user && user.id);
-    })(), // Проверяем авторизован ли пользователь по наличию id
+      const user = JSON.parse(localStorage.getItem('user'))
+      return !!(user && user.id)
+    })()
+  }),
+
+  getters: {
+    isAuthenticated: (state) => state.isLoggedIn,
+    getUser: (state) => state.user
   },
-  mutations: {
-    SET_USER(state, user) {
-      state.user = user;
-      localStorage.setItem('user', JSON.stringify(user));
-    },
-    LOGIN(state) {
-      state.isLoggedIn = true;
-    },
-    LOGOUT(state) {
-      state.user = {};
-      state.isLoggedIn = false;
-      localStorage.setItem('user', JSON.stringify({}));
-    },
-  },
+
   actions: {
-    async register({ commit, dispatch }, payload) {
+    setUser(user) {
+      this.user = user
+      this.isLoggedIn = !!(user && user.id)
+      localStorage.setItem('user', JSON.stringify(user))
+    },
+
+    login() {
+      this.isLoggedIn = true
+    },
+
+    logout() {
+      this.user = {}
+      this.isLoggedIn = false
+      localStorage.setItem('user', JSON.stringify({}))
+    },
+
+    async register(payload) {
       try {
-        const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.REGISTER), payload);
-        commit('SET_USER', response.data.user);
-        await dispatch('favorite/fetchFavorites', null, { root: true });
-        await dispatch('cart/fetchCart', null, { root: true });
-        alert('Регистрация успешна!');
-        return true;
+        const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.REGISTER), payload)
+        this.setUser(response.data.user)
+        
+        // Импортируем stores для обновления данных
+        const { useFavoriteStore } = await import('./favoriteStore')
+        const { useCartStore } = await import('./cartStore')
+        
+        const favoriteStore = useFavoriteStore()
+        const cartStore = useCartStore()
+        
+        await favoriteStore.fetchFavorites()
+        await cartStore.fetchCart()
+        
+        alert('Регистрация успешна!')
+        return true
       } catch (error) {
-        console.error(error);
-        alert(error.response.data.message);
-        return false;
+        console.error(error)
+        alert(error.response?.data?.message || 'Ошибка регистрации')
+        return false
       }
     },
-    async login({ commit, dispatch }, payload) {
+
+    async loginUser(payload) {
       try {
-        const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.LOGIN), payload);
-        commit('SET_USER', response.data.user);
-        commit('LOGIN');
-        await dispatch('favorite/fetchFavorites', null, { root: true });
-        await dispatch('cart/fetchCart', null, { root: true });
-        alert('Вход выполнен успешно!');
-        return true;
+        const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.LOGIN), payload)
+        this.setUser(response.data.user)
+        this.login()
+        
+        // Импортируем stores для обновления данных
+        const { useFavoriteStore } = await import('./favoriteStore')
+        const { useCartStore } = await import('./cartStore')
+        
+        const favoriteStore = useFavoriteStore()
+        const cartStore = useCartStore()
+        
+        await favoriteStore.fetchFavorites()
+        await cartStore.fetchCart()
+        
+        alert('Вход выполнен успешно!')
+        return true
       } catch (error) {
-        console.error(error);
-        alert(error.response.data.message);
-        return false;
+        console.error(error)
+        alert(error.response?.data?.message || 'Ошибка входа')
+        return false
       }
     },
-    logout({ commit, dispatch }) {
-      commit('LOGOUT');
-      dispatch('favorite/clearFavorites', null, { root: true });
-      dispatch('cart/clearCart', null, { root: true });
+
+    async logoutUser() {
+      this.logout()
+      
+      // Импортируем stores для очистки данных
+      const { useFavoriteStore } = await import('./favoriteStore')
+      const { useCartStore } = await import('./cartStore')
+      
+      const favoriteStore = useFavoriteStore()
+      const cartStore = useCartStore()
+      
+      favoriteStore.clearFavorites()
+      cartStore.clearCart()
     },
-    async checkUserExists({ commit, state }) {
-      if (!state.user || !state.user.id) return;
+
+    async checkUserExists() {
+      if (!this.user || !this.user.id) return
       try {
-        await axios.get(getApiUrl(`${API_CONFIG.ENDPOINTS.PROFILE}/${state.user.id}`));
+        await axios.get(getApiUrl(`${API_CONFIG.ENDPOINTS.PROFILE}/${this.user.id}`))
       } catch (error) {
         if (error.response && error.response.status === 404) {
-          commit('LOGOUT');
-          router.push('/');
+          this.logout()
+          router.push('/')
         }
       }
-    },
-  },
-  getters: {
-    isAuthenticated: state => state.isLoggedIn,
-    getUser: state => state.user,
-  },
-};
+    }
+  }
+})

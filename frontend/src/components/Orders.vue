@@ -52,102 +52,102 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useStore } from 'vuex';
-import axios from 'axios';
-import { getApiUrl, API_CONFIG } from '../config/api';
-import OrderDetailsModal from './OrderDetailsModal.vue';
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useProfileStore, useCartStore } from '../store'
+import axios from 'axios'
+import { getApiUrl, API_CONFIG } from '../config/api'
+import OrderDetailsModal from './OrderDetailsModal.vue'
 
-const store = useStore();
-const orders = ref([]);
-const isLoading = ref(false);
+const profileStore = useProfileStore()
+const cartStore = useCartStore()
 
-const formatPrice = price => Number(price).toLocaleString('ru-RU');
+const orders = ref([])
+const isLoading = ref(false)
 
-const selectedOrder = ref(null);
-const isModalOpen = ref(false);
+const formatPrice = price => Number(price).toLocaleString('ru-RU')
+
+const selectedOrder = ref(null)
+const isModalOpen = ref(false)
 
 const openOrderModal = order => {
-  selectedOrder.value = order;
-  isModalOpen.value = true;
-};
+  selectedOrder.value = order
+  isModalOpen.value = true
+}
+
 const closeOrderModal = () => {
-  isModalOpen.value = false;
-  selectedOrder.value = null;
-};
+  isModalOpen.value = false
+  selectedOrder.value = null
+}
 
 const checkOrderStatus = async (order) => {
   if (order.status === 'Ожидает оплаты' && order.paymentId) {
     try {
-              const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.ORDERS_CHECK_STATUS), {
+      const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.ORDERS_CHECK_STATUS), {
         orderId: order.id
-      });
-      const updatedOrder = response.data.order;
+      })
+      const updatedOrder = response.data.order
       
-      // Если заказ стал оплаченным, очищаем корзину в Vuex store
+      // Если заказ стал оплаченным, очищаем корзину в Pinia store
       if (updatedOrder.status === 'Оплачен') {
-        store.dispatch('cart/clearCart');
+        cartStore.clearCart()
       }
       
-      return updatedOrder;
+      return updatedOrder
     } catch (error) {
-      console.error('Ошибка при проверке статуса заказа:', error);
-      return order;
+      console.error('Ошибка при проверке статуса заказа:', error)
+      return order
     }
   }
-  return order;
-};
+  return order
+}
 
 const loadOrders = async () => {
-  if (isLoading.value) return;
+  if (isLoading.value) return
   
-  isLoading.value = true;
-  const user = store.getters['profile/getUser'] || {};
-        let url = getApiUrl(API_CONFIG.ENDPOINTS.ORDERS);
+  isLoading.value = true
+  const user = profileStore.getUser || {}
+  let url = getApiUrl(API_CONFIG.ENDPOINTS.ORDERS)
   if (user.id) {
-    url += `?userId=${user.id}`;
+    url += `?userId=${user.id}`
   } else if (user.phone) {
-    url += `?userPhone=${encodeURIComponent(user.phone)}`;
+    url += `?userPhone=${encodeURIComponent(user.phone)}`
   } else {
-    orders.value = [];
-    isLoading.value = false;
-    return;
+    orders.value = []
+    isLoading.value = false
+    return
   }
   try {
-    const res = await axios.get(url);
-    const allOrders = res.data.orders || [];
+    const res = await axios.get(url)
+    const allOrders = res.data.orders || []
     
     // Проверяем статус заказов, которые ожидают оплаты
     const checkedOrders = await Promise.all(
       allOrders.map(async (order) => {
         if (order.status === 'Ожидает оплаты' && order.paymentId) {
           try {
-            return await checkOrderStatus(order);
+            return await checkOrderStatus(order)
           } catch (error) {
-            console.error(`Ошибка при проверке статуса заказа ${order.id}:`, error);
-            return order;
+            console.error(`Ошибка при проверке статуса заказа ${order.id}:`, error)
+            return order
           }
         }
-        return order;
+        return order
       })
-    );
+    )
     
     // Фильтруем только оплаченные заказы
-    orders.value = checkedOrders.filter(order => order.status === 'Оплачен');
+    orders.value = checkedOrders.filter(order => order.status === 'Оплачен')
   } catch (e) {
-    console.error('Ошибка при загрузке заказов:', e);
-    orders.value = [];
+    console.error('Ошибка при загрузке заказов:', e)
+    orders.value = []
   } finally {
-    isLoading.value = false;
+    isLoading.value = false
   }
-};
-
+}
 
 onMounted(() => {
-  loadOrders();
-  
-});
-
+  loadOrders()
+})
 </script>
 
 <style lang="scss" scoped>

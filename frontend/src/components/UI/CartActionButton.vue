@@ -1,28 +1,28 @@
 <script setup>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
+import { computed } from 'vue'
+import { useCartStore } from '../../store'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   product: { type: Object, required: true },
   onAdded: Function
-});
+})
 
-const store = useStore();
-const router = useRouter();
+const cartStore = useCartStore()
+const router = useRouter()
 
 const isInCart = computed(() => {
-  return store.getters['cart/getCart'].some(item => item.id === props.product.id);
-});
+  return cartStore.getCart.some(item => item.id === props.product.id)
+})
 
 const handleClick = () => {
   if (isInCart.value) {
-    router.push('/cart');
-    return;
+    router.push('/cart')
+    return
   }
-  store.dispatch('cart/addToCart', props.product);
-  if (props.onAdded) props.onAdded();
-};
+  cartStore.addToCartAsync(props.product)
+  if (props.onAdded) props.onAdded()
+}
 </script>
 
 <template>

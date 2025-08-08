@@ -1,30 +1,27 @@
 <script setup>
-import { defineProps, ref, computed } from 'vue';
-import { useStore } from 'vuex';
-import reviewDetailsModal from './reviewDetailsModal.vue';
+import { defineProps, ref, computed } from 'vue'
+import reviewDetailsModal from './reviewDetailsModal.vue'
 
 const props = defineProps({
   review: Object
-});
+})
 
-const store = useStore();
 // Получаем имя пользователя по userId
-const userName = computed(() => props.review.userName || 'Пользователь');
+const userName = computed(() => props.review.userName || 'Пользователь')
 
-const isModalActive = ref(false);
+const isModalActive = ref(false)
 
 // Моковые данные для аватара, имени и даты (заменить на реальные при интеграции)
-const avatarUrl = computed(() => props.review.avatar || 'https://i.imgur.com/0y0y0y0.png'); // заглушка
-const reviewDate = computed(() => props.review.date || '—');
+const avatarUrl = computed(() => props.review.avatar || 'https://i.imgur.com/0y0y0y0.png') // заглушка
+const reviewDate = computed(() => props.review.date || '—')
 
 const openModal = () => {
-  isModalActive.value = true;
-};
+  isModalActive.value = true
+}
 
 const closeModal = () => {
-  isModalActive.value = false;
-};
-
+  isModalActive.value = false
+}
 </script>
 
 <template>

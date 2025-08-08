@@ -21,31 +21,33 @@
 
 <script setup>
 import { computed, onMounted } from 'vue';
-import { useStore } from 'vuex';
 import reviewItem from './reviewItem.vue';
 import { transliterate } from '../helpers/translit.js';
+import { useProfileStore, useReviewStore, useMainStore } from '../store';
 
-const store = useStore();
+const profileStore = useProfileStore();
+const reviewStore = useReviewStore();
+const mainStore = useMainStore();
 
-const userId = computed(() => store.getters['profile/getUser']?.id);
+const userId = computed(() => profileStore.getUser?.id);
 
 const userReviews = computed(() => {
-  return store.state.review.reviews.filter(r => r.userId === userId.value);
+  return reviewStore.reviews.filter(r => r.userId === userId.value);
 });
 
 const getProductName = (productId) => {
-  const product = store.getters.getItemById?.(productId);
+  const product = mainStore.getItemById?.(productId);
   return product ? product.name : 'Товар не найден';
 };
 
 const getProductLink = (productId) => {
-  const product = store.getters.getItemById?.(productId);
+  const product = mainStore.getItemById?.(productId);
   if (!product) return '#';
   return `/catalog/${product.category}/${transliterate(product.name)}/${product.id}`;
 };
 
 onMounted(() => {
-  store.dispatch('fetchReviews');
+  reviewStore.fetchReviews();
 });
 </script>
 
