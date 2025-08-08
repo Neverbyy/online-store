@@ -3,6 +3,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useOrderStore, useCartStore, useProfileStore } from '../store'
 import { getApiUrl, API_CONFIG } from '../config/api'
+import FormInput from '../components/UI/FormInput.vue'
+import buttonCart from '../components/UI/buttonCart.vue'
 import axios from 'axios'
 
 const orderStore = useOrderStore()
