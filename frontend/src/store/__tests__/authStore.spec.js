@@ -2,7 +2,7 @@ import { setActivePinia, createPinia } from 'pinia'
 import { useAuthStore } from '../authStore'
 import { describe, it, expect, beforeEach } from 'vitest'
 
-// Мокаем localStorage для среды Node
+// Мокаем localStorage для Node
 if (typeof global.localStorage === 'undefined') {
   global.localStorage = {
     store: {},
