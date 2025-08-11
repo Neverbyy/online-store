@@ -33,7 +33,14 @@ export const useReviewStore = defineStore('review', {
 
     async addReviewAsync(newReview) {
       try {
-        const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.REVIEWS), newReview)
+        const { useAuthStore } = await import('./authStore')
+        const authStore = useAuthStore()
+        const token = authStore.getToken
+        let config = {}
+        if (token) {
+          config.headers = { Authorization: `Bearer ${token}` }
+        }
+        const response = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.REVIEWS), newReview, config)
         this.addReview(response.data)
       } catch (error) {
         console.error('Ошибка при добавлении отзыва:', error)

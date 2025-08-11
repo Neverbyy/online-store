@@ -67,11 +67,15 @@ export const useCartStore = defineStore('cart', {
       const { useAuthStore } = await import('./authStore')
       const authStore = useAuthStore()
       const user = authStore.getUser
+      const token = authStore.getToken
 
-      if (user && user.id) {
+      if (user && user.id && token) {
         // Серверная корзина
         try {
-          const { data } = await axios.get(getApiUrl(API_CONFIG.ENDPOINTS.CART), { params: { userId: user.id } })
+          const { data } = await axios.get(getApiUrl(API_CONFIG.ENDPOINTS.CART), {
+            params: { userId: user.id },
+            headers: { Authorization: `Bearer ${token}` }
+          })
           this.setCart(data.cart)
         } catch {
           this.setCart([])
@@ -87,13 +91,16 @@ export const useCartStore = defineStore('cart', {
       const { useAuthStore } = await import('./authStore')
       const authStore = useAuthStore()
       const user = authStore.getUser
+      const token = authStore.getToken
 
-      if (user && user.id) {
+      if (user && user.id && token) {
         // Сервер
         const existing = this.cart.find(i => i.id === product.id)
         const quantity = existing ? Math.min(existing.quantity + 1, 20) : 1
         try {
-          const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART), { userId: user.id, product, quantity })
+          const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART), { userId: user.id, product, quantity }, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
           this.setCart(data.cart)
         } catch {}
       } else {
@@ -106,10 +113,14 @@ export const useCartStore = defineStore('cart', {
       const { useAuthStore } = await import('./authStore')
       const authStore = useAuthStore()
       const user = authStore.getUser
+      const token = authStore.getToken
 
-      if (user && user.id) {
+      if (user && user.id && token) {
         try {
-          const { data } = await axios.delete(getApiUrl(API_CONFIG.ENDPOINTS.CART), { data: { userId: user.id, productId: id } })
+          const { data } = await axios.delete(getApiUrl(API_CONFIG.ENDPOINTS.CART), {
+            data: { userId: user.id, productId: id },
+            headers: { Authorization: `Bearer ${token}` }
+          })
           this.setCart(data.cart)
         } catch {}
       } else {
@@ -121,12 +132,15 @@ export const useCartStore = defineStore('cart', {
       const { useAuthStore } = await import('./authStore')
       const authStore = useAuthStore()
       const user = authStore.getUser
+      const token = authStore.getToken
 
-      if (user && user.id) {
+      if (user && user.id && token) {
         const item = this.cart.find(i => i.id === id)
         if (item && item.quantity < 20) {
           try {
-            const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART), { userId: user.id, product: item, quantity: item.quantity + 1 })
+            const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART), { userId: user.id, product: item, quantity: item.quantity + 1 }, {
+              headers: { Authorization: `Bearer ${token}` }
+            })
             this.setCart(data.cart)
           } catch {}
         }
@@ -139,12 +153,15 @@ export const useCartStore = defineStore('cart', {
       const { useAuthStore } = await import('./authStore')
       const authStore = useAuthStore()
       const user = authStore.getUser
+      const token = authStore.getToken
 
-      if (user && user.id) {
+      if (user && user.id && token) {
         const item = this.cart.find(i => i.id === id)
         if (item && item.quantity > 1) {
           try {
-            const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART), { userId: user.id, product: item, quantity: item.quantity - 1 })
+            const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART), { userId: user.id, product: item, quantity: item.quantity - 1 }, {
+              headers: { Authorization: `Bearer ${token}` }
+            })
             this.setCart(data.cart)
           } catch {}
         }
@@ -157,10 +174,13 @@ export const useCartStore = defineStore('cart', {
       const { useAuthStore } = await import('./authStore')
       const authStore = useAuthStore()
       const user = authStore.getUser
+      const token = authStore.getToken
 
-      if (user && user.id) {
+      if (user && user.id && token) {
         try {
-          const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART_CLEAR), { userId: user.id })
+          const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.CART_CLEAR), { userId: user.id }, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
           this.setCart(data.cart)
         } catch {
           this.setCart([])

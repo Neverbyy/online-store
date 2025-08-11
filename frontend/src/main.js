@@ -19,6 +19,11 @@ import { useCartStore } from './store'
 const authStore = useAuthStore()
 const cartStore = useCartStore()
 
+// Проверка валидности токена при старте
+if (!authStore.isTokenValid) {
+    authStore.logout()
+}
+
 if (authStore.isAuthenticated) {
     authStore.checkUserExists()
 }

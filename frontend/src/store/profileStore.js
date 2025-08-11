@@ -37,8 +37,13 @@ export const useProfileStore = defineStore('profile', {
     async fetchContact() {
       try {
         const user = JSON.parse(localStorage.getItem('user')) || { name: '', email: '', phone: '', addresses: [] }
-        if (user && user.id) {
-          const response = await axios.get(getApiUrl(`${API_CONFIG.ENDPOINTS.PROFILE}/${user.id}`))
+        const { useAuthStore } = await import('./authStore')
+        const authStore = useAuthStore()
+        const token = authStore.getToken
+        if (user && user.id && token) {
+          const response = await axios.get(getApiUrl(`${API_CONFIG.ENDPOINTS.PROFILE}/${user.id}`), {
+            headers: { Authorization: `Bearer ${token}` }
+          })
           this.setUser(response.data.user)
         } else {
           this.setUser(user)
@@ -51,8 +56,13 @@ export const useProfileStore = defineStore('profile', {
     async updateContact({ phone, name, email, addresses }) {
       try {
         const user = JSON.parse(localStorage.getItem('user')) || { name: '', email: '', phone: '', addresses: [] }
-        if (user && user.id) {
-          const response = await axios.put(getApiUrl(API_CONFIG.ENDPOINTS.PROFILE), { id: user.id, phone, name, email, addresses: addresses || user.addresses })
+        const { useAuthStore } = await import('./authStore')
+        const authStore = useAuthStore()
+        const token = authStore.getToken
+        if (user && user.id && token) {
+          const response = await axios.put(getApiUrl(API_CONFIG.ENDPOINTS.PROFILE), { id: user.id, phone, name, email, addresses: addresses || user.addresses }, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
           this.setUser(response.data.user)
         } else {
           // Если пользователь не авторизован, просто обновляем localStorage
@@ -71,8 +81,12 @@ export const useProfileStore = defineStore('profile', {
       if (this.user && this.user.id) {
         const addresses = [...(this.user.addresses || [])]
         if (!addresses.some(a => JSON.stringify(a) === JSON.stringify(address))) {
-          addresses.push(address)
-          await axios.put(getApiUrl(API_CONFIG.ENDPOINTS.PROFILE), { ...this.user, addresses })
+          const { useAuthStore } = await import('./authStore')
+          const authStore = useAuthStore()
+          const token = authStore.getToken
+          await axios.put(getApiUrl(API_CONFIG.ENDPOINTS.PROFILE), { ...this.user, addresses }, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
           this.addAddress(address)
         }
       }

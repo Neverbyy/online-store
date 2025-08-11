@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import { YooCheckout } from '@a2seven/yoo-checkout';
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 
 
 // Инициализация переменных окружения
@@ -182,11 +183,62 @@ app.post('/api/login', async (req, res) => {
     return res.status(401).json({ message: 'Неверный пароль' });
   }
 
-  res.status(200).json({ message: 'Вход выполнен успешно', user });
+  // Генерация access и refresh токенов
+  const token = jwt.sign(
+    { id: user.id, phone: user.phone },
+    process.env.JWT_SECRET || 'your_jwt_secret',
+    { expiresIn: '7d' }
+  );
+  const refreshToken = jwt.sign(
+    { id: user.id, phone: user.phone },
+    process.env.JWT_SECRET || 'your_jwt_secret',
+    { expiresIn: '30d' }
+  );
+
+  // Не возвращаем пароль
+  const { password: _, ...userData } = user;
+
+  res.status(200).json({ message: 'Вход выполнен успешно', user: userData, token, refreshToken });
 });
 
+// Endpoint для обновления access token
+app.post('/api/refresh', (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) {
+    return res.status(401).json({ message: 'Refresh token отсутствует' });
+  }
+  jwt.verify(refreshToken, process.env.JWT_SECRET || 'your_jwt_secret', (err, user) => {
+    if (err) {
+      return res.status(401).json({ message: 'Невалидный refresh token' });
+    }
+    // Генерируем новый access token
+    const token = jwt.sign(
+      { id: user.id, phone: user.phone },
+      process.env.JWT_SECRET || 'your_jwt_secret',
+      { expiresIn: '7d' }
+    );
+    res.status(200).json({ token });
+  });
+});
+
+// JWT middleware
+function verifyToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'Требуется авторизация (нет токена)' });
+  }
+  jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret', (err, user) => {
+    if (err) {
+      return res.status(401).json({ message: 'Невалидный токен' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
 // Получение профиля пользователя по id
-app.get('/api/profile/:id', (req, res) => {
+app.get('/api/profile/:id', verifyToken, (req, res) => {
   const id = parseInt(req.params.id, 10);
   const user = users.find(user => user.id === id);
   if (!user) {
@@ -223,7 +275,7 @@ app.put('/api/profile', async (req, res) => {
 
 // ===================== ЗАКАЗЫ =====================
 // Создать заказ
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', verifyToken, (req, res) => {
   const order = req.body;
   if (!order.userId && !order.userPhone) {
     return res.status(400).json({ message: 'userId или userPhone обязателен' });
@@ -235,7 +287,7 @@ app.post('/api/orders', (req, res) => {
 });
 
 // Получить заказы пользователя
-app.get('/api/orders', (req, res) => {
+app.get('/api/orders', verifyToken, (req, res) => {
   const { userId, userPhone } = req.query;
   let userOrders = [];
   if (userId) {

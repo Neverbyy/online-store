@@ -41,8 +41,9 @@ export const useFavoriteStore = defineStore('favorite', {
       const { useAuthStore } = await import('./authStore')
       const authStore = useAuthStore()
       const user = authStore.getUser
+      const token = authStore.getToken
 
-      if (!user || !user.id) {
+      if (!user || !user.id || !token) {
         // Неавторизованный — localStorage
         const favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]')
         this.setFavorites(favorites)
@@ -50,7 +51,10 @@ export const useFavoriteStore = defineStore('favorite', {
       }
       // Авторизованный — сервер
       try {
-        const { data } = await axios.get(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { params: { userId: user.id } })
+        const { data } = await axios.get(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), {
+          params: { userId: user.id },
+          headers: { Authorization: `Bearer ${token}` }
+        })
         this.setFavorites(data.favorites)
       } catch (e) {
         this.setFavorites([])
@@ -61,15 +65,18 @@ export const useFavoriteStore = defineStore('favorite', {
       const { useAuthStore } = await import('./authStore')
       const authStore = useAuthStore()
       const user = authStore.getUser
+      const token = authStore.getToken
 
-      if (!user || !user.id) {
+      if (!user || !user.id || !token) {
         // Неавторизованный — localStorage
         this.addToFavorites(product)
         return
       }
       // Авторизованный — сервер
       try {
-        const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { userId: user.id, product })
+        const { data } = await axios.post(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { userId: user.id, product }, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
         this.setFavorites(data.favorites)
       } catch (e) {}
     },
@@ -78,15 +85,19 @@ export const useFavoriteStore = defineStore('favorite', {
       const { useAuthStore } = await import('./authStore')
       const authStore = useAuthStore()
       const user = authStore.getUser
+      const token = authStore.getToken
 
-      if (!user || !user.id) {
+      if (!user || !user.id || !token) {
         // Неавторизованный — localStorage
         this.removeFromFavorites(productId)
         return
       }
       // Авторизованный — сервер
       try {
-        const { data } = await axios.delete(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), { data: { userId: user.id, productId } })
+        const { data } = await axios.delete(getApiUrl(API_CONFIG.ENDPOINTS.FAVORITES), {
+          data: { userId: user.id, productId },
+          headers: { Authorization: `Bearer ${token}` }
+        })
         this.setFavorites(data.favorites)
       } catch (e) {}
     }
