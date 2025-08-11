@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-// import router from '../router/router' // Удаляем глобальный импорт
 import { getApiUrl, API_CONFIG } from '../config/api'
 import { jwtDecode } from 'jwt-decode';
 
