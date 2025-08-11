@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import router from '../router/router'
+// import router from '../router/router' // Удаляем глобальный импорт
 import { getApiUrl, API_CONFIG } from '../config/api'
 import { jwtDecode } from 'jwt-decode';
 
@@ -143,6 +143,9 @@ export const useAuthStore = defineStore('auth', {
         const refreshed = await this.refreshAccessToken()
         if (!refreshed) {
           this.logout()
+          // Импортируем router только здесь!
+          const { default: router } = await import('../router/router')
+          router.push('/')
           return
         }
       }
@@ -153,6 +156,7 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         if (error.response && error.response.status === 404) {
           this.logout()
+          const { default: router } = await import('../router/router')
           router.push('/')
         }
       }
