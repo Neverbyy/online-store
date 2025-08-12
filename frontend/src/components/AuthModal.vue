@@ -35,9 +35,26 @@ const handleSubmit = async () => {
   // Предотвращаем множественные клики
   if (loading.value) return
   
-  if (isRegister.value && password.value !== confirmPassword.value) {
-    ElMessage.error('Пароли не совпадают!')
+  // Валидация номера телефона
+  const phoneDigits = phone.value.replace(/\D/g, '')
+  if (phoneDigits.length !== 11) {
+    ElMessage.error('Номер телефона должен состоять из 11 цифр')
     return
+  }
+  
+  // Валидация пароля для регистрации
+  if (isRegister.value) {
+    
+    if (password.value !== confirmPassword.value) {
+      ElMessage.error('Пароли не совпадают!')
+      return
+    }
+  } else {
+    // Валидация для входа в систему
+    if (!password.value.trim()) {
+      ElMessage.error('Введите пароль')
+      return
+    }
   }
 
   loading.value = true

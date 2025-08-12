@@ -50,7 +50,7 @@ const isInvalid = computed(() => {
       if (!value) {
         return 'Укажите номер телефона';
       } else if (value.replace(/\D/g, '').length !== 11) {
-        return 'Номер телефона должен состоять из 10 цифр';
+        return 'Номер телефона должен состоять из 11 цифр';
       }
     } else if (props.type === 'email') {
       if (!value && props.required) {
@@ -72,7 +72,7 @@ const isValid = computed(() => {
     return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value);
   }
   if (props.type === 'tel') {
-    // Проверка на 10 цифр
+    // Проверка на 11 цифр (включая код страны)
     return value.replace(/\D/g, '').length === 11;
   }
   return !!value; // Для всех остальных полей
