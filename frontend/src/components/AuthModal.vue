@@ -146,7 +146,6 @@ const switchLinkText = computed(() =>
 <template>
   <div v-if="visible" class="modal-overlay" @click.self="closeModal">
     <div class="modal-content">
-      <button class="close-button" @click="closeModal">&times;</button>
       <h2>{{ modalTitle }}</h2>
 
       <div v-if="props.message" class="auth-warning">
@@ -256,12 +255,6 @@ const switchLinkText = computed(() =>
 
   /* Мобильные стили */
   @media (max-width: 768px) {
-    .modal-content {
-      margin: 20px;
-      max-width: calc(100% - 40px);
-      max-height: calc(100vh - 40px);
-      overflow-y: auto;
-    }
     
     .modal-overlay {
       padding: 10px;
