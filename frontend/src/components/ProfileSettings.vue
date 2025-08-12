@@ -168,9 +168,6 @@ const logout = async () => {
           Отменить
         </buttonCart>
       </div>
-      <div v-if="validationError" class="validation-error">
-        {{ validationError }}
-      </div>
     </div>
   </form>
   <buttonCart @click="logout" class="logout-button">Выйти</buttonCart>
@@ -205,13 +202,6 @@ const logout = async () => {
     background-color: #a6a9ad !important;
     border-color: #a6a9ad !important;
   }
-}
-
-.validation-error {
-  color: #f56c6c;
-  font-size: 14px;
-  margin-top: 8px;
-  text-align: center;
 }
 
 // Стили для неактивной кнопки
