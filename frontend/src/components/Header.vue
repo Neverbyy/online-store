@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useCartStore, useFavoriteStore, useAuthStore, useMainStore } from '../store'
+import { ElMessage } from 'element-plus'
 import search from './search.vue'
 import AuthModal from './AuthModal.vue'
 import { transliterate } from '../helpers/translit'
@@ -35,21 +36,14 @@ const handleAuthSubmit = async (payload) => {
   try {
     if (modalType.value === 'register') {
       await authStore.register(payload)
-      closeModal()
-      alert('Регистрация успешна! Пожалуйста, войдите.')
-      openModal('login') // Открытие модального окна логина после успешной регистрации
+      // Уведомление о регистрации показывается в AuthModal.vue
     } else {
       await authStore.loginUser(payload)
-      closeModal()
+      // Уведомление о входе показывается в handleModalClose
     }
   } catch (error) {
-    if (error.message === 'User already exists') {
-      alert('Данный пользователь уже существует')
-    } else if (error.message === 'Invalid credentials') {
-      alert('Неверный телефон или пароль. Попробуйте снова.')
-    } else {
-      alert('Произошла ошибка. Пожалуйста, попробуйте снова.')
-    }
+    // Ошибки обрабатываются в AuthModal.vue
+    console.error('Ошибка в handleAuthSubmit:', error)
   }
 }
 
@@ -87,6 +81,13 @@ const onSearchBlur = () => {
 
 const switchModalType = (type) => {
   modalType.value = type
+}
+
+const handleModalClose = () => {
+  closeModal()
+  if (authStore.isAuthenticated) {
+    ElMessage.success('Вход выполнен успешно!')
+  }
 }
 
 onMounted(() => {
@@ -232,7 +233,7 @@ const showLoginModal = () => {
     :visible="isModalVisible" 
     :type="modalType" 
     :message="authMessage" 
-    @close="closeModal"
+    @close="handleModalClose"
     @submit="handleAuthSubmit" 
     @switch="switchModalType" 
   />

@@ -82,12 +82,12 @@ export const useAuthStore = defineStore('auth', {
         const cartStore = useCartStore()
         await favoriteStore.fetchFavorites()
         await cartStore.fetchCart()
-        alert('Регистрация успешна!')
+        // Уведомление будет показано в компоненте Header
         return true
       } catch (error) {
         console.error(error)
-        alert(error.response?.data?.message || 'Ошибка регистрации')
-        return false
+        // Уведомление об ошибке будет показано в компоненте Header
+        throw error
       }
     },
     async loginUser(payload) {
@@ -104,12 +104,12 @@ export const useAuthStore = defineStore('auth', {
         const cartStore = useCartStore()
         await favoriteStore.fetchFavorites()
         await cartStore.fetchCart()
-        alert('Вход выполнен успешно!')
+        // Уведомление будет показано в компоненте Header
         return true
       } catch (error) {
         console.error(error)
-        alert(error.response?.data?.message || 'Ошибка входа')
-        return false
+        // Уведомление об ошибке будет показано в компоненте Header
+        throw error
       }
     },
     async refreshAccessToken() {

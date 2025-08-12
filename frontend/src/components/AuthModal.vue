@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useAuthStore } from '../store'
+import { ElMessage } from 'element-plus'
 import FormInput from './UI/FormInput.vue'
 import buttonCart from '/src/components/UI/buttonCart.vue'
 
@@ -35,7 +36,7 @@ const handleSubmit = async () => {
   if (loading.value) return
   
   if (isRegister.value && password.value !== confirmPassword.value) {
-    alert('Пароли не совпадают!')
+    ElMessage.error('Пароли не совпадают!')
     return
   }
 
@@ -50,6 +51,7 @@ const handleSubmit = async () => {
     if (isRegister.value) {
       const success = await authStore.register(payload)
       if (success) {
+        ElMessage.success('Регистрация успешна! Теперь войдите в систему.')
         emit('switch', 'login')
       }
     } else {
@@ -60,6 +62,48 @@ const handleSubmit = async () => {
     }
   } catch (error) {
     console.error('Ошибка при авторизации:', error)
+    
+    // Обработка различных типов ошибок
+    if (error.response) {
+      const { status, data } = error.response
+      
+      if (status === 409) {
+        // Конфликт - пользователь уже существует
+        ElMessage.error('Пользователь с таким номером уже существует')
+      } else if (status === 401) {
+        // Неавторизован - неверные данные
+        ElMessage.error('Неверный номер телефона или пароль')
+      } else if (status === 404) {
+        // Пользователь не найден
+        ElMessage.error('Пользователь не найден')
+      } else if (status === 400) {
+        // Неверный запрос
+        if (data && data.message) {
+          ElMessage.error(data.message)
+        } else {
+          ElMessage.error('Неверные данные. Проверьте правильность ввода')
+        }
+      } else if (status === 422) {
+        // Ошибка валидации
+        if (data && data.message) {
+          ElMessage.error(data.message)
+        } else {
+          ElMessage.error('Ошибка валидации данных')
+        }
+      } else if (status >= 500) {
+        // Ошибка сервера
+        ElMessage.error('Ошибка сервера. Попробуйте позже')
+      } else {
+        // Другие ошибки
+        ElMessage.error('Произошла ошибка. Попробуйте снова')
+      }
+    } else if (error.request) {
+      // Ошибка сети
+      ElMessage.error('Ошибка сети. Проверьте подключение к интернету')
+    } else {
+      // Другие ошибки
+      ElMessage.error('Произошла ошибка. Попробуйте снова')
+    }
   } finally {
     loading.value = false
   }

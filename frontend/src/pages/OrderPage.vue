@@ -6,6 +6,7 @@ import { getApiUrl, API_CONFIG } from '../config/api'
 import FormInput from '../components/UI/FormInput.vue'
 import buttonCart from '../components/UI/buttonCart.vue'
 import axios from 'axios'
+import { ElMessage } from 'element-plus'
 
 const orderStore = useOrderStore()
 const cartStore = useCartStore()
@@ -108,7 +109,7 @@ const submitForm = async () => {
 
   } catch (error) {
     console.error('Ошибка при создании заказа:', error);
-    alert('Ошибка при оформлении заказа! Попробуйте еще раз.');
+    ElMessage.error('Ошибка при оформлении заказа! Попробуйте еще раз.');
   } finally {
     isLoading.value = false;
   }
